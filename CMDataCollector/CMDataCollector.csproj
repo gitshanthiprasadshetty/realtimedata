@@ -1,0 +1,171 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>8.0.30703</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{77B09680-966C-4EE3-9D5C-C9C99E23B22A}</ProjectGuid>
+    <ProjectTypeGuids>{3D9AD99F-2412-4246-B90B-4EAA41C64699};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>CMDataCollector</RootNamespace>
+    <AssemblyName>CMDataCollector</AssemblyName>
+    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <TargetFrameworkProfile />
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup>
+    <StartupObject />
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="AMACWeb_Proxy, Version=2.0.12.1, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\BcmsSIPManager\lib\27072017\AMACWeb_Proxy.exe</HintPath>
+    </Reference>
+    <Reference Include="AutoMapper">
+      <HintPath>lib\AutoMapper.dll</HintPath>
+    </Reference>
+    <Reference Include="ConfigurationProvider, Version=1.2.2.6, Culture=neutral, processorArchitecture=x86">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>lib\ConfigurationProvider.dll</HintPath>
+    </Reference>
+    <Reference Include="Connector">
+      <HintPath>..\Connector\bin\Debug\Connector.dll</HintPath>
+    </Reference>
+    <Reference Include="log4net">
+      <HintPath>..\BcmsSIPManager\bin\Debug\log4net.dll</HintPath>
+    </Reference>
+    <Reference Include="Logger, Version=1.2.2.6, Culture=neutral, processorArchitecture=x86">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>lib\Logger.dll</HintPath>
+    </Reference>
+    <Reference Include="Newtonsoft.Json, Version=10.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.10.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Renci.SshNet">
+      <HintPath>lib\Renci.SshNet.dll</HintPath>
+    </Reference>
+    <Reference Include="SIPDataCollector">
+      <HintPath>..\SIPDataCollector\bin\Debug\SIPDataCollector.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Configuration" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Runtime.Serialization" />
+    <Reference Include="System.ServiceModel" />
+    <Reference Include="System.Web.Extensions" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="BcmsCommandType\Skill.cs" />
+    <Compile Include="BcmsCommandType\System.cs" />
+    <Compile Include="BcmsCommandType\Trunk.cs" />
+    <Compile Include="CMDataService.cs" />
+    <Compile Include="Connection\CMCommandState.cs" />
+    <Compile Include="Connection\CMConnection.cs" />
+    <Compile Include="Connection\ConnectionEstablishedState.cs" />
+    <Compile Include="Connection\ConnectionNotEstablishedState.cs" />
+    <Compile Include="Connection\ConnectionState.cs" />
+    <Compile Include="Connection\ConnectionTerminalType.cs" />
+    <Compile Include="Models\BcmsSystem.cs" />
+    <Compile Include="Service References\THistoricalData\Reference.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </Compile>
+    <Compile Include="Utilities\ConfigSection.cs" />
+    <Compile Include="Utilities\ConfigurationData.cs" />
+    <Compile Include="CMConnectionManager.cs" />
+    <Compile Include="BCMSDashboardManager.cs" />
+    <Compile Include="IRealtimeDataService.cs" />
+    <Compile Include="Models\AgentData.cs" />
+    <Compile Include="Models\BcmsDashboard.cs" />
+    <Compile Include="Models\BcmsDataForSIP.cs" />
+    <Compile Include="Models\BcmsHistoricalReport.cs" />
+    <Compile Include="DataParser\BcmsMonitor.cs" />
+    <Compile Include="Models\CMData.cs" />
+    <Compile Include="Models\TrunkGroupTraffic.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Connection\SshConnect.cs" />
+    <Compile Include="Utilities\CacheMemory.cs" />
+    <Compile Include="DataParser\Utils.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="App.config" />
+    <None Include="packages.config" />
+    <None Include="Service References\THistoricalData\CMDataCollector.THistoricalData.SkillData.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\THistoricalData\service.wsdl" />
+    <None Include="Service References\THistoricalData\service.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Service References\THistoricalData\service1.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Service References\THistoricalData\THistoricalData.Lib.Model.xsd">
+      <SubType>Designer</SubType>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <WCFMetadata Include="Service References\" />
+  </ItemGroup>
+  <ItemGroup>
+    <WCFMetadataStorage Include="Service References\THistoricalData\" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Service References\THistoricalData\configuration91.svcinfo" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Service References\THistoricalData\configuration.svcinfo" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Service References\THistoricalData\Reference.svcmap">
+      <Generator>WCF Proxy Generator</Generator>
+      <LastGenOutput>Reference.cs</LastGenOutput>
+    </None>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <ProjectExtensions>
+    <VisualStudio>
+      <FlavorProperties GUID="{3D9AD99F-2412-4246-B90B-4EAA41C64699}">
+        <WcfProjectProperties>
+          <AutoStart>False</AutoStart>
+        </WcfProjectProperties>
+      </FlavorProperties>
+    </VisualStudio>
+  </ProjectExtensions>
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

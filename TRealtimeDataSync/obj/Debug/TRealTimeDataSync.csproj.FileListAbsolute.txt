@@ -1,0 +1,10 @@
+D:\Projects\Tetherfi\TRealtimeData\TRealtimeDataSync\bin\Debug\TRealTimeDataSync.dll.config
+D:\Projects\Tetherfi\TRealtimeData\TRealtimeDataSync\bin\Debug\TRealTimeDataSync.dll
+D:\Projects\Tetherfi\TRealtimeData\TRealtimeDataSync\bin\Debug\TRealTimeDataSync.pdb
+D:\Projects\Tetherfi\TRealtimeData\TRealtimeDataSync\bin\Debug\Logger.dll
+D:\Projects\Tetherfi\TRealtimeData\TRealtimeDataSync\bin\Debug\ConfigurationProvider.dll
+D:\Projects\Tetherfi\TRealtimeData\TRealtimeDataSync\obj\Debug\TRealTimeDataSync.csprojResolveAssemblyReference.cache
+D:\Projects\Tetherfi\TRealtimeData\TRealtimeDataSync\obj\Debug\TRealTimeDataSync.csproj.CoreCompileInputs.cache
+D:\Projects\Tetherfi\TRealtimeData\TRealtimeDataSync\obj\Debug\TRealTimeDataSync.csproj.CopyComplete
+D:\Projects\Tetherfi\TRealtimeData\TRealtimeDataSync\obj\Debug\TRealTimeDataSync.dll
+D:\Projects\Tetherfi\TRealtimeData\TRealtimeDataSync\obj\Debug\TRealTimeDataSync.pdb

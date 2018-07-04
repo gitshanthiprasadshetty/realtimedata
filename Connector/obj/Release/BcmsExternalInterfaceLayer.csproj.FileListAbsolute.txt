@@ -1,0 +1,12 @@
+D:\Projects\Tetherfi\Bcms.Realtime\BcmsExternalInterfaceLayer\bin\Release\BcmsExternalInterfaceLayer.dll.config
+D:\Projects\Tetherfi\Bcms.Realtime\BcmsExternalInterfaceLayer\bin\Release\BcmsExternalInterfaceLayer.dll
+D:\Projects\Tetherfi\Bcms.Realtime\BcmsExternalInterfaceLayer\bin\Release\BcmsExternalInterfaceLayer.pdb
+D:\Projects\Tetherfi\Bcms.Realtime\BcmsExternalInterfaceLayer\bin\Release\log4net.dll
+D:\Projects\Tetherfi\Bcms.Realtime\BcmsExternalInterfaceLayer\bin\Release\Logger.dll
+D:\Projects\Tetherfi\Bcms.Realtime\BcmsExternalInterfaceLayer\bin\Release\Newtonsoft.Json.dll
+D:\Projects\Tetherfi\Bcms.Realtime\BcmsExternalInterfaceLayer\bin\Release\Newtonsoft.Json.xml
+D:\Projects\Tetherfi\Bcms.Realtime\BcmsExternalInterfaceLayer\obj\Release\BcmsExternalInterfaceLayer.csprojResolveAssemblyReference.cache
+D:\Projects\Tetherfi\Bcms.Realtime\BcmsExternalInterfaceLayer\obj\Release\BcmsExternalInterfaceLayer.csproj.CoreCompileInputs.cache
+D:\Projects\Tetherfi\Bcms.Realtime\BcmsExternalInterfaceLayer\obj\Release\BcmsExternalInterfaceLayer.csproj.CopyComplete
+D:\Projects\Tetherfi\Bcms.Realtime\BcmsExternalInterfaceLayer\obj\Release\BcmsExternalInterfaceLayer.dll
+D:\Projects\Tetherfi\Bcms.Realtime\BcmsExternalInterfaceLayer\obj\Release\BcmsExternalInterfaceLayer.pdb

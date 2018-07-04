@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ReferenceGroup xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" ID="6a75d980-dfcb-4f55-8791-81dc40f34b2a" xmlns="urn:schemas-microsoft-com:xml-wcfservicemap">
+  <ClientOptions>
+    <GenerateAsynchronousMethods>false</GenerateAsynchronousMethods>
+    <GenerateTaskBasedAsynchronousMethod>true</GenerateTaskBasedAsynchronousMethod>
+    <EnableDataBinding>true</EnableDataBinding>
+    <ExcludedTypes />
+    <ImportXmlTypes>false</ImportXmlTypes>
+    <GenerateInternalTypes>false</GenerateInternalTypes>
+    <GenerateMessageContracts>false</GenerateMessageContracts>
+    <NamespaceMappings />
+    <CollectionMappings />
+    <GenerateSerializableTypes>true</GenerateSerializableTypes>
+    <Serializer>Auto</Serializer>
+    <UseSerializerForFaults>true</UseSerializerForFaults>
+    <ReferenceAllAssemblies>true</ReferenceAllAssemblies>
+    <ReferencedAssemblies />
+    <ReferencedDataContractTypes />
+    <ServiceContractMappings />
+  </ClientOptions>
+  <MetadataSources>
+    <MetadataSource Address="http://10.133.146.4:55000/WorkQueue/mex" Protocol="mex" SourceId="1" />
+  </MetadataSources>
+  <Metadata>
+    <MetadataFile FileName="service.wsdl" MetadataType="Wsdl" ID="c980a8c1-7c77-40aa-9783-4ddf98371934" SourceId="1" SourceUrl="http://10.133.146.4:55000/WorkQueue/mex" />
+    <MetadataFile FileName="service.xsd" MetadataType="Schema" ID="797e72b7-4b96-4e2c-bf6c-5d01c9f8e3f6" SourceId="1" SourceUrl="http://10.133.146.4:55000/WorkQueue/mex" />
+    <MetadataFile FileName="service1.xsd" MetadataType="Schema" ID="c8507e97-8656-4a77-9e7d-243f6bfd88f2" SourceId="1" SourceUrl="http://10.133.146.4:55000/WorkQueue/mex" />
+    <MetadataFile FileName="TetherfiWorkAssignment.xsd" MetadataType="Schema" ID="8a00d61f-7db2-40e6-a374-51a3e271ac51" SourceId="1" SourceUrl="http://10.133.146.4:55000/WorkQueue/mex" />
+    <MetadataFile FileName="Arrays.xsd" MetadataType="Schema" ID="b910fda5-a643-478c-a73e-73590e46ae33" SourceId="1" SourceUrl="http://10.133.146.4:55000/WorkQueue/mex" />
+  </Metadata>
+  <Extensions>
+    <ExtensionFile FileName="configuration91.svcinfo" Name="configuration91.svcinfo" />
+    <ExtensionFile FileName="configuration.svcinfo" Name="configuration.svcinfo" />
+  </Extensions>
+</ReferenceGroup>

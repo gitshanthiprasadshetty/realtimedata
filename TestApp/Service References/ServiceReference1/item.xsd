@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xs:schema xmlns:tns="http://schemas.datacontract.org/2004/07/CMDataCollector.Models" elementFormDefault="qualified" targetNamespace="http://schemas.datacontract.org/2004/07/CMDataCollector.Models" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:complexType name="ArrayOfBcmsDashboard">
+    <xs:sequence>
+      <xs:element minOccurs="0" maxOccurs="unbounded" name="BcmsDashboard" nillable="true" type="tns:BcmsDashboard" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="ArrayOfBcmsDashboard" nillable="true" type="tns:ArrayOfBcmsDashboard" />
+  <xs:complexType name="BcmsDashboard">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="ACD" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="ACW" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="AUX" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="AbandCalls" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="AccptedSL" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="Avail" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="AvgAbandTime" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="CallsWaiting" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="Date" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="Extn" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="OldestCall" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="Other" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="SL" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="Skill" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="SkillName" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="Staff" nillable="true" type="xs:string" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="BcmsDashboard" nillable="true" type="tns:BcmsDashboard" />
+</xs:schema>

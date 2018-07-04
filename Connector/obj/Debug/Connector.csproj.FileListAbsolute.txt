@@ -1,0 +1,10 @@
+D:\Projects\Tetherfi\TRealtimeData\Connector\bin\Debug\Connector.dll.config
+D:\Projects\Tetherfi\TRealtimeData\Connector\bin\Debug\Connector.dll
+D:\Projects\Tetherfi\TRealtimeData\Connector\bin\Debug\Connector.pdb
+D:\Projects\Tetherfi\TRealtimeData\Connector\bin\Debug\log4net.dll
+D:\Projects\Tetherfi\TRealtimeData\Connector\bin\Debug\Logger.dll
+D:\Projects\Tetherfi\TRealtimeData\Connector\obj\Debug\Connector.csprojResolveAssemblyReference.cache
+D:\Projects\Tetherfi\TRealtimeData\Connector\obj\Debug\Connector.csproj.CoreCompileInputs.cache
+D:\Projects\Tetherfi\TRealtimeData\Connector\obj\Debug\Connector.csproj.CopyComplete
+D:\Projects\Tetherfi\TRealtimeData\Connector\obj\Debug\Connector.dll
+D:\Projects\Tetherfi\TRealtimeData\Connector\obj\Debug\Connector.pdb

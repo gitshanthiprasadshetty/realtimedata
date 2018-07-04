@@ -1,0 +1,458 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<wsdl:definitions xmlns:wsap="http://schemas.xmlsoap.org/ws/2004/08/addressing/policy" xmlns:wsa10="http://www.w3.org/2005/08/addressing" xmlns:tns="http://tempuri.org/" xmlns:msc="http://schemas.microsoft.com/ws/2005/12/wsdl/contract" xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:wsp="http://schemas.xmlsoap.org/ws/2004/09/policy" xmlns:wsam="http://www.w3.org/2007/05/addressing/metadata" xmlns:wsa="http://schemas.xmlsoap.org/ws/2004/08/addressing" xmlns:wsaw="http://www.w3.org/2006/05/addressing/wsdl" xmlns:soap12="http://schemas.xmlsoap.org/wsdl/soap12/" xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd" xmlns:xsd="http://www.w3.org/2001/XMLSchema" name="WorkQueueService" targetNamespace="http://tempuri.org/" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
+  <wsdl:types>
+    <xsd:schema targetNamespace="http://tempuri.org/Imports">
+      <xsd:import namespace="http://tempuri.org/" />
+      <xsd:import namespace="http://schemas.microsoft.com/2003/10/Serialization/" />
+      <xsd:import namespace="http://schemas.datacontract.org/2004/07/TetherfiWorkAssignment" />
+      <xsd:import namespace="http://schemas.microsoft.com/2003/10/Serialization/Arrays" />
+    </xsd:schema>
+  </wsdl:types>
+  <wsdl:message name="IService_AddWorkItem_InputMessage">
+    <wsdl:part name="parameters" element="tns:AddWorkItem" />
+  </wsdl:message>
+  <wsdl:message name="IService_AddWorkItem_OutputMessage">
+    <wsdl:part name="parameters" element="tns:AddWorkItemResponse" />
+  </wsdl:message>
+  <wsdl:message name="IService_AddWorkItemSync_InputMessage">
+    <wsdl:part name="parameters" element="tns:AddWorkItemSync" />
+  </wsdl:message>
+  <wsdl:message name="IService_AddWorkItemSync_OutputMessage">
+    <wsdl:part name="parameters" element="tns:AddWorkItemSyncResponse" />
+  </wsdl:message>
+  <wsdl:message name="IService_RemoveWorkItemSync_InputMessage">
+    <wsdl:part name="parameters" element="tns:RemoveWorkItemSync" />
+  </wsdl:message>
+  <wsdl:message name="IService_RemoveWorkItemSync_OutputMessage">
+    <wsdl:part name="parameters" element="tns:RemoveWorkItemSyncResponse" />
+  </wsdl:message>
+  <wsdl:message name="IService_UpdateWorkItemStatusSync_InputMessage">
+    <wsdl:part name="parameters" element="tns:UpdateWorkItemStatusSync" />
+  </wsdl:message>
+  <wsdl:message name="IService_UpdateWorkItemStatusSync_OutputMessage">
+    <wsdl:part name="parameters" element="tns:UpdateWorkItemStatusSyncResponse" />
+  </wsdl:message>
+  <wsdl:message name="IService_RemoveWorkItemByItemIDAndChannel_InputMessage">
+    <wsdl:part name="parameters" element="tns:RemoveWorkItemByItemIDAndChannel" />
+  </wsdl:message>
+  <wsdl:message name="IService_RemoveWorkItemByItemIDAndChannel_OutputMessage">
+    <wsdl:part name="parameters" element="tns:RemoveWorkItemByItemIDAndChannelResponse" />
+  </wsdl:message>
+  <wsdl:message name="IService_RemoveWorkItemByKey_InputMessage">
+    <wsdl:part name="parameters" element="tns:RemoveWorkItemByKey" />
+  </wsdl:message>
+  <wsdl:message name="IService_RemoveWorkItemByKey_OutputMessage">
+    <wsdl:part name="parameters" element="tns:RemoveWorkItemByKeyResponse" />
+  </wsdl:message>
+  <wsdl:message name="IService_GetWorkItem_InputMessage">
+    <wsdl:part name="parameters" element="tns:GetWorkItem" />
+  </wsdl:message>
+  <wsdl:message name="IService_GetWorkItem_OutputMessage">
+    <wsdl:part name="parameters" element="tns:GetWorkItemResponse" />
+  </wsdl:message>
+  <wsdl:message name="IService_ReloadEmailQueue_InputMessage">
+    <wsdl:part name="parameters" element="tns:ReloadEmailQueue" />
+  </wsdl:message>
+  <wsdl:message name="IService_ReloadEmailQueue_OutputMessage">
+    <wsdl:part name="parameters" element="tns:ReloadEmailQueueResponse" />
+  </wsdl:message>
+  <wsdl:message name="IService_ReloadQueue_InputMessage">
+    <wsdl:part name="parameters" element="tns:ReloadQueue" />
+  </wsdl:message>
+  <wsdl:message name="IService_ReloadQueue_OutputMessage">
+    <wsdl:part name="parameters" element="tns:ReloadQueueResponse" />
+  </wsdl:message>
+  <wsdl:message name="IService_ClearQueue_InputMessage">
+    <wsdl:part name="parameters" element="tns:ClearQueue" />
+  </wsdl:message>
+  <wsdl:message name="IService_ClearQueue_OutputMessage">
+    <wsdl:part name="parameters" element="tns:ClearQueueResponse" />
+  </wsdl:message>
+  <wsdl:message name="IService_ClearAllQueue_InputMessage">
+    <wsdl:part name="parameters" element="tns:ClearAllQueue" />
+  </wsdl:message>
+  <wsdl:message name="IService_ClearAllQueue_OutputMessage">
+    <wsdl:part name="parameters" element="tns:ClearAllQueueResponse" />
+  </wsdl:message>
+  <wsdl:message name="IService_GetQueueDetails_InputMessage">
+    <wsdl:part name="parameters" element="tns:GetQueueDetails" />
+  </wsdl:message>
+  <wsdl:message name="IService_GetQueueDetails_OutputMessage">
+    <wsdl:part name="parameters" element="tns:GetQueueDetailsResponse" />
+  </wsdl:message>
+  <wsdl:message name="IService_GetQueueCount_InputMessage">
+    <wsdl:part name="parameters" element="tns:GetQueueCount" />
+  </wsdl:message>
+  <wsdl:message name="IService_GetQueueCount_OutputMessage">
+    <wsdl:part name="parameters" element="tns:GetQueueCountResponse" />
+  </wsdl:message>
+  <wsdl:message name="IService_PullWorkItemForAgentByChannelAndItemID_InputMessage">
+    <wsdl:part name="parameters" element="tns:PullWorkItemForAgentByChannelAndItemID" />
+  </wsdl:message>
+  <wsdl:message name="IService_PullWorkItemForAgentByChannelAndItemID_OutputMessage">
+    <wsdl:part name="parameters" element="tns:PullWorkItemForAgentByChannelAndItemIDResponse" />
+  </wsdl:message>
+  <wsdl:message name="IService_PullWorkItemForAgentByGlobalKey_InputMessage">
+    <wsdl:part name="parameters" element="tns:PullWorkItemForAgentByGlobalKey" />
+  </wsdl:message>
+  <wsdl:message name="IService_PullWorkItemForAgentByGlobalKey_OutputMessage">
+    <wsdl:part name="parameters" element="tns:PullWorkItemForAgentByGlobalKeyResponse" />
+  </wsdl:message>
+  <wsdl:message name="IService_GetWorkItems_InputMessage">
+    <wsdl:part name="parameters" element="tns:GetWorkItems" />
+  </wsdl:message>
+  <wsdl:message name="IService_GetWorkItems_OutputMessage">
+    <wsdl:part name="parameters" element="tns:GetWorkItemsResponse" />
+  </wsdl:message>
+  <wsdl:message name="IService_GetWorkItemsBySubChannel_InputMessage">
+    <wsdl:part name="parameters" element="tns:GetWorkItemsBySubChannel" />
+  </wsdl:message>
+  <wsdl:message name="IService_GetWorkItemsBySubChannel_OutputMessage">
+    <wsdl:part name="parameters" element="tns:GetWorkItemsBySubChannelResponse" />
+  </wsdl:message>
+  <wsdl:message name="IService_PullWorkItemsForAgentByChannelAndCustomerId_InputMessage">
+    <wsdl:part name="parameters" element="tns:PullWorkItemsForAgentByChannelAndCustomerId" />
+  </wsdl:message>
+  <wsdl:message name="IService_PullWorkItemsForAgentByChannelAndCustomerId_OutputMessage">
+    <wsdl:part name="parameters" element="tns:PullWorkItemsForAgentByChannelAndCustomerIdResponse" />
+  </wsdl:message>
+  <wsdl:message name="IService_AddWorkItemWithCustomerIdentifier_InputMessage">
+    <wsdl:part name="parameters" element="tns:AddWorkItemWithCustomerIdentifier" />
+  </wsdl:message>
+  <wsdl:message name="IService_AddWorkItemWithCustomerIdentifier_OutputMessage">
+    <wsdl:part name="parameters" element="tns:AddWorkItemWithCustomerIdentifierResponse" />
+  </wsdl:message>
+  <wsdl:message name="IService_PullWorkItemsForAgent_InputMessage">
+    <wsdl:part name="parameters" element="tns:PullWorkItemsForAgent" />
+  </wsdl:message>
+  <wsdl:message name="IService_PullWorkItemsForAgent_OutputMessage">
+    <wsdl:part name="parameters" element="tns:PullWorkItemsForAgentResponse" />
+  </wsdl:message>
+  <wsdl:message name="IService_SearchWorkItems_InputMessage">
+    <wsdl:part name="parameters" element="tns:SearchWorkItems" />
+  </wsdl:message>
+  <wsdl:message name="IService_SearchWorkItems_OutputMessage">
+    <wsdl:part name="parameters" element="tns:SearchWorkItemsResponse" />
+  </wsdl:message>
+  <wsdl:message name="IService_SetWorkItemAssignedToAgent_InputMessage">
+    <wsdl:part name="parameters" element="tns:SetWorkItemAssignedToAgent" />
+  </wsdl:message>
+  <wsdl:message name="IService_SetWorkItemAssignedToAgent_OutputMessage">
+    <wsdl:part name="parameters" element="tns:SetWorkItemAssignedToAgentResponse" />
+  </wsdl:message>
+  <wsdl:message name="IService_UpdateWorkItemStatus_InputMessage">
+    <wsdl:part name="parameters" element="tns:UpdateWorkItemStatus" />
+  </wsdl:message>
+  <wsdl:message name="IService_UpdateWorkItemStatus_OutputMessage">
+    <wsdl:part name="parameters" element="tns:UpdateWorkItemStatusResponse" />
+  </wsdl:message>
+  <wsdl:portType name="IService">
+    <wsdl:operation name="AddWorkItem">
+      <wsdl:input wsaw:Action="http://tempuri.org/IService/AddWorkItem" message="tns:IService_AddWorkItem_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/IService/AddWorkItemResponse" message="tns:IService_AddWorkItem_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="AddWorkItemSync">
+      <wsdl:input wsaw:Action="http://tempuri.org/IService/AddWorkItemSync" message="tns:IService_AddWorkItemSync_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/IService/AddWorkItemSyncResponse" message="tns:IService_AddWorkItemSync_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="RemoveWorkItemSync">
+      <wsdl:input wsaw:Action="http://tempuri.org/IService/RemoveWorkItemSync" message="tns:IService_RemoveWorkItemSync_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/IService/RemoveWorkItemSyncResponse" message="tns:IService_RemoveWorkItemSync_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="UpdateWorkItemStatusSync">
+      <wsdl:input wsaw:Action="http://tempuri.org/IService/UpdateWorkItemStatusSync" message="tns:IService_UpdateWorkItemStatusSync_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/IService/UpdateWorkItemStatusSyncResponse" message="tns:IService_UpdateWorkItemStatusSync_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="RemoveWorkItemByItemIDAndChannel">
+      <wsdl:input wsaw:Action="http://tempuri.org/IService/RemoveWorkItemByItemIDAndChannel" message="tns:IService_RemoveWorkItemByItemIDAndChannel_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/IService/RemoveWorkItemByItemIDAndChannelResponse" message="tns:IService_RemoveWorkItemByItemIDAndChannel_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="RemoveWorkItemByKey">
+      <wsdl:input wsaw:Action="http://tempuri.org/IService/RemoveWorkItemByKey" message="tns:IService_RemoveWorkItemByKey_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/IService/RemoveWorkItemByKeyResponse" message="tns:IService_RemoveWorkItemByKey_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="GetWorkItem">
+      <wsdl:input wsaw:Action="http://tempuri.org/IService/GetWorkItem" message="tns:IService_GetWorkItem_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/IService/GetWorkItemResponse" message="tns:IService_GetWorkItem_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="ReloadEmailQueue">
+      <wsdl:input wsaw:Action="http://tempuri.org/IService/ReloadEmailQueue" message="tns:IService_ReloadEmailQueue_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/IService/ReloadEmailQueueResponse" message="tns:IService_ReloadEmailQueue_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="ReloadQueue">
+      <wsdl:input wsaw:Action="http://tempuri.org/IService/ReloadQueue" message="tns:IService_ReloadQueue_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/IService/ReloadQueueResponse" message="tns:IService_ReloadQueue_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="ClearQueue">
+      <wsdl:input wsaw:Action="http://tempuri.org/IService/ClearQueue" message="tns:IService_ClearQueue_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/IService/ClearQueueResponse" message="tns:IService_ClearQueue_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="ClearAllQueue">
+      <wsdl:input wsaw:Action="http://tempuri.org/IService/ClearAllQueue" message="tns:IService_ClearAllQueue_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/IService/ClearAllQueueResponse" message="tns:IService_ClearAllQueue_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="GetQueueDetails">
+      <wsdl:input wsaw:Action="http://tempuri.org/IService/GetQueueDetails" message="tns:IService_GetQueueDetails_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/IService/GetQueueDetailsResponse" message="tns:IService_GetQueueDetails_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="GetQueueCount">
+      <wsdl:input wsaw:Action="http://tempuri.org/IService/GetQueueCount" message="tns:IService_GetQueueCount_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/IService/GetQueueCountResponse" message="tns:IService_GetQueueCount_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="PullWorkItemForAgentByChannelAndItemID">
+      <wsdl:input wsaw:Action="http://tempuri.org/IService/PullWorkItemForAgentByChannelAndItemID" message="tns:IService_PullWorkItemForAgentByChannelAndItemID_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/IService/PullWorkItemForAgentByChannelAndItemIDResponse" message="tns:IService_PullWorkItemForAgentByChannelAndItemID_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="PullWorkItemForAgentByGlobalKey">
+      <wsdl:input wsaw:Action="http://tempuri.org/IService/PullWorkItemForAgentByGlobalKey" message="tns:IService_PullWorkItemForAgentByGlobalKey_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/IService/PullWorkItemForAgentByGlobalKeyResponse" message="tns:IService_PullWorkItemForAgentByGlobalKey_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="GetWorkItems">
+      <wsdl:input wsaw:Action="http://tempuri.org/IService/GetWorkItems" message="tns:IService_GetWorkItems_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/IService/GetWorkItemsResponse" message="tns:IService_GetWorkItems_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="GetWorkItemsBySubChannel">
+      <wsdl:input wsaw:Action="http://tempuri.org/IService/GetWorkItemsBySubChannel" message="tns:IService_GetWorkItemsBySubChannel_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/IService/GetWorkItemsBySubChannelResponse" message="tns:IService_GetWorkItemsBySubChannel_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="PullWorkItemsForAgentByChannelAndCustomerId">
+      <wsdl:input wsaw:Action="http://tempuri.org/IService/PullWorkItemsForAgentByChannelAndCustomerId" message="tns:IService_PullWorkItemsForAgentByChannelAndCustomerId_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/IService/PullWorkItemsForAgentByChannelAndCustomerIdResponse" message="tns:IService_PullWorkItemsForAgentByChannelAndCustomerId_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="AddWorkItemWithCustomerIdentifier">
+      <wsdl:input wsaw:Action="http://tempuri.org/IService/AddWorkItemWithCustomerIdentifier" message="tns:IService_AddWorkItemWithCustomerIdentifier_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/IService/AddWorkItemWithCustomerIdentifierResponse" message="tns:IService_AddWorkItemWithCustomerIdentifier_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="PullWorkItemsForAgent">
+      <wsdl:input wsaw:Action="http://tempuri.org/IService/PullWorkItemsForAgent" message="tns:IService_PullWorkItemsForAgent_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/IService/PullWorkItemsForAgentResponse" message="tns:IService_PullWorkItemsForAgent_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="SearchWorkItems">
+      <wsdl:input wsaw:Action="http://tempuri.org/IService/SearchWorkItems" message="tns:IService_SearchWorkItems_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/IService/SearchWorkItemsResponse" message="tns:IService_SearchWorkItems_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="SetWorkItemAssignedToAgent">
+      <wsdl:input wsaw:Action="http://tempuri.org/IService/SetWorkItemAssignedToAgent" message="tns:IService_SetWorkItemAssignedToAgent_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/IService/SetWorkItemAssignedToAgentResponse" message="tns:IService_SetWorkItemAssignedToAgent_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="UpdateWorkItemStatus">
+      <wsdl:input wsaw:Action="http://tempuri.org/IService/UpdateWorkItemStatus" message="tns:IService_UpdateWorkItemStatus_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/IService/UpdateWorkItemStatusResponse" message="tns:IService_UpdateWorkItemStatus_OutputMessage" />
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:binding name="BasicHttpBinding_IService" type="tns:IService">
+    <soap:binding transport="http://schemas.xmlsoap.org/soap/http" />
+    <wsdl:operation name="AddWorkItem">
+      <soap:operation soapAction="http://tempuri.org/IService/AddWorkItem" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="AddWorkItemSync">
+      <soap:operation soapAction="http://tempuri.org/IService/AddWorkItemSync" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="RemoveWorkItemSync">
+      <soap:operation soapAction="http://tempuri.org/IService/RemoveWorkItemSync" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="UpdateWorkItemStatusSync">
+      <soap:operation soapAction="http://tempuri.org/IService/UpdateWorkItemStatusSync" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="RemoveWorkItemByItemIDAndChannel">
+      <soap:operation soapAction="http://tempuri.org/IService/RemoveWorkItemByItemIDAndChannel" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="RemoveWorkItemByKey">
+      <soap:operation soapAction="http://tempuri.org/IService/RemoveWorkItemByKey" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetWorkItem">
+      <soap:operation soapAction="http://tempuri.org/IService/GetWorkItem" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="ReloadEmailQueue">
+      <soap:operation soapAction="http://tempuri.org/IService/ReloadEmailQueue" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="ReloadQueue">
+      <soap:operation soapAction="http://tempuri.org/IService/ReloadQueue" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="ClearQueue">
+      <soap:operation soapAction="http://tempuri.org/IService/ClearQueue" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="ClearAllQueue">
+      <soap:operation soapAction="http://tempuri.org/IService/ClearAllQueue" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetQueueDetails">
+      <soap:operation soapAction="http://tempuri.org/IService/GetQueueDetails" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetQueueCount">
+      <soap:operation soapAction="http://tempuri.org/IService/GetQueueCount" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="PullWorkItemForAgentByChannelAndItemID">
+      <soap:operation soapAction="http://tempuri.org/IService/PullWorkItemForAgentByChannelAndItemID" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="PullWorkItemForAgentByGlobalKey">
+      <soap:operation soapAction="http://tempuri.org/IService/PullWorkItemForAgentByGlobalKey" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetWorkItems">
+      <soap:operation soapAction="http://tempuri.org/IService/GetWorkItems" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetWorkItemsBySubChannel">
+      <soap:operation soapAction="http://tempuri.org/IService/GetWorkItemsBySubChannel" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="PullWorkItemsForAgentByChannelAndCustomerId">
+      <soap:operation soapAction="http://tempuri.org/IService/PullWorkItemsForAgentByChannelAndCustomerId" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="AddWorkItemWithCustomerIdentifier">
+      <soap:operation soapAction="http://tempuri.org/IService/AddWorkItemWithCustomerIdentifier" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="PullWorkItemsForAgent">
+      <soap:operation soapAction="http://tempuri.org/IService/PullWorkItemsForAgent" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="SearchWorkItems">
+      <soap:operation soapAction="http://tempuri.org/IService/SearchWorkItems" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="SetWorkItemAssignedToAgent">
+      <soap:operation soapAction="http://tempuri.org/IService/SetWorkItemAssignedToAgent" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="UpdateWorkItemStatus">
+      <soap:operation soapAction="http://tempuri.org/IService/UpdateWorkItemStatus" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:service name="WorkQueueService">
+    <wsdl:port name="BasicHttpBinding_IService" binding="tns:BasicHttpBinding_IService">
+      <soap:address location="http://10.133.5.184:55000/WorkQueue/" />
+    </wsdl:port>
+  </wsdl:service>
+</wsdl:definitions>
