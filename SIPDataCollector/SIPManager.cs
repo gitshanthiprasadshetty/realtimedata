@@ -521,7 +521,8 @@ namespace SIPDataCollector
                             if (queue.TryDequeue(out string skillExtn))
                             {
                                 Log.Debug("skillExtn is = " + skillExtn);
-                                var dbData = DataAccess.GetHistoricalData(skillExtn);
+                                string skillId = _skillExtnInfo[skillExtn].SkillId ?? string.Empty;
+                                var dbData = DataAccess.GetHistoricalData(skillExtn, skillId);
                                 if (dbData != null)
                                 {
                                     Log.Debug("Received historical data");

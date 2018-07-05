@@ -73,7 +73,7 @@ namespace SIPDataCollector.Utilities
             return 0;
         }
 
-        public static SkillData GetHistoricalData(string skillExtn)
+        public static SkillData GetHistoricalData(string skillExtn, string skillId)
         {
             Log.Debug("GetHistoricalData() : " + skillExtn);
             try
@@ -84,7 +84,17 @@ namespace SIPDataCollector.Utilities
                 string startTime = "000000";
                 string endTime = DateTime.Now.TimeOfDay.ToString("hhmmss");
                 string type = "skill";
-                string sql = @"EXEC [GET_HistoricalData] '" + DateTime.Now.Date.ToString("yyyyMMdd") + "'" + ',' + "'" + startTime + "'" + ',' + "'" + endTime + "'" + ',' + "'" + skillExtn + "'" + ',' + "'" + type + "'" + ',' + "'" + ConfigurationData.acceptableSL + "'";
+                int accSlLevl;
+                try
+                {
+                    accSlLevl = ConfigurationData.acceptableSlObj.FirstOrDefault(x => x.Key == skillId).Value;
+                }
+                catch (Exception ex)
+                {
+                    Log.Error("Error while reading acceptable sl level : ", ex);
+                    accSlLevl = ConfigurationData.acceptableSL;
+                }
+                string sql = @"EXEC [GET_HistoricalData] '" + DateTime.Now.Date.ToString("yyyyMMdd") + "'" + ',' + "'" + startTime + "'" + ',' + "'" + endTime + "'" + ',' + "'" + skillExtn + "'" + ',' + "'" + type + "'" + ',' + "'" + accSlLevl + "'";
                 Log.Debug("SQL Query : " + sql);
                 DataTable dsusers = SqlDataAccess.ExecuteDataTable(sql, ConfigurationData.ConntnString);
                 if (dsusers != null)
@@ -204,9 +214,35 @@ namespace SIPDataCollector.Utilities
             return null;
         }
 
+        public static Dictionary<string, int> GetAcceptableLevels()
+        {
+            try
+            {
+                string[] auxCodes = new string[] { };
+                string sql = @"select distinct SkillID, AcceptableServiceLevel from TMAC_Skills";
+                DataTable dataTable = SqlDataAccess.ExecuteDataTable(sql, ConfigurationData.ConntnString);
+                if (dataTable != null)
+                {
+                    Dictionary<string, int> result = new Dictionary<string, int>();
+                    foreach (DataRow item in dataTable.Rows)
+                    {
+                        string skillId = Convert.ToString(item["SkillID"]);
+                        int accSlLevl = Convert.ToInt32(item["AcceptableServiceLevel"]);
+                        result.Add(skillId, accSlLevl);
+                    }
+                    return result;
+                }
+            }
+            catch (Exception ex)
+            {
+                Log.Error("Error in GetAcceptableLevels : " + ex);
+            }
+            return null;
+        }
+
         #region for bcms summary data
 
-        public  void SummaryData(BcmsDataForSIP summarydata)
+        public void SummaryData(BcmsDataForSIP summarydata)
         {
             try
             {

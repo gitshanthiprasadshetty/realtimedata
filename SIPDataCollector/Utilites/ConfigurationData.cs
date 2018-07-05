@@ -39,6 +39,8 @@ namespace SIPDataCollector.Utilites
 
         internal static List<string> auxCodes;
 
+        internal static  Dictionary<string, int> acceptableSlObj = new Dictionary<string, int>();
+
         internal static int acceptableSL;
 
         /// <summary>
@@ -58,6 +60,7 @@ namespace SIPDataCollector.Utilites
                 DashboardRefreshTime = Convert.ToInt32(ConfigurationSettings.AppSettings["DashboardRefreshTime"]);
                 skillList = skillsToMonitor.Split(',');
                 auxCodes = DataAccess.GetAuxCodes();
+                acceptableSlObj = DataAccess.GetAcceptableLevels();
                 acceptableSL = Convert.ToInt32(ConfigurationSettings.AppSettings["acceptableSL"]);
                 DBRefreshTime = Convert.ToInt32(ConfigurationSettings.AppSettings["DBRefreshTime"]);
             }
