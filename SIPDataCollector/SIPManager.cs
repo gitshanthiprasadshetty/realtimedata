@@ -437,7 +437,14 @@ namespace SIPDataCollector
                             data.Date = "";
                             data.Extn = "";
                             data.Other = "";
-                            data.AccptedSL = ConfigurationData.acceptableSL;
+
+                            try
+                            {
+                                data.AccptedSL = ConfigurationData.acceptableSlObj.FirstOrDefault(x => x.Key == data.Skill).Value;
+                            }
+                            catch (Exception)
+                            {
+                            }
 
                             //bcmsdata.Add(data);
                             // update data to cache memory.
