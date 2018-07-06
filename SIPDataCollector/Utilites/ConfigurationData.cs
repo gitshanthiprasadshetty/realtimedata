@@ -58,11 +58,11 @@ namespace SIPDataCollector.Utilites
                 ConntnString = ConfigurationSettings.AppSettings["CMDbConn"].ToString();
                 skillsToMonitor = ConfigurationSettings.AppSettings["skillsToMonitorForSIP"].ToString();
                 DashboardRefreshTime = Convert.ToInt32(ConfigurationSettings.AppSettings["DashboardRefreshTime"]);
+                acceptableSL = Convert.ToInt32(ConfigurationSettings.AppSettings["acceptableSL"]);
+                DBRefreshTime = Convert.ToInt32(ConfigurationSettings.AppSettings["DBRefreshTime"]);
                 skillList = skillsToMonitor.Split(',');
                 auxCodes = DataAccess.GetAuxCodes();
                 acceptableSlObj = DataAccess.GetAcceptableLevels();
-                acceptableSL = Convert.ToInt32(ConfigurationSettings.AppSettings["acceptableSL"]);
-                DBRefreshTime = Convert.ToInt32(ConfigurationSettings.AppSettings["DBRefreshTime"]);
             }
             catch (Exception ex)
             {
