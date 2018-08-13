@@ -15,6 +15,7 @@ namespace SIPDataCollector.Models
         internal decimal SLPercentage { get; set; }
         internal int TotalACDInteractions { get; set; }
         internal int AvgHandlingTime { get; set; }
+        internal string AvgAbandTime { get; set; }
         internal decimal AbandonPercentage { get; set; }
     }
 }

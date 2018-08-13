@@ -365,13 +365,18 @@ namespace SIPDataCollector
                             data.SkillName = entry.SkillName;
                             //data.Staff = entry.AgentsStaffed.ToString();
                             //data.Avail = entry.AgentAvailable.ToString();
-                            data.CallsWaiting = (channel.ToLower() == "email") ? WorkQueueProxy.GetQueueCount(entry.SkillID) : entry.CallsInQueue.ToString();
+                            try
+                            {
+                                data.CallsWaiting = (channel.ToLower() == "email") ? WorkQueueProxy.GetQueueCount(entry.SkillID) : entry.CallsInQueue.ToString();
 
-                            data.OldestCall = (channel.ToLower() != "voice") ? WorkQueueProxy.GetOldestWaitTime(entry.SkillID) : "";
+                                data.OldestCall = (channel.ToLower() != "voice") ? WorkQueueProxy.GetOldestWaitTime(entry.SkillID) : "";
 
-                            if (!queue.Contains(entry.SkillID))
-                                queue.Enqueue(entry.SkillID);
-
+                            }
+                            catch (Exception ex)
+                            {
+                                Log.Error("Error while reading workqueue data : " + ex);
+                            }
+                          
                             // here model name skill is actually extnid,so get actual skillid from _skillExtnInfo object
                             data.Skill = _skillExtnInfo[entry.SkillID].SkillId;
                             // new method will be exposed to get this data for given skillid
@@ -384,7 +389,7 @@ namespace SIPDataCollector
 
                             if (data.AgentData != null)
                             {
-                                data.ACD = data.AgentData.Count(x => x.State.Contains("On Call")).ToString();
+                                //data.ACD = data.AgentData.Count(x => x.State.Contains("On Call")).ToString();
 
                                 /*
                                 if (acdInteraction != null)
@@ -421,14 +426,16 @@ namespace SIPDataCollector
                                     }
                                 }
                                 */
-                                data.ACW = "0";
-                                data.AUX = "0";
-                                // data.TotalACDInteractions = "0";
+                                //data.ACW = "0";
+                                //data.AUX = "0";
+                                //data.TotalACDInteractions = Convert.ToString(entry.ActiveInteractions + 1);
                                 // data.TotalACDInteractions = acdInteraction[data.Skill].TotalACDInteractions ?? "0";
-                                data.Staff = data.AgentData.Count().ToString();
-                                data.Avail = data.AgentData.Count(x => x.State.Contains("Available")).ToString();
+                                data.ACD = Convert.ToString(entry.ActiveInteractions < 0 ? 0 : entry.ActiveInteractions) ?? "0";
+                                data.Staff = Convert.ToString(data.AgentData.Count());
+                                //data.Avail = data.AgentData.Count(x => x.State.Contains("Available")).ToString();
+                                data.Avail = Convert.ToString(entry.AgentAvailable);
                                 data.ACW = data.AgentData.Count(x => x.State.Contains("ACW")).ToString();
-                                data.AUX = data.AgentData.Count(x => ConfigurationData.auxCodes.Contains(x.State)).ToString();                                
+                                data.AUX = Convert.ToString(data.AgentData.Count(x => ConfigurationData.auxCodes.Contains(x.State)));
                             }
                                 
                             // currently these values are not used in front-end.
@@ -449,6 +456,9 @@ namespace SIPDataCollector
                             //bcmsdata.Add(data);
                             // update data to cache memory.
                             DataCache.UpdateCacheData(data);
+
+                            if (!queue.Contains(entry.SkillID))
+                                queue.Enqueue(entry.SkillID);
                         }
                     }
                 }                
@@ -533,22 +543,32 @@ namespace SIPDataCollector
                                 if (dbData != null)
                                 {
                                     Log.Debug("Received historical data");
-                                    SkillData data = new SkillData
+                                    try
                                     {
-                                        AbandCalls = dbData.AbandCalls,
-                                        SLPercentage = dbData.SLPercentage,
-                                        AvgHandlingTime = (dbData.ACDTime + dbData.ACWTime) / (dbData.TotalACDInteractions == 0 ? 1 : dbData.TotalACDInteractions),
-                                        skillID = _skillExtnInfo[skillExtn].SkillId ?? string.Empty,
-                                        TotalACDInteractions = dbData.TotalACDInteractions,
-                                        AbandonPercentage = (100 * (dbData.AbandCalls) / (dbData.TotalACDInteractions == 0 ? 1 : dbData.TotalACDInteractions))
-                                    };
-                                    if (!string.IsNullOrEmpty(data.skillID) && (data != null))
-                                        DataCache.UpdateHistoricalData(data);
+                                        SkillData data = new SkillData
+                                        {
+                                            ACDTime = dbData.ACDTime,
+                                            ACWTime = dbData.ACWTime,
+                                            AbandCalls = dbData.AbandCalls,
+                                            SLPercentage = dbData.SLPercentage,
+                                            AvgHandlingTime = (dbData.ACDTime + dbData.ACWTime) / (dbData.TotalACDInteractions == 0 ? 1 : dbData.TotalACDInteractions),
+                                            skillID = _skillExtnInfo[skillExtn].SkillId ?? string.Empty,
+                                            TotalACDInteractions = dbData.TotalACDInteractions,
+                                            AbandonPercentage = Math.Round(Convert.ToDecimal(100 * Convert.ToDouble((dbData.AbandCalls)) / (dbData.TotalACDInteractions == 0 ? 1 : dbData.TotalACDInteractions)),2),
+                                            AvgAbandTime = dbData.AvgAbandTime
+                                        };
+                                        if (!string.IsNullOrEmpty(data.skillID) && (data != null))
+                                            DataCache.UpdateHistoricalData(data);
+                                    }
+                                    catch (Exception ex)
+                                    {
+                                        Log.Error("Error while processing histoircal data : ", ex);
+                                    }
                                 }
                             }
                         }                        
                     }
-                    Thread.Sleep(ConfigurationData.DBRefreshTime * 60000);
+                    Thread.Sleep(ConfigurationData.DBRefreshTime);
                 }
             }
             catch (Exception ex)

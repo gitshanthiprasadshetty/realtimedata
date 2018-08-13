@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace Connector.TMACWorkQ {
+namespace Connector.WorkQueue {
     using System.Runtime.Serialization;
     using System;
     
@@ -283,7 +283,7 @@ namespace Connector.TMACWorkQ {
     }
     
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
-    [System.ServiceModel.ServiceContractAttribute(ConfigurationName="TMACWorkQ.IService")]
+    [System.ServiceModel.ServiceContractAttribute(ConfigurationName="WorkQueue.IService")]
     public interface IService {
         
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IService/AddWorkItem", ReplyAction="http://tempuri.org/IService/AddWorkItemResponse")]
@@ -293,10 +293,10 @@ namespace Connector.TMACWorkQ {
         System.Threading.Tasks.Task<string> AddWorkItemAsync(string channel, string skill, string itemid, string insertBy, string subchannel, string data);
         
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IService/AddWorkItemSync", ReplyAction="http://tempuri.org/IService/AddWorkItemSyncResponse")]
-        string AddWorkItemSync(Connector.TMACWorkQ.WorkItem item);
+        string AddWorkItemSync(Connector.WorkQueue.WorkItem item);
         
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IService/AddWorkItemSync", ReplyAction="http://tempuri.org/IService/AddWorkItemSyncResponse")]
-        System.Threading.Tasks.Task<string> AddWorkItemSyncAsync(Connector.TMACWorkQ.WorkItem item);
+        System.Threading.Tasks.Task<string> AddWorkItemSyncAsync(Connector.WorkQueue.WorkItem item);
         
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IService/RemoveWorkItemSync", ReplyAction="http://tempuri.org/IService/RemoveWorkItemSyncResponse")]
         string RemoveWorkItemSync(string key);
@@ -426,12 +426,12 @@ namespace Connector.TMACWorkQ {
     }
     
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
-    public interface IServiceChannel : Connector.TMACWorkQ.IService, System.ServiceModel.IClientChannel {
+    public interface IServiceChannel : Connector.WorkQueue.IService, System.ServiceModel.IClientChannel {
     }
     
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
-    public partial class ServiceClient : System.ServiceModel.ClientBase<Connector.TMACWorkQ.IService>, Connector.TMACWorkQ.IService {
+    public partial class ServiceClient : System.ServiceModel.ClientBase<Connector.WorkQueue.IService>, Connector.WorkQueue.IService {
         
         public ServiceClient() {
         }
@@ -460,11 +460,11 @@ namespace Connector.TMACWorkQ {
             return base.Channel.AddWorkItemAsync(channel, skill, itemid, insertBy, subchannel, data);
         }
         
-        public string AddWorkItemSync(Connector.TMACWorkQ.WorkItem item) {
+        public string AddWorkItemSync(Connector.WorkQueue.WorkItem item) {
             return base.Channel.AddWorkItemSync(item);
         }
         
-        public System.Threading.Tasks.Task<string> AddWorkItemSyncAsync(Connector.TMACWorkQ.WorkItem item) {
+        public System.Threading.Tasks.Task<string> AddWorkItemSyncAsync(Connector.WorkQueue.WorkItem item) {
             return base.Channel.AddWorkItemSyncAsync(item);
         }
         

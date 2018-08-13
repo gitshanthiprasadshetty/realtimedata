@@ -1,7 +1,9 @@
-﻿using SIPDataCollector.Utilities;
+﻿using ConfigurationProvider;
+using SIPDataCollector.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Configuration;
+using System.Linq;
 
 namespace SIPDataCollector.Utilites
 {
@@ -55,12 +57,14 @@ namespace SIPDataCollector.Utilites
             Log.Debug("BcmsSIPManager.ConfigurationData[LoadConfig]");
             try
             {
-                ConntnString = ConfigurationSettings.AppSettings["CMDbConn"].ToString();
-                skillsToMonitor = ConfigurationSettings.AppSettings["skillsToMonitorForSIP"].ToString();
+                ////ConntnString = ConfigurationSettings.AppSettings["CMDbConn"].ToString();
+                ConntnString = ConnectionStrings.DecryptConnectionString(ConfigurationSettings.AppSettings["CMDbConn"]);
+                skillsToMonitor = ConfigurationSettings.AppSettings["skillsToMonitorForSIP"];
                 DashboardRefreshTime = Convert.ToInt32(ConfigurationSettings.AppSettings["DashboardRefreshTime"]);
                 acceptableSL = Convert.ToInt32(ConfigurationSettings.AppSettings["acceptableSL"]);
                 DBRefreshTime = Convert.ToInt32(ConfigurationSettings.AppSettings["DBRefreshTime"]);
-                skillList = skillsToMonitor.Split(',');
+                if (!string.IsNullOrEmpty(skillsToMonitor) || skillsToMonitor.ToLower() != "na")
+                    skillList = skillsToMonitor.Split(',');
                 auxCodes = DataAccess.GetAuxCodes();
                 acceptableSlObj = DataAccess.GetAcceptableLevels();
             }
@@ -70,7 +74,49 @@ namespace SIPDataCollector.Utilites
             }
         }
 
-
+        #region notused
+        public void GetConnectionString()
+        {
+            Log.Debug("GetConnectionString()");
+            try
+            {
+                string pwdString = string.Empty , userIdString = string.Empty;
+                string decryptedPassword = string.Empty; string decryptedUserID = string.Empty;
+                string[] stringarray = ConntnString.Split(';');
+                int pwdndex = Array.IndexOf(stringarray, "Password");
+                int usrIdndex = Array.IndexOf(stringarray, "Password");
+                if (stringarray.Contains("Password"))
+                {
+                    pwdString = stringarray.ElementAt(pwdndex);
+                    decryptedPassword = StringEncryptor.Decrypt(pwdString);
+                    if (decryptedPassword == null || String.IsNullOrEmpty(decryptedPassword))
+                    {
+                        Log.Warn("Failed to decrypt the password");
+                        decryptedPassword = pwdString;
+                    }
+                }
+                if (stringarray.Contains("user"))
+                {
+                    userIdString = stringarray.ElementAt(usrIdndex);
+                    decryptedUserID = StringEncryptor.Decrypt(userIdString);
+                    if (decryptedUserID == null || String.IsNullOrEmpty(decryptedUserID))
+                    {
+                        Log.Warn("Failed to decrypt the password");
+                        decryptedUserID = userIdString;
+                    }
+                }
+                try
+                {
+                    string ConnectionString = String.Format(ConntnString, decryptedPassword);
+                }
+                catch (Exception ex)
+                {
+                }
+            }
+            catch (Exception ex)
+            {
+            }
+        }
         /// <summary>
         /// 
         /// </summary>
@@ -111,5 +157,6 @@ namespace SIPDataCollector.Utilites
         //        return null;
         //    }
         //}
+        #endregion
     }
 }

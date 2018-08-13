@@ -23,7 +23,7 @@ namespace CMDataCollector
         {
             try
             {
-                Log.Debug("BCMSDashboardManager[Start]");
+                Log.Debug("Start()");
 
                 // Load all the config values from app.config
                 ConfigurationData.LoadConfig();

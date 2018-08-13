@@ -171,18 +171,37 @@ namespace CMDataCollector.Connection
             }
         }
 
-        ///// <summary>
-        ///// 
-        ///// </summary>
-        //public void ExecuteCommand(List<string> skillRange)
-        //{
-        //    if (skillRange.Contains("trunk"))
-        //        ExecuteTrunkCommand();
-        //    else if (skillRange.Contains("system"))
-        //        ExecuteSystemCommand();
-        //    else
-        //        ExecuteBcmsCommand(skillRange);
-        //}
+        /// <summary>
+        /// 
+        /// </summary>
+        public void ExecuteCommand()
+        {
+            try
+            {
+                var t1 = new Thread(new ThreadStart(delegate
+                   {
+                       string c = "c lis agent \r\nt";
+
+                       _commandReponse = _conn.SendCommand(c);
+                       Log.Debug("ExecuteCommand commandReponse :[" + _commandReponse + "]:" + ConnectionKey);
+
+                       if (_commandReponse == -1)
+                       {
+                           Log.Debug("ExecuteCommand failed: Reconnect:" + ConnectionKey);
+                           Responsereceived = true;
+                    //reset the connection
+                    //set the state to not connected and connect again
+                    State = new ConnectionNotEstablishedState(ConnectionKey);
+                           ConnectionStateStatus = "ConnectionNotEstablishedState";
+                           State.Connect();
+                       }
+                   }));
+                t1.Start();
+            }
+            catch (Exception ex)
+            {
+            }
+        }
 
         /// <summary>
         /// Execute BCMS command once all connection state is success.
@@ -223,6 +242,11 @@ namespace CMDataCollector.Connection
                         t1.Start();
 
                         // if no data/resposnce is received keep trying..
+
+                        // this keep trying is required to handle data-mismatch between diff skills in same connection obj.
+                        // doing this, control won't be passed to next sequence to execute untill we get whole data
+                        // for executing skillid.
+                        
                         while (!Responsereceived)
                         {
                             Thread.Sleep(1000);

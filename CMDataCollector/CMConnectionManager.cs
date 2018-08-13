@@ -51,6 +51,11 @@ namespace CMDataCollector
         /// 
         /// </summary>
         public bool IsSystemEnabled;
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public bool IsListEnabled;
         #endregion
 
         #region Singleton
@@ -243,6 +248,13 @@ namespace CMDataCollector
                     CM.Add(key.ToString(), new CMConnection(key.ToString(), new List<string> { "system" }));
                 }
 
+                // check if we need to monitor 'system data' as well
+                IsListEnabled = ConfigurationData.CommandsToRun.Contains("list");
+                if (IsListEnabled)
+                {
+                    int key = noOfConn + 1;
+                    CM.Add(key.ToString(), new CMConnection(key.ToString(), new List<string> { "list" }));
+                }
                 // create connection to cm
                 CreateConnectionToCm();
             }

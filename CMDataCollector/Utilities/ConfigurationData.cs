@@ -8,6 +8,7 @@ using System.Xml;
 using SIPDataCollector.Utilities;
 using System.Data;
 using Connector.DbLayer;
+using ConfigurationProvider;
 
 namespace CMDataCollector.Utilities
 {
@@ -105,6 +106,10 @@ namespace CMDataCollector.Utilities
         /// </summary>
         static readonly Dictionary<string, SIPDataCollector.Models.SkillExtensionInfo> _skillExtnInfo = new Dictionary<string, SIPDataCollector.Models.SkillExtensionInfo>();
 
+        /// <summary>
+        /// DB Connection string
+        /// </summary>
+        public static string ConntnString { get; set; }
         #endregion
 
         static string userName = ConfigurationSettings.AppSettings["userName"].ToString();
@@ -120,19 +125,19 @@ namespace CMDataCollector.Utilities
             {
                 Channel();
                 DecryptCredentials();
-                ServerAddress = ConfigurationSettings.AppSettings["serverAddress"].ToString();
-                Port = Convert.ToInt32(ConfigurationSettings.AppSettings["port"]);
-                skillsToMonitor = ConfigurationSettings.AppSettings["skillsToMonitor"].ToString();
-                skillsPerConnection = Convert.ToInt32(ConfigurationSettings.AppSettings["skillsPerConnection"]);
+                ConntnString = ConnectionStrings.DecryptConnectionString(ConfigurationSettings.AppSettings["CMDbConn"]);
+                ServerAddress = ConfigurationSettings.AppSettings["serverAddress"];
+                Port = Convert.ToInt32(ConfigurationSettings.AppSettings["port"] == "0");
+                skillsToMonitor = ConfigurationSettings.AppSettings["skillsToMonitor"];
+                skillsPerConnection = Convert.ToInt32(ConfigurationSettings.AppSettings["skillsPerConnection"] == "0");
                 skillList = skillsToMonitor.Split(',');
-                DashboardRefreshTime = Convert.ToInt32(ConfigurationSettings.AppSettings["DashboardRefreshTime"]);
-                ReportRefreshTime = Convert.ToInt32(ConfigurationSettings.AppSettings["HistoricalReportRefreshTime"]);
-                HAEnabled = Convert.ToInt32(ConfigurationSettings.AppSettings["HAEnabled"]);
-                MaxTriesOnCMConFailure = Convert.ToInt32(ConfigurationSettings.AppSettings["MaxTriesOnConnectionFailure"]);
-                ActionOnCMConFailure = ConfigurationSettings.AppSettings["ActionOnCMConFailure"].ToLower().ToString();
-                ConnectionType = ConfigurationSettings.AppSettings["Type"].ToString();
-                CMConntnString = ConfigurationSettings.AppSettings["CMDbConn"].ToString();
-                var val = ConfigurationSettings.AppSettings["CommandsToRun"].ToString();
+                DashboardRefreshTime = Convert.ToInt32(ConfigurationSettings.AppSettings["DashboardRefreshTime"] == "1000");
+                ReportRefreshTime = Convert.ToInt32(ConfigurationSettings.AppSettings["HistoricalReportRefreshTime"] == "1000");
+                HAEnabled = Convert.ToInt32(ConfigurationSettings.AppSettings["HAEnabled"] == "0");
+                MaxTriesOnCMConFailure = Convert.ToInt32(ConfigurationSettings.AppSettings["MaxTriesOnConnectionFailure"] = "0");
+                ActionOnCMConFailure = ConfigurationSettings.AppSettings["ActionOnCMConFailure"].ToLower();
+                ConnectionType = ConfigurationSettings.AppSettings["Type"];
+                var val = ConfigurationSettings.AppSettings["CommandsToRun"];
                 CommandsToRun = val.Split(',');
 
                 FetchExtenSkillData();
@@ -262,27 +267,50 @@ namespace CMDataCollector.Utilities
                 Log.Debug("FetchExtenSkillData()");
                 if (channelObj != null)
                 {
-                    var emailSkillIds = channelObj.FirstOrDefault(x => x.Key.ToLower() == "email").Value.ToList();
-                    if (emailSkillIds != null)
+                    //var emailSkillIds = channelObj.FirstOrDefault(x => x.Key.ToLower() == "email").Value.ToList();
+                    //StringBuilder builder = new StringBuilder();
+                    string skillIds = string.Empty;
+                    for (int i = 0; i < channelObj.Count; i++)
                     {
-                        var emailSkills = string.Join(",", emailSkillIds);
-                        if (!string.IsNullOrWhiteSpace(emailSkills))
+                        var skills = channelObj.ElementAtOrDefault(i).Value;
+                        if (skills != null || skills.Count > 0)
                         {
-                            string sql = @"select SkillID,SkillExtension,SkillName from TMAC_Skills with (nolock) Where SkillID in (" + emailSkills + ")";
-                            //DataTable result = CMDataCollector.Utilities.SqlDataAccess.ExecuteDataTable(sql,);
-                            DataTable result = SqlDataAccess.ExecuteDataTable(sql, CMConntnString);
-                            if (result != null)
+                            skillIds += string.Join(",", skills);
+                            skillIds = skillIds.EndsWith(",") ? skillIds : skillIds + ",";
+                        }
+                    }
+
+                    if (!string.IsNullOrEmpty(skillIds)) {
+
+                        if (skillIds.StartsWith(","))
+                            skillIds = skillIds.Remove(0, 1);
+
+                        if (skillIds.EndsWith(","))
+                            skillIds = skillIds.Substring(0, skillIds.Length - 1);
+
+                        string sql = @"select SkillID,SkillExtension,SkillName from TMAC_Skills with (nolock) Where SkillID in (" + skillIds + ")";
+                        //DataTable result = CMDataCollector.Utilities.SqlDataAccess.ExecuteDataTable(sql,);
+                        DataTable result = SqlDataAccess.ExecuteDataTable(sql, ConntnString);
+                        
+                        if (result != null)
+                        {
+                            Log.Debug("Skill to Extension mapping");
+                            foreach (DataRow entry in result.Rows)
                             {
-                                Log.Debug("Skill to Extension mapping");
-                                foreach (DataRow entry in result.Rows)
+                                // add to dictionary object to maintain a skill-Extn mapping.
+                                try
                                 {
-                                    // add to dictionary object to maintain a skill-Extn mapping.
                                     _skillExtnInfo.Add(entry.ItemArray[1].ToString(), new SIPDataCollector.Models.SkillExtensionInfo
                                     {
                                         SkillId = entry.ItemArray[0].ToString(),
                                         ExtensionId = entry.ItemArray[1].ToString(),
                                         SkillName = entry.ItemArray[2].ToString()
                                     });
+                                }
+                                catch (Exception ex)
+                                {
+                                    Log.Warn("Warning! while adding values to dictionary");
+                                    Log.Error("Message : ", ex);
                                 }
                             }
                         }

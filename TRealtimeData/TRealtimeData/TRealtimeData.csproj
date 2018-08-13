@@ -35,6 +35,9 @@
     <Reference Include="CMDataCollector">
       <HintPath>..\..\CMDataCollector\bin\Debug\CMDataCollector.dll</HintPath>
     </Reference>
+    <Reference Include="KMSClient">
+      <HintPath>lib\KMSClient.dll</HintPath>
+    </Reference>
     <Reference Include="log4net">
       <HintPath>lib\log4net.dll</HintPath>
     </Reference>
@@ -51,6 +54,9 @@
     <Reference Include="System.Net.Http" />
     <Reference Include="System.ServiceProcess" />
     <Reference Include="System.Xml" />
+    <Reference Include="TConfigLoader">
+      <HintPath>..\..\..\..\..\..\Office\TConfigLoader\TConfigLoader\3.1.08.02\TConfigLoader.exe</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="TRealtimeService.cs">
@@ -63,7 +69,13 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="App.config" />
+    <None Include="App.config">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="App_Tconfig.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <ResolveAssemblyReferenceIgnoreTargetFrameworkAttributeVersionMismatch>true</ResolveAssemblyReferenceIgnoreTargetFrameworkAttributeVersionMismatch>
+  </PropertyGroup>
 </Project>

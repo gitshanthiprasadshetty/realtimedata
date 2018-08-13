@@ -101,19 +101,22 @@ namespace SIPDataCollector.Utilities
                 {
                     foreach(DataRow item in dsusers.Rows)
                     {
-                        skillInfo = new SkillData();
-                        skillInfo.ACWTime = Convert.ToInt32(item["TotalACWTime"]);
-                        skillInfo.SLPercentage = Convert.ToDecimal(item["SLPercentage"]);
-                        skillInfo.ACDTime = Convert.ToInt32(item["TotalACDTime"]);
-                        skillInfo.AbandCalls = Convert.ToInt32(item["AbandCalls"]);
-                        skillInfo.TotalACDInteractions = Convert.ToInt32(item["TotalInteraction"]);
+                        skillInfo = new SkillData
+                        {
+                            ACWTime = Convert.ToInt32(item["TotalAfterCallTime"]),
+                            SLPercentage = Convert.ToDecimal(item["SLPercentage"]),
+                            ACDTime = Convert.ToInt32(item["TotalACDTime"]),
+                            AbandCalls = Convert.ToInt32(item["AbandCalls"]),
+                            TotalACDInteractions = Convert.ToInt32(item["TotalInteraction"]),
+                            AvgAbandTime = Convert.ToString(item["AvgAbandTime"])
+                        };
                         return skillInfo;
                     }
                 }
             }
             catch (Exception ex)
             {
-                Log.Error("Exception in GetAbnData():" + ex);
+                Log.Error("Exception in GetHistoricalData():" + ex);
             }
             return new SkillData();
         }
@@ -197,13 +200,13 @@ namespace SIPDataCollector.Utilities
             try
             {
                 string[] auxCodes = new string[] { };
-                string sql = @"select code from [dbo].[AGT_AUX_Codes]";
+                string sql = @"select Name from [dbo].[AGT_AUX_Codes]";
                 DataTable dataTable = SqlDataAccess.ExecuteDataTable(sql, ConfigurationData.ConntnString);
                 if(dataTable != null)
                 {
                         auxCodes = dataTable
                         .AsEnumerable()
-                        .Select(row => row.Field<string>("code"))
+                        .Select(row => row.Field<string>("Name"))
                         .ToArray();
                 }
                 return auxCodes.ToList();

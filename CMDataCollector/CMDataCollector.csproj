@@ -83,6 +83,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="BcmsCommandType\Agent.cs" />
     <Compile Include="BcmsCommandType\Skill.cs" />
     <Compile Include="BcmsCommandType\System.cs" />
     <Compile Include="BcmsCommandType\Trunk.cs" />

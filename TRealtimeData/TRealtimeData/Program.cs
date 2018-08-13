@@ -1,10 +1,6 @@
 ﻿using CMDataCollector;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.ServiceProcess;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace TRealtimeData
 {
@@ -15,13 +11,15 @@ namespace TRealtimeData
         /// </summary>
         static void Main()
         {
-            //ServiceBase[] ServicesToRun;
-            //ServicesToRun = new ServiceBase[]
-            //{
-            //    new TRealtimeService()
-            //};
-            //ServiceBase.Run(ServicesToRun);
-            BCMSDashboardManager.Start();
+            TConfigLoader.TConfig.UpdateConfigFromTmc();
+            ServiceBase[] ServicesToRun;
+            ServicesToRun = new ServiceBase[]
+            {
+                new TRealtimeService()
+            };
+            ServiceBase.Run(ServicesToRun);
+            //BCMSDashboardManager.Start();
+            //Console.ReadLine();
         }
     }
 }

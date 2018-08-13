@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ReferenceGroup xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" ID="f48e6798-4187-4602-a3e7-eb85f528d63b" xmlns="urn:schemas-microsoft-com:xml-wcfservicemap">
+  <ClientOptions>
+    <GenerateAsynchronousMethods>false</GenerateAsynchronousMethods>
+    <GenerateTaskBasedAsynchronousMethod>true</GenerateTaskBasedAsynchronousMethod>
+    <EnableDataBinding>true</EnableDataBinding>
+    <ExcludedTypes />
+    <ImportXmlTypes>false</ImportXmlTypes>
+    <GenerateInternalTypes>false</GenerateInternalTypes>
+    <GenerateMessageContracts>false</GenerateMessageContracts>
+    <NamespaceMappings />
+    <CollectionMappings />
+    <GenerateSerializableTypes>true</GenerateSerializableTypes>
+    <Serializer>Auto</Serializer>
+    <UseSerializerForFaults>true</UseSerializerForFaults>
+    <ReferenceAllAssemblies>true</ReferenceAllAssemblies>
+    <ReferencedAssemblies />
+    <ReferencedDataContractTypes />
+    <ServiceContractMappings />
+  </ClientOptions>
+  <MetadataSources>
+    <MetadataSource Address="http://10.133.146.11:55001/WorkQueue1/" Protocol="http" SourceId="1" />
+  </MetadataSources>
+  <Metadata>
+    <MetadataFile FileName="WorkQueueService.wsdl" MetadataType="Wsdl" ID="b2d97c46-258e-426e-b68d-c6294a124b8d" SourceId="1" SourceUrl="http://10.133.146.11:55001/WorkQueue1/?wsdl" />
+    <MetadataFile FileName="item.xsd" MetadataType="Schema" ID="0221ea93-7c1c-49b4-ad70-33d9762b7fd7" SourceId="1" SourceUrl="http://10.133.146.11:55001/WorkQueue1/?xsd=xsd1" />
+    <MetadataFile FileName="item1.xsd" MetadataType="Schema" ID="0e28dc3d-cb45-498b-ba61-a9182e7ac7e0" SourceId="1" SourceUrl="http://10.133.146.11:55001/WorkQueue1/?xsd=xsd2" />
+    <MetadataFile FileName="item2.xsd" MetadataType="Schema" ID="4dcfdc58-007f-4d55-9c76-40e388d07383" SourceId="1" SourceUrl="http://10.133.146.11:55001/WorkQueue1/?xsd=xsd3" />
+    <MetadataFile FileName="item3.xsd" MetadataType="Schema" ID="df779820-4865-4cfd-93f9-f9102c9190dc" SourceId="1" SourceUrl="http://10.133.146.11:55001/WorkQueue1/?xsd=xsd0" />
+    <MetadataFile FileName="item.disco" MetadataType="Disco" ID="11a272c8-6686-4b74-8581-58628226150f" SourceId="1" SourceUrl="http://10.133.146.11:55001/WorkQueue1/?disco" />
+  </Metadata>
+  <Extensions>
+    <ExtensionFile FileName="configuration91.svcinfo" Name="configuration91.svcinfo" />
+    <ExtensionFile FileName="configuration.svcinfo" Name="configuration.svcinfo" />
+  </Extensions>
+</ReferenceGroup>

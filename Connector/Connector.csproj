@@ -57,14 +57,11 @@
     <Compile Include="Models\WorkQueueDetails.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Proxy\WorkQueueProxy.cs" />
-    <Compile Include="Service References\TMACWorkQ\Reference.cs">
+    <Compile Include="Service References\WorkQueue\Reference.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>Reference.svcmap</DependentUpon>
     </Compile>
-  </ItemGroup>
-  <ItemGroup>
-    <WCFMetadataStorage Include="Service References\TMACWorkQ\" />
   </ItemGroup>
   <ItemGroup>
     <WCFMetadata Include="Service References\" />
@@ -72,28 +69,34 @@
   <ItemGroup>
     <None Include="app.config" />
     <None Include="packages.config" />
-    <None Include="Service References\TMACWorkQ\Arrays.xsd">
+    <None Include="Service References\WorkQueue\item.xsd">
       <SubType>Designer</SubType>
     </None>
-    <None Include="Service References\TMACWorkQ\service.wsdl" />
-    <None Include="Service References\TMACWorkQ\service.xsd">
+    <None Include="Service References\WorkQueue\item1.xsd">
       <SubType>Designer</SubType>
     </None>
-    <None Include="Service References\TMACWorkQ\service1.xsd">
+    <None Include="Service References\WorkQueue\item2.xsd">
       <SubType>Designer</SubType>
     </None>
-    <None Include="Service References\TMACWorkQ\TetherfiWorkAssignment.xsd">
+    <None Include="Service References\WorkQueue\item3.xsd">
       <SubType>Designer</SubType>
     </None>
+    <None Include="Service References\WorkQueue\WorkQueueService.wsdl" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Service References\TMACWorkQ\configuration91.svcinfo" />
+    <WCFMetadataStorage Include="Service References\WorkQueue\" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Service References\TMACWorkQ\configuration.svcinfo" />
+    <None Include="Service References\WorkQueue\item.disco" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Service References\TMACWorkQ\Reference.svcmap">
+    <None Include="Service References\WorkQueue\configuration91.svcinfo" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Service References\WorkQueue\configuration.svcinfo" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Service References\WorkQueue\Reference.svcmap">
       <Generator>WCF Proxy Generator</Generator>
       <LastGenOutput>Reference.cs</LastGenOutput>
     </None>

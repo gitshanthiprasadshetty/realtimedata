@@ -71,11 +71,13 @@ namespace SIPDataCollector.Utilites
                     if(CachObj.TryGetValue(data.skillID, out BcmsDataForSIP values))
                     {
                         Log.Debug("Updating with histoircaldata for skill = " + data.skillID);
-                        BcmsDataForSIP oldValues = values;
+                        BcmsDataForSIP oldValues = values;                        
                         values.AvgHandlingTime = data.AvgHandlingTime;
-                        values.SLPercentage = data.SLPercentage.ToString();
-                        values.AbandCalls = data.AbandCalls.ToString();
-                        values.TotalACDInteractions = data.TotalACDInteractions.ToString();
+                        values.SLPercentage = Convert.ToString(data.SLPercentage);
+                        values.AbandCalls = Convert.ToString(data.AbandCalls);
+                        values.TotalACDInteractions = Convert.ToString(data.TotalACDInteractions);
+                        values.AvgAbandTime = data.AvgAbandTime;
+                        values.AbandonPercentage = data.AbandonPercentage;
                         CachObj.TryUpdate(data.skillID, values, oldValues);
                     }
                 }

@@ -209,8 +209,10 @@ namespace CMDataCollector.Utilities
                         val.AUX = result.AUX;
                         val.Avail = result.Avail;
                         val.AvgAbandTime = result.AvgAbandTime;
+                        val.AbandonPercentage = result.AbandonPercentage;
+                        val.AvgHandlingTime = result.AvgHandlingTime;                        
                         val.CallsWaiting = result.CallsWaiting;
-                        val.Channel = result.Channel;
+                        val.Channel = result.Channel;                        
                         val.Date = result.Date;
                         val.Extn = result.Extn;
                         val.OldestCall = result.OldestCall;

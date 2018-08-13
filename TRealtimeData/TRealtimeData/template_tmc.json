@@ -1,0 +1,83 @@
+{
+  "MyCustom": [
+    {
+      "PropertLabel": "Server Address",
+      "PropertKey": "tmc.conf.serverAddress",
+      "Category": "CM",
+      "Settings\",": null,
+      "PropertyValue": "Tetherfi_01",
+      "PropertyValueType": "string",
+      "PropertyAcceptableList": [],
+      "Description": "AES password",
+      "IsEncrypted": true,
+      "RestartRequired": true
+    },
+    {
+      "PropertLabel": "User Name",
+      "PropertKey": "tmc.conf.userName",
+      "Category": "CM",
+      "Settings\",": null,
+      "PropertyValue": "smsapi",
+      "PropertyValueType": "string",
+      "PropertyAcceptableList": [],
+      "Description": "CM User Name",
+      "IsEncrypted": false,
+      "RestartRequired": true
+    },
+    {
+      "PropertLabel": "Password",
+      "PropertKey": "tmc.conf.password",
+      "Category": "CM",
+      "PropertyValue": "smsapi01",
+      "PropertyValueType": "string",
+      "PropertyAcceptableList": [],
+      "Description": "CM Password",
+      "IsEncrypted": false,
+      "RestartRequired": true
+    } ,
+	{
+      "PropertLabel": "Port",
+      "PropertKey": "tmc.conf.port",
+      "Category": "CM",
+      "PropertyValue": "22",
+      "PropertyValueType": "int",
+      "PropertyAcceptableList": [],
+      "Description": "CM Port",
+      "IsEncrypted": false,
+      "RestartRequired": true
+    },
+	{
+      "PropertLabel": "Connection Type",
+      "PropertKey": "tmc.conf.Type",
+      "Category": "Work-Queue",
+      "PropertyValue": "cm",
+      "PropertyValueType": "string",
+      "PropertyAcceptableList": [],
+      "Description": "Skills to be monitored by system",
+      "IsEncrypted": false,
+      "RestartRequired": true
+    },
+	{
+      "PropertLabel": "Skills to Monitor",
+      "PropertKey": "tmc.conf.skillsToMonitorForSIP",
+      "Category": "Work-Queue",
+      "PropertyValue": "22",
+      "PropertyValueType": "string",
+      "PropertyAcceptableList": [],
+      "Description": "Skills to be monitored by system",
+      "IsEncrypted": false,
+      "RestartRequired": true
+    },
+	{
+      "PropertLabel": "Dashboard Refresh Time",
+      "PropertKey": "tmc.conf.DashboardRefreshTime",
+      "Category": "CM, Work-Queue",
+      "PropertyValue": "1000",
+      "PropertyValueType": "int",
+      "PropertyAcceptableList": [],
+      "Description": "Dashboard Service Refresh time",
+      "IsEncrypted": false,
+      "RestartRequired": false
+    }
+  ]
+}

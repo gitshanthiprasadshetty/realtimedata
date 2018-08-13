@@ -45,6 +45,8 @@ namespace CMDataCollector.Connection
                     _connValue.State = new BcmsCommandType.System(_connectionKey);
                 else if (_connValue.SkillRange.Contains("trunk"))
                     _connValue.State = new Trunk(_connectionKey);
+                else if (_connValue.SkillRange.Contains("list"))
+                    _connValue.State = new Agent(_connectionKey);
                 else
                     _connValue.State = new Skill(_connectionKey);
 

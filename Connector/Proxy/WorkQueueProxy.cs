@@ -12,7 +12,7 @@ namespace Connector.Proxy
         /// <summary>
         /// Tmac WorkQ proxy
         /// </summary>
-        static TMACWorkQ.ServiceClient workqProxy = new TMACWorkQ.ServiceClient();
+        static WorkQueue.ServiceClient workqProxy = new WorkQueue.ServiceClient();
 
         /// <summary>
         /// Logger
@@ -80,7 +80,8 @@ namespace Connector.Proxy
                     TimeSpan timeDiff = currentTime.Subtract(dtObject);
 
                     // convert the timdiff into seconds and return.
-                    return timeDiff.TotalSeconds.ToString();
+                    Log.Debug("Oldest wait time : " + Convert.ToString(timeDiff.TotalSeconds));
+                    return Convert.ToString(Math.Round(timeDiff.TotalSeconds,0));
                 }
             }
             catch (Exception ex)
