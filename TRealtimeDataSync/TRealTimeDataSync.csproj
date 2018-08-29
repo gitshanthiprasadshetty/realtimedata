@@ -57,7 +57,7 @@
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
       <DependentUpon>Settings.settings</DependentUpon>
     </Compile>
-    <Compile Include="Web References\HB_BcmsService\Reference.cs">
+    <Compile Include="Web References\HB_TRealtimeData\Reference.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>Reference.map</DependentUpon>
@@ -74,42 +74,48 @@
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
-    <None Include="Web References\HB_BcmsService\BcmsDashboard1.datasource">
+    <None Include="Web References\HB_TRealtimeData\BcmsDashboard.datasource">
       <DependentUpon>Reference.map</DependentUpon>
     </None>
-    <None Include="Web References\HB_BcmsService\BcmsDashboardService.wsdl" />
-    <None Include="Web References\HB_BcmsService\item.xsd">
+    <None Include="Web References\HB_TRealtimeData\BcmsSystem.datasource">
+      <DependentUpon>Reference.map</DependentUpon>
+    </None>
+    <None Include="Web References\HB_TRealtimeData\CMDataService.wsdl" />
+    <None Include="Web References\HB_TRealtimeData\item.xsd">
       <SubType>Designer</SubType>
     </None>
-    <None Include="Web References\HB_BcmsService\item0.xsd">
+    <None Include="Web References\HB_TRealtimeData\item0.xsd">
       <SubType>Designer</SubType>
     </None>
-    <None Include="Web References\HB_BcmsService\item1.xsd">
+    <None Include="Web References\HB_TRealtimeData\item1.xsd">
       <SubType>Designer</SubType>
     </None>
-    <None Include="Web References\HB_BcmsService\Reference.map">
+    <None Include="Web References\HB_TRealtimeData\Reference.map">
       <Generator>MSDiscoCodeGenerator</Generator>
       <LastGenOutput>Reference.cs</LastGenOutput>
+    </None>
+    <None Include="Web References\HB_TRealtimeData\TrunkGroupTraffic.datasource">
+      <DependentUpon>Reference.map</DependentUpon>
     </None>
   </ItemGroup>
   <ItemGroup>
     <WebReferences Include="Web References\" />
   </ItemGroup>
   <ItemGroup>
-    <WebReferenceUrl Include="http://192.168.1.25:35002/BcmsDashboardService/">
+    <WebReferenceUrl Include="http://10.133.146.11:55555/TRealtimeData/">
       <UrlBehavior>Dynamic</UrlBehavior>
-      <RelPath>Web References\HB_BcmsService\</RelPath>
-      <UpdateFromURL>http://192.168.1.25:35002/BcmsDashboardService/</UpdateFromURL>
+      <RelPath>Web References\HB_TRealtimeData\</RelPath>
+      <UpdateFromURL>http://10.133.146.11:55555/TRealtimeData/</UpdateFromURL>
       <ServiceLocationURL>
       </ServiceLocationURL>
       <CachedDynamicPropName>
       </CachedDynamicPropName>
       <CachedAppSettingsObjectName>Settings</CachedAppSettingsObjectName>
-      <CachedSettingsPropName>BcmsDataSync_HB_BcmsService_BcmsDashboardService</CachedSettingsPropName>
+      <CachedSettingsPropName>TRealTimeDataSync_HB_TRealtimeData_CMDataService</CachedSettingsPropName>
     </WebReferenceUrl>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Web References\HB_BcmsService\item.disco" />
+    <None Include="Web References\HB_TRealtimeData\item.disco" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

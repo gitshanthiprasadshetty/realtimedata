@@ -335,6 +335,7 @@ namespace SIPDataCollector
                 var getActiveInteractions = _tmacProxy.Stat_GetSkillData();
                 // Gives wallboard data for all("") skills.
                 var res = _tmacProxy.GetTmacWallboardSkills("");
+
                 if (res != null)
                 {
                     Log.Debug("Total count from GetTmacWallboardSkills : " + res.Count());
@@ -348,6 +349,7 @@ namespace SIPDataCollector
                         // here SkillID obtained from _tmacProxy is actually EXTENSIONID.
                         if (_skillExtnInfo.ContainsKey(entry.SkillID))
                         {
+                            //var datad =_tmacProxy.GetQueueStatusForSkill(entry.SkillID,"");
                             Log.Debug("Extension-Id : " + entry.SkillID + " is found in _skillExtnInfo dictionary object");
                             data = new BcmsDataForSIP();
 
@@ -380,67 +382,75 @@ namespace SIPDataCollector
                             // here model name skill is actually extnid,so get actual skillid from _skillExtnInfo object
                             data.Skill = _skillExtnInfo[entry.SkillID].SkillId;
                             // new method will be exposed to get this data for given skillid
-              
+
                             //if (getActiveInteractions != null)
                             //    data.ACD = getActiveInteractions.FirstOrDefault(x => x.SkillID == data.Skill).ActiveInteractions.ToString();
 
                             // get the agentdata[Total agents logged-in for a skill] for given skillId
-                            data.AgentData = _instance.GetAgentListLoggedInForSkill(data.Skill);
-
-                            if (data.AgentData != null)
+                            try
                             {
-                                //data.ACD = data.AgentData.Count(x => x.State.Contains("On Call")).ToString();
+                                data.AgentData = _instance.GetAgentListLoggedInForSkill(data.Skill);
+                                if (data.AgentData != null)
+                                {
+                                    //data.ACD = data.AgentData.Count(x => x.State.Contains("On Call")).ToString();
 
-                                /*
-                                if (acdInteraction != null)
-                                {                                   
-                                    DateTime lastSyncDate = DateTime.Now.Date;
-
-                                    RData value;
-
+                                    /*
                                     if (acdInteraction != null)
-                                    {
-                                        if (acdInteraction.TryGetValue(data.Skill, out value))
+                                    {                                   
+                                        DateTime lastSyncDate = DateTime.Now.Date;
+
+                                        RData value;
+
+                                        if (acdInteraction != null)
                                         {
-                                            DateTime date = value.LastUpdatedTime;
-                                            if (date == lastSyncDate)
+                                            if (acdInteraction.TryGetValue(data.Skill, out value))
                                             {
-                                                Log.Debug("update | old acd value = " + value.TotalACDInteractions + ", new acd : " + data.ACD + " for skill : " + data.Skill);
-                                                acdInteraction.TryRemove(data.Skill, out RData oldValue);
-                                                acdInteraction.TryAdd(data.Skill, new RData { LastUpdatedTime = lastSyncDate, TotalACDInteractions = oldValue.TotalACDInteractions + data.ACD });
+                                                DateTime date = value.LastUpdatedTime;
+                                                if (date == lastSyncDate)
+                                                {
+                                                    Log.Debug("update | old acd value = " + value.TotalACDInteractions + ", new acd : " + data.ACD + " for skill : " + data.Skill);
+                                                    acdInteraction.TryRemove(data.Skill, out RData oldValue);
+                                                    acdInteraction.TryAdd(data.Skill, new RData { LastUpdatedTime = lastSyncDate, TotalACDInteractions = oldValue.TotalACDInteractions + data.ACD });
+                                                }
+                                                else
+                                                {
+                                                    Log.Debug("AddOrUpdate | old acd value = " + value.TotalACDInteractions + ", new acd : " + data.ACD + " for skill : " + data.Skill);
+                                                    acdInteraction.AddOrUpdate(data.Skill, new RData { LastUpdatedTime = lastSyncDate, TotalACDInteractions = data.ACD },
+                                                        (k, v) => new RData
+                                                        {
+                                                            LastUpdatedTime = lastSyncDate,
+                                                            TotalACDInteractions = data.ACD
+                                                        });
+                                                }
+                                                //acdInteraction.TryAdd(data.Skill, new RData { LastUpdatedTime = lastSyncDate, TotalACDInteractions = data.ACD });
                                             }
                                             else
-                                            {
-                                                Log.Debug("AddOrUpdate | old acd value = " + value.TotalACDInteractions + ", new acd : " + data.ACD + " for skill : " + data.Skill);
-                                                acdInteraction.AddOrUpdate(data.Skill, new RData { LastUpdatedTime = lastSyncDate, TotalACDInteractions = data.ACD },
-                                                    (k, v) => new RData
-                                                    {
-                                                        LastUpdatedTime = lastSyncDate,
-                                                        TotalACDInteractions = data.ACD
-                                                    });
-                                            }
-                                            //acdInteraction.TryAdd(data.Skill, new RData { LastUpdatedTime = lastSyncDate, TotalACDInteractions = data.ACD });
+                                                acdInteraction.TryAdd(data.Skill, new RData { LastUpdatedTime = lastSyncDate, TotalACDInteractions = data.ACD });
                                         }
-                                        else
-                                            acdInteraction.TryAdd(data.Skill, new RData { LastUpdatedTime = lastSyncDate, TotalACDInteractions = data.ACD });
                                     }
+                                    */
+                                    //data.ACW = "0";
+                                    //data.AUX = "0";
+                                    //data.TotalACDInteractions = Convert.ToString(entry.ActiveInteractions + 1);
+                                    // data.TotalACDInteractions = acdInteraction[data.Skill].TotalACDInteractions ?? "0";
+                                    Log.Debug("Active Interaction : " + entry.ActiveInteractions + 1);
+                                    data.Staff = Convert.ToString(data.AgentData.Count());
+                                    //data.Avail = data.AgentData.Count(x => x.State.Contains("Available")).ToString();
+                                    data.ACW = data.AgentData.Count(x => x.State.Contains("ACW")).ToString();
+                                    data.AUX = Convert.ToString(data.AgentData.Count(x => ConfigurationData.auxCodes.Contains(x.State)));
                                 }
-                                */
-                                //data.ACW = "0";
-                                //data.AUX = "0";
-                                //data.TotalACDInteractions = Convert.ToString(entry.ActiveInteractions + 1);
-                                // data.TotalACDInteractions = acdInteraction[data.Skill].TotalACDInteractions ?? "0";
-                                data.ACD = Convert.ToString(entry.ActiveInteractions < 0 ? 0 : entry.ActiveInteractions) ?? "0";
-                                data.Staff = Convert.ToString(data.AgentData.Count());
-                                //data.Avail = data.AgentData.Count(x => x.State.Contains("Available")).ToString();
-                                data.Avail = Convert.ToString(entry.AgentAvailable);
-                                data.ACW = data.AgentData.Count(x => x.State.Contains("ACW")).ToString();
-                                data.AUX = Convert.ToString(data.AgentData.Count(x => ConfigurationData.auxCodes.Contains(x.State)));
-                            }
-                                
-                            // currently these values are not used in front-end.
 
-                            data.AvgAbandTime = "0";
+                            }
+                            catch (Exception)
+                            {
+                                Log.Error("Error while calling tmac method : GetAgentListLoggedInForSkill() for skill = " + data.Skill);
+                            }
+
+
+                            // currently these values are not used in front-end.
+                            data.ACD = Convert.ToString(entry.ActiveInteractions);
+                            data.Avail = Convert.ToString(entry.AgentAvailable);
+                            data.AvgAbandTime = "00:00:00";
                             data.Date = "";
                             data.Extn = "";
                             data.Other = "";
@@ -545,16 +555,18 @@ namespace SIPDataCollector
                                     Log.Debug("Received historical data");
                                     try
                                     {
+                                        decimal abandPercentage = Math.Round(Convert.ToDecimal(100 * Convert.ToDouble(dbData.AbandCalls) / ((dbData.AbandCalls) + (dbData.TotalACDInteractions == 0 ? 1 : dbData.TotalACDInteractions))), 2);
+
                                         SkillData data = new SkillData
                                         {
                                             ACDTime = dbData.ACDTime,
                                             ACWTime = dbData.ACWTime,
                                             AbandCalls = dbData.AbandCalls,
                                             SLPercentage = dbData.SLPercentage,
-                                            AvgHandlingTime = (dbData.ACDTime + dbData.ACWTime) / (dbData.TotalACDInteractions == 0 ? 1 : dbData.TotalACDInteractions),
+                                            AvgHandlingTime = ((dbData.ACDTime + dbData.AHTTime) / (dbData.TotalCallsHandled == 0 ? 1 : dbData.TotalCallsHandled)),
                                             skillID = _skillExtnInfo[skillExtn].SkillId ?? string.Empty,
                                             TotalACDInteractions = dbData.TotalACDInteractions,
-                                            AbandonPercentage = Math.Round(Convert.ToDecimal(100 * Convert.ToDouble((dbData.AbandCalls)) / (dbData.TotalACDInteractions == 0 ? 1 : dbData.TotalACDInteractions)),2),
+                                            AbandonPercentage = abandPercentage,
                                             AvgAbandTime = dbData.AvgAbandTime
                                         };
                                         if (!string.IsNullOrEmpty(data.skillID) && (data != null))

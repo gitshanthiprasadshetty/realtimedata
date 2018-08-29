@@ -37,7 +37,7 @@ namespace TRealTimeDataSync
         /// <summary>
         /// Alternate service object
         /// </summary>
-        static HB_BcmsService.BcmsDashboardService _service = new HB_BcmsService.BcmsDashboardService();
+        static HB_TRealtimeData.CMDataService _service = new HB_TRealtimeData.CMDataService();
 
         #endregion
 
@@ -111,7 +111,7 @@ namespace TRealTimeDataSync
         /// Pulls the bcms data from alternate server.
         /// </summary>
         /// <returns>returns a list of bcms data</returns>
-        public static List<TRealTimeDataSync.HB_BcmsService.BcmsDashboard> PullDataFromCache()
+        public static List<TRealTimeDataSync.HB_TRealtimeData.BcmsDashboard> PullDataFromCache()
         {
             Log.Debug("SyncManager[PullDataFromCache]");
             try

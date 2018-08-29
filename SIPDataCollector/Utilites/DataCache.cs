@@ -72,7 +72,7 @@ namespace SIPDataCollector.Utilites
                     {
                         Log.Debug("Updating with histoircaldata for skill = " + data.skillID);
                         BcmsDataForSIP oldValues = values;                        
-                        values.AvgHandlingTime = data.AvgHandlingTime;
+                        values.AvgHandlingTime = Convert.ToString(data.AvgHandlingTime);
                         values.SLPercentage = Convert.ToString(data.SLPercentage);
                         values.AbandCalls = Convert.ToString(data.AbandCalls);
                         values.TotalACDInteractions = Convert.ToString(data.TotalACDInteractions);

@@ -1,7 +1,6 @@
 ﻿using System;
 using Renci.SshNet;
 using Renci.SshNet.Common;
-using log4net;
 
 namespace CMDataCollector.Connection
 {
@@ -10,7 +9,8 @@ namespace CMDataCollector.Connection
         /// <summary>
         /// Logger
         /// </summary>
-        private static readonly ILog Log = LogManager.GetLogger(typeof(SshConnect).Name);
+        //private static readonly ILog Log = LogManager.GetLogger(typeof(SshConnect).Name);
+        static Logger.Logger Log = new Logger.Logger(typeof(SshConnect));
 
         /// <summary>
         /// 

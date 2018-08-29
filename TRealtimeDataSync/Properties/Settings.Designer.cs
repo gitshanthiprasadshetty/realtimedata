@@ -26,10 +26,10 @@ namespace TRealTimeDataSync.Properties {
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.SpecialSettingAttribute(global::System.Configuration.SpecialSetting.WebServiceUrl)]
-        [global::System.Configuration.DefaultSettingValueAttribute("http://192.168.1.25:35002/BcmsDashboardService/")]
-        public string BcmsDataSync_HB_BcmsService_BcmsDashboardService {
+        [global::System.Configuration.DefaultSettingValueAttribute("http://10.133.146.11:55555/TRealtimeData/")]
+        public string TRealTimeDataSync_HB_TRealtimeData_CMDataService {
             get {
-                return ((string)(this["BcmsDataSync_HB_BcmsService_BcmsDashboardService"]));
+                return ((string)(this["TRealTimeDataSync_HB_TRealtimeData_CMDataService"]));
             }
         }
     }

@@ -107,7 +107,7 @@ namespace CMDataCollector.Models
         private string acdCallsSummary;
 
         private decimal abnPercent;
-        private int avgHandlingTime;
+        private string avgHandlingTime;
 
         /// <summary>
         /// 
@@ -256,7 +256,7 @@ namespace CMDataCollector.Models
         }
 
         [DataMember]
-        public int AvgHandlingTime
+        public string AvgHandlingTime
         {
             get { return avgHandlingTime; }
             set { avgHandlingTime = value; }

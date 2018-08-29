@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <xs:schema xmlns:tns="http://tempuri.org/" elementFormDefault="qualified" targetNamespace="http://tempuri.org/" xmlns:xs="http://www.w3.org/2001/XMLSchema">
-  <xs:import schemaLocation="http://192.168.1.25:35002/BcmsDashboardService/?xsd=xsd2" namespace="http://schemas.datacontract.org/2004/07/CMDataCollector.Models" />
+  <xs:import schemaLocation="http://10.133.146.11:55555/TRealtimeData/?xsd=xsd2" namespace="http://schemas.datacontract.org/2004/07/CMDataCollector.Models" />
   <xs:element name="MonitorBcms">
     <xs:complexType>
       <xs:sequence />
@@ -27,6 +27,32 @@
       </xs:sequence>
     </xs:complexType>
   </xs:element>
+  <xs:element name="MonitorTrunkTraffic">
+    <xs:complexType>
+      <xs:sequence />
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="MonitorTrunkTrafficResponse">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element xmlns:q3="http://schemas.datacontract.org/2004/07/CMDataCollector.Models" minOccurs="0" name="MonitorTrunkTrafficResult" nillable="true" type="q3:ArrayOfTrunkGroupTraffic" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="MonitorBcmsSystem">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" name="skillName" nillable="true" type="xs:string" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="MonitorBcmsSystemResponse">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element xmlns:q4="http://schemas.datacontract.org/2004/07/CMDataCollector.Models" minOccurs="0" name="MonitorBcmsSystemResult" nillable="true" type="q4:ArrayOfBcmsSystem" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
   <xs:element name="IsRunning">
     <xs:complexType>
       <xs:sequence />
@@ -36,6 +62,18 @@
     <xs:complexType>
       <xs:sequence>
         <xs:element minOccurs="0" name="IsRunningResult" type="xs:boolean" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="IsConnectedToCM">
+    <xs:complexType>
+      <xs:sequence />
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="IsConnectedToCMResponse">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" name="IsConnectedToCMResult" type="xs:boolean" />
       </xs:sequence>
     </xs:complexType>
   </xs:element>

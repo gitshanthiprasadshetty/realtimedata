@@ -34,7 +34,7 @@ namespace SIPDataCollector.Models
         private string other;
         private string oldestCall;
         private string sl;
-        private int avgHandlingTime;
+        private string avgHandlingTime;
         private string date;
         private decimal abnPercent;
 
@@ -149,7 +149,7 @@ namespace SIPDataCollector.Models
             set { sl = value; }
         }
 
-        public int AvgHandlingTime
+        public string AvgHandlingTime
         {
             get { return avgHandlingTime; }
             set { avgHandlingTime = value; }

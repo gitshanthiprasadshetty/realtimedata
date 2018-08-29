@@ -39,10 +39,6 @@
     <StartupObject />
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="AMACWeb_Proxy, Version=2.0.12.1, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\BcmsSIPManager\lib\27072017\AMACWeb_Proxy.exe</HintPath>
-    </Reference>
     <Reference Include="AutoMapper">
       <HintPath>lib\AutoMapper.dll</HintPath>
     </Reference>
