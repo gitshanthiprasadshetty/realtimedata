@@ -6,6 +6,7 @@ using System.Threading;
 using CMDataCollector.Models;
 using AutoMapper;
 using CMDataCollector.DataParser;
+using Newtonsoft.Json;
 
 namespace CMDataCollector.Utilities
 {
@@ -103,9 +104,11 @@ namespace CMDataCollector.Utilities
                     }   
                 }
 
+                Log.Debug("check for type : cm or sip");
                 // check the connection type before getting data. If SIP read from sip cache else cm cache obj
                 if (ConfigurationData.ConnectionType.ToLower() == "cm")
                 {
+                    Log.Debug("get and return data for cm");
                     if (skillCachObj != null)
                     {
                         if (skillCachObj.Count > 0)
@@ -369,18 +372,22 @@ namespace CMDataCollector.Utilities
                 var result = _bcmsReportClientObj.GetSkillHistoricalData(skillId);
                 if (result != null)
                 {
+                    //Log.Debug("abandonedcalls dumbu : " + Convert.ToString(result.AbandCalls));
+                    //Log.Debug("AcdCalls dumbu : " + Convert.ToString(result.AcdCalls));
                     Log.Debug("CacheMemory[GetBcmsHistoricalData] Result from service for skill : "+result.SkillId);
                     _reportObj = new BcmsHistoricalReport();
-                    _reportObj.abandoned_Calls = result.AbandCalls.ToString();
-                    _reportObj.acceptable_Service_Level = result.ServiceLevel.ToString();
-                    _reportObj.acd_Calls = result.AcdCalls.ToString();
-                    _reportObj.avg_Abandoned_Time = result.AvgAbandTime.ToString();
+                    _reportObj.abandoned_Calls = Convert.ToString(result.AbandCalls);
+                    //Log.Debug("abandonedcalls bokka : " + Convert.ToString(result.AbandCalls));
+                    _reportObj.acceptable_Service_Level = Convert.ToString(result.ServiceLevel);
+                    _reportObj.acd_Calls = Convert.ToString(result.AcdCalls);
+                    //Log.Debug("AcdCalls bokka : " + Convert.ToString(result.AcdCalls));
+                    _reportObj.avg_Abandoned_Time = Convert.ToString(result.AvgAbandTime);
                     _reportObj.avg_Speed_Answered = result.AvgSpeedAnswer;
-                    _reportObj.avg_Staff = result.AvgStaff.ToString();
+                    _reportObj.avg_Staff = Convert.ToString(result.AvgStaff);
                     _reportObj.avg_Talk_Time = result.AvgTalkTime;
                     _reportObj.date = result.DateInt;
-                    _reportObj.flow_In = result.FlowIn.ToString();
-                    _reportObj.flow_Out = result.FlowOut.ToString();
+                    _reportObj.flow_In = Convert.ToString(result.FlowIn);
+                    _reportObj.flow_Out = Convert.ToString(result.FlowOut);
                     _reportObj.interval = result.Interval;
                     _reportObj.pct_In_Svc_Level = result.ServiceLevel;
                     _reportObj.total_After_Call = result.TotalAfterCallTime;
@@ -426,6 +433,8 @@ namespace CMDataCollector.Utilities
                             // Log.Debug("CacheMemory[UpdateCacheMemory] update to dictionary " + bcmsReturnObj.Skill + "cache abandon call = " + value.AgentData.Count);
                             try
                             {
+                                //Log.Debug("Before update : " + JsonConvert.SerializeObject(value, Newtonsoft.Json.Formatting.Indented));
+
                                 value.AbandCalls = (value.AbandCalls == null) ? "0" : value.AbandCalls;
                                 value.AvgAbandTime = (value.AbandCalls == null) ? "0" : value.AvgAbandTime;
                                 value.AcdCallsSummary = (value.AbandCalls == null) ? "0" : value.AcdCallsSummary;
@@ -434,6 +443,7 @@ namespace CMDataCollector.Utilities
                                 bcmsReturnObj.AbandCalls = value.AbandCalls;
                                 bcmsReturnObj.AvgAbandTime = value.AvgAbandTime;
                                 bcmsReturnObj.AcdCallsSummary = value.AcdCallsSummary;
+                                bcmsReturnObj.AbandCallsSummary = value.AbandCallsSummary;
                                 bcmsReturnObj.SL = value.SL;
                             }
                             catch (Exception ex)
@@ -444,6 +454,7 @@ namespace CMDataCollector.Utilities
                             bool updateResult = skillCachObj.TryUpdate(bcmsReturnObj.Skill, bcmsReturnObj, value);
                             Log.Debug("CacheMemory[UpdateCacheMemory] update to dictionary is  " + updateResult + "for " + bcmsReturnObj.Skill);
 
+                            //Log.Debug("After Update : " + JsonConvert.SerializeObject(value, Newtonsoft.Json.Formatting.Indented));
                             //if (value.AbandCalls != null)
                             //{
                             //    Log.Debug("CacheMemory[UpdateCacheMemory] update to dictionary for skill : " + bcmsReturnObj.Skill + " cache abandon call = " + value.AbandCalls);
@@ -479,36 +490,131 @@ namespace CMDataCollector.Utilities
         /// <param name="reportValue">historical data for a skill</param>
         public static void UpdateCacheMemory(BcmsHistoricalReport reportValue)
         {
-            Log.Debug("UpdateCacheMemory()");
             try
             {
-                _bcmsObj = new BcmsDashboard();
-                var isKeyExist = skillCachObj.ContainsKey(reportValue.skill);
-                if (isKeyExist)
+                Log.Debug("UpdateCacheMemory()");
+                if (reportValue != null)
                 {
-                    var currentData = skillCachObj.FirstOrDefault(x => x.Key == reportValue.skill).Value;
-                    _bcmsObj = currentData;
-                    _bcmsObj.AbandCallsSummary = reportValue.abandoned_Calls;
-                    _bcmsObj.AvgAbandTime = reportValue.avg_Abandoned_Time;
-                    _bcmsObj.AcdCallsSummary = reportValue.acd_Calls;
-                    _bcmsObj.SL = reportValue.pct_In_Svc_Level;
-                    _bcmsObj.AbandCalls = "0";
-                    _bcmsObj.PercentageInSL = "0";
-                    try
-                    {
-                        if (systemCachObj != null && systemCachObj.Count > 0)
-                        {
-                            _bcmsObj.AbandCalls = systemCachObj.FirstOrDefault(x => x.Key == _bcmsObj.SkillName).Value.AbandandCalls ?? "0";
-                            _bcmsObj.PercentageInSL = systemCachObj.FirstOrDefault(x => x.Key == _bcmsObj.SkillName).Value.PercentageSL ?? "0";
-                        }
-                    }
-                    catch (Exception ex)
-                    {
-                        Log.Error("Error while updating system data to skill : " + ex);
-                    }
+                    Log.Debug("UpdateCacheMemory for skill : " + reportValue.skill);
 
-                    skillCachObj.TryUpdate(currentData.Skill, _bcmsObj, currentData);                 
+                    _bcmsObj = new BcmsDashboard();
+
+                    //foreach (var item in skillCachObj)
+                    //{
+                    //    Log.Info("skillid " + item.Value.Skill);
+                    //    Log.Info("AbandCalls " + item.Value.AbandCalls);
+                    //    Log.Info("AbandCallsSummary " + item.Value.AbandCallsSummary);
+                    //    Log.Info("AcdCallsSummary " + item.Value.AcdCallsSummary);
+                    //}
+
+                    //Log.Debug(JsonConvert.SerializeObject(skillCachObj, Newtonsoft.Json.Formatting.Indented));
+                    BcmsDashboard values;
+                    if (skillCachObj.TryGetValue(reportValue.skill, out values))
+                    {
+                        Log.Debug("update historical data to cache memory");
+                        //Log.Debug("Input value : " + JsonConvert.SerializeObject(values1, Newtonsoft.Json.Formatting.Indented));
+                        values.AbandCallsSummary = reportValue.abandoned_Calls;
+                        //values1.AbandCallsSummaryTest = reportValue.abandoned_Calls;
+                        //values1.AbandCallsSummaryTest = "prakash";
+                        values.AvgAbandTime = reportValue.avg_Abandoned_Time;
+                        values.AcdCallsSummary = reportValue.acd_Calls;
+                    }
+                    else
+                        Log.Info("No key present in the cache memory");
+                   // Log.Debug("Afert update : " + JsonConvert.SerializeObject(values1, Newtonsoft.Json.Formatting.Indented));
+
+                    //if (skillCachObj.ContainsKey(reportValue.skill))
+                    //{
+                    //    //_bcmsObj = skillCachObj[reportValue.skill];
+
+                    //    BcmsDashboard values;
+
+                    //    //skillCachObj.TryGetValue(reportValue.skill, out values){
+
+                    //    //};
+
+                    //    Log.Debug("Input value : "+ JsonConvert.SerializeObject(reportValue, Newtonsoft.Json.Formatting.Indented));
+                    //    //Log.Debug("");
+
+                    //    Log.Debug("Before update : "+JsonConvert.SerializeObject(values, Newtonsoft.Json.Formatting.Indented));
+
+
+
+                    //    values.AbandCallsSummary = reportValue.abandoned_Calls;
+                    //    Log.Info("abandcalls summary new value : " + values.AbandCallsSummary);
+                    //   // values.AvgAbandTime = reportValue.avg_Abandoned_Time;
+                    //    values.AcdCallsSummary = reportValue.acd_Calls;
+
+                        //_bcmsObj.AccptedSL = values.AccptedSL;
+                        //_bcmsObj.ACD = values.ACD;
+                        //_bcmsObj.ACW = values.ACW;
+                        //_bcmsObj.AbandCalls = values.AbandCalls;
+                        //_bcmsObj.AbandonPercentage = values.AbandonPercentage;
+                        //_bcmsObj.AgentData = values.AgentData;
+                        //_bcmsObj.AvgHandlingTime = values.AvgHandlingTime;
+                        //_bcmsObj.CallsWaiting = values.CallsWaiting;
+                        //_bcmsObj.Channel = values.Channel;
+                        //_bcmsObj.Date = values.Date;
+                        //_bcmsObj.Extn = values.Extn;
+                        //_bcmsObj.OldestCall = values.OldestCall;
+                        //_bcmsObj.Other = values.Other;
+                        //_bcmsObj.PercentageInSL = values.PercentageInSL;
+                        //_bcmsObj.Skill = values.Skill;
+                        //_bcmsObj.SkillName = values.SkillName;
+                        //_bcmsObj.Staff = values.Staff;
+                        //_bcmsObj.AUX = values.AUX;
+                        //_bcmsObj.Avail = values.Avail;
+
+                        //_bcmsObj.AbandCallsSummary = reportValue.abandoned_Calls;
+                        //Log.Info("abandcalls summary new value : " + _bcmsObj.AbandCallsSummary);
+                        //_bcmsObj.AvgAbandTime = reportValue.avg_Abandoned_Time;
+                        //_bcmsObj.AcdCallsSummary = reportValue.acd_Calls;
+                        //_bcmsObj.SL = reportValue.pct_In_Svc_Level;
+                        //Log.Debug("AddToCacheMemory() cache old value key :" + values.Skill);
+                        //skillCachObj.TryUpdate(reportValue.skill, _bcmsObj, values);
+
+                        //Log.Debug("After update "+JsonConvert.SerializeObject(values, Newtonsoft.Json.Formatting.Indented));
+                    //}
+                    //else
+                    //{
+                    //    Log.Debug("skill not found in dictionary.");
+                    //}
+
+                    //var isKeyExist = skillCachObj.ContainsKey(reportValue.skill);
+                    //if (isKeyExist)
+                    //{
+                    //    Log.Info("skill exists in current cache memory, update values.");
+                    //    var currentData = skillCachObj.FirstOrDefault(x => x.Key == reportValue.skill).Value;
+                    //    Log.Info("abandcalls summary old value : " + currentData.AbandCallsSummary);
+                    //    _bcmsObj = currentData;
+                    //    _bcmsObj.AbandCallsSummary = reportValue.abandoned_Calls;
+                    //    Log.Info("abandcalls summary new value : " + _bcmsObj.AbandCallsSummary);
+                    //    _bcmsObj.AvgAbandTime = reportValue.avg_Abandoned_Time;
+                    //    _bcmsObj.AcdCallsSummary = reportValue.acd_Calls;
+                    //    _bcmsObj.SL = reportValue.pct_In_Svc_Level;
+                    //    _bcmsObj.AbandCalls = "0";
+                    //    _bcmsObj.PercentageInSL = "0";
+                    //    try
+                    //    {
+                    //        if (systemCachObj != null && systemCachObj.Count > 0)
+                    //        {
+                    //            _bcmsObj.AbandCalls = systemCachObj.FirstOrDefault(x => x.Key == _bcmsObj.SkillName).Value.AbandandCalls ?? "0";
+                    //            _bcmsObj.PercentageInSL = systemCachObj.FirstOrDefault(x => x.Key == _bcmsObj.SkillName).Value.PercentageSL ?? "0";
+                    //        }
+                    //    }
+                    //    catch (Exception ex)
+                    //    {
+                    //        Log.Error("Error while updating system data to skill : " + ex);
+                    //    }
+
+                    //    Log.Debug("update values to skill : " + currentData.Skill);
+                    //    skillCachObj.AddOrUpdate(currentData.Skill, _bcmsObj, (k, v) => _bcmsObj);
+
+                    //    //skillCachObj.TryUpdate(currentData.Skill, _bcmsObj, currentData);                 
+                    //}
                 }
+                else
+                    Log.Info("No data to update to cache memory.");
             }
             catch (Exception ex)
             {

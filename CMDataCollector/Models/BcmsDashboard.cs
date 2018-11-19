@@ -216,9 +216,14 @@ namespace CMDataCollector.Models
         [DataMember]
         public string AbandCallsSummary
         {
-            get { return abandCallsSummary; }
-            set { abandCallsSummary = value; }
+            //get { return abandCallsSummary; }
+            //set { abandCallsSummary = value; }
+            get;
+            set;
         }
+
+        [DataMember]
+        public string AbandCallsSummaryTest { get; set; }
 
         [DataMember]
         public string AvgAbandTime

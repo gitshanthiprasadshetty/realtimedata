@@ -127,26 +127,56 @@ namespace CMDataCollector.Utilities
                 DecryptCredentials();
                 ConntnString = ConnectionStrings.DecryptConnectionString(ConfigurationSettings.AppSettings["CMDbConn"]);
                 ServerAddress = ConfigurationSettings.AppSettings["serverAddress"];
-                Port = Convert.ToInt32(ConfigurationSettings.AppSettings["port"] == "0");
                 skillsToMonitor = ConfigurationSettings.AppSettings["skillsToMonitor"];
-                skillsPerConnection = Convert.ToInt32(ConfigurationSettings.AppSettings["skillsPerConnection"] == "0");
                 skillList = skillsToMonitor.Split(',');
-                DashboardRefreshTime = Convert.ToInt32(ConfigurationSettings.AppSettings["DashboardRefreshTime"] == "1000");
-                ReportRefreshTime = Convert.ToInt32(ConfigurationSettings.AppSettings["HistoricalReportRefreshTime"] == "1000");
-                HAEnabled = Convert.ToInt32(ConfigurationSettings.AppSettings["HAEnabled"] == "0");
-                MaxTriesOnCMConFailure = Convert.ToInt32(ConfigurationSettings.AppSettings["MaxTriesOnConnectionFailure"] = "0");
+                DashboardRefreshTime = Convert.ToInt32(ConfigurationSettings.AppSettings["DashboardRefreshTime"]);
+                ReportRefreshTime = Convert.ToInt32(ConfigurationSettings.AppSettings["HistoricalReportRefreshTime"]); 
                 ActionOnCMConFailure = ConfigurationSettings.AppSettings["ActionOnCMConFailure"].ToLower();
                 ConnectionType = ConfigurationSettings.AppSettings["Type"];
                 var val = ConfigurationSettings.AppSettings["CommandsToRun"];
                 CommandsToRun = val.Split(',');
-
+                try
+                {
+                    Port = Convert.ToInt32(ConfigurationSettings.AppSettings["port"]);
+                }
+                catch (Exception)
+                {
+                    Port = 22;
+                }
+                try
+                {
+                    MaxTriesOnCMConFailure = Convert.ToInt32(ConfigurationSettings.AppSettings["MaxTriesOnConnectionFailure"]);
+                    skillsPerConnection = Convert.ToInt32(ConfigurationSettings.AppSettings["skillsPerConnection"]);
+                    HAEnabled = Convert.ToInt32(ConfigurationSettings.AppSettings["HAEnabled"]);
+                }
+                catch (Exception)
+                {
+                    skillsPerConnection = GetSkillsPerConnection();
+                    HAEnabled = 0;
+                    MaxTriesOnCMConFailure = 0;
+                }
                 FetchExtenSkillData();
             }
             catch (Exception ex)
             {
                 Log.Error("Error in LoadConfig() : " + ex);
             }
-        }       
+        }
+
+        static int GetSkillsPerConnection()
+        {
+            Log.Debug("GetSkillsPerConnection()");
+            try
+            {
+                if (skillList.Count() > 2)
+                    return skillList.Count() / 2;
+            }
+            catch (Exception ex)
+            {
+                Log.Error("Error in GetSkillsPerConnection() : " + ex);
+            }
+            return 1;
+        }
 
         /// <summary>
         /// Gives total number of connections to be established to CM.
@@ -157,22 +187,22 @@ namespace CMDataCollector.Utilities
             try
             {
                 List<int> skills = new List<int>();
-                var skillList = skillsToMonitor.Split(',');
+                Log.Debug(skillList.Count().ToString());
                 foreach (var skil in skillList)
                 {
                     skills.Add(Convert.ToInt32(skil));
                 }
-
+                Log.Debug("skillsPerConnection : "+ skillsPerConnection);
                 double skillListCount = ((double)skills.Count() / skillsPerConnection);
 
                 string s = skillListCount.ToString("0.00");
                 string[] sl = s.Split('.');
-
                 int totalConnections = 0;
                 if (Convert.ToInt32(sl[1]) > 0 && Convert.ToInt32(sl[0]) > 0) totalConnections = Convert.ToInt32(sl[0]) + 1;
                 if (Convert.ToInt32(sl[1]) > 0 && Convert.ToInt32(sl[0]) < 0) totalConnections = 1;
                 if (Convert.ToInt32(sl[1]) == 0 && Convert.ToInt32(sl[0]) > 0) totalConnections=Convert.ToInt32(sl[0]);
 
+                Log.Debug("Total Connections to make : " + totalConnections);
                 return totalConnections;
             }
             catch (Exception ex)
@@ -313,6 +343,7 @@ namespace CMDataCollector.Utilities
                                     Log.Error("Message : ", ex);
                                 }
                             }
+                            Log.Debug("completed mapping of skill-extension");
                         }
                     }
                 }

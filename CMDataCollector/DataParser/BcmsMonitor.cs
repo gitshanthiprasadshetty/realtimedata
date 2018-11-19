@@ -45,12 +45,14 @@ namespace CMDataCollector.DataParser
                 // extract receveid data into fields and values arrays
                 Models.CMData data = Utils.ExtractCMData(result);
 
+                Log.Debug("Completed Extracting Data");
                 //System.IO.File.WriteAllLines("fs.txt",data.Fields);
                 //System.IO.File.WriteAllLines("d1.txt", data.Values);
 
                 //check if the response is successful
                 if (data != null && data.Success)
                 {
+                    Log.Debug("got data");
                     //check if we have atleast one field
                     if (data.Fields != null && data.Fields.Count > 0)
                     {
@@ -132,6 +134,7 @@ namespace CMDataCollector.DataParser
                         //list object to hold the final set of staitons
                         //List<BcmsMonitor> monList = new List<BcmsMonitor>();
 
+                        Log.Debug("field position done");
                         //station type object
                         var monBcms = new BcmsMonitor();
                         monBcms.AgentData = new List<AgentData>(); 
@@ -144,6 +147,7 @@ namespace CMDataCollector.DataParser
                             //assign all parameters one by one
                             foreach (PropertyInfo prop in props)
                             {
+                                Log.Debug("assigning all parameters one by one");
                                 //check if our field position map contains this property
                                 //then set the value
                                 if (fieldPositionMap.ContainsKey(prop.Name))
