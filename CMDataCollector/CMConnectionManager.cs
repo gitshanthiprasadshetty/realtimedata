@@ -232,6 +232,7 @@ namespace CMDataCollector
                 IsTrunkEnabled = ConfigurationData.CommandsToRun.Contains("trunk");
                 if (IsTrunkEnabled)
                 {
+                    Log.Debug("trunk enabled");
                     // since we are establishing only one connection to CM if trunk is to be monitored, so
                     // take next followed connectionkey as a connection key to trunk.
                     int key = noOfConn;
@@ -244,6 +245,7 @@ namespace CMDataCollector
                 IsSystemEnabled = ConfigurationData.CommandsToRun.Contains("system");
                 if (IsSystemEnabled)
                 {
+                    Log.Debug("System Enabled");
                     int key = noOfConn + 1;
                     CM.Add(key.ToString(), new CMConnection(key.ToString(), new List<string> { "system" }));
                 }
@@ -252,6 +254,7 @@ namespace CMDataCollector
                 IsListEnabled = ConfigurationData.CommandsToRun.Contains("list");
                 if (IsListEnabled)
                 {
+                    Log.Debug("List Enabled");
                     int key = noOfConn + 1;
                     CM.Add(key.ToString(), new CMConnection(key.ToString(), new List<string> { "list" }));
                 }

@@ -2,6 +2,7 @@
 using System.ServiceProcess;
 using System.ServiceModel;
 using CMDataCollector;
+using System.Threading;
 
 namespace TRealtimeData
 {
@@ -21,18 +22,22 @@ namespace TRealtimeData
             ServiceHost myServiceHost = new ServiceHost(typeof(CMDataService));
             try
             {
+                log.Debug("Starting TRealtime service.");
                 myServiceHost.Open();
-                BCMSDashboardManager.Start();
-                log.Debug("BCMS Service is started");
+                Thread startThread = new Thread(new ThreadStart(delegate { BCMSDashboardManager.Start(); })); // new Thread(new ThreadStart(delegate{ GetHistoricalData(); }));
+                startThread.Start();
+                //BCMSDashboardManager.Start();
+                log.Debug("TRealtime Service is started");
             }
             catch (Exception ex)
             {
-                log.Error("BCMS Service OnStart : " + ex);
+                log.Error("TRealtime Service OnStart : " + ex);
             }
         }
 
         protected override void OnStop()
         {
+            log.Debug("TRealtime Service Stopped");
         }
     }
 }

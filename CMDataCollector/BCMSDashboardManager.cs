@@ -27,12 +27,15 @@ namespace CMDataCollector
 
                 // Load all the config values from app.config
                 ConfigurationData.LoadConfig();
-
+                Log.Debug("All configs loaded to in-memory.");
                 if (ConfigurationData.HAEnabled != 1)
                 {
                     // if HA is not enabled establish the connection to CM directly.
                     if (ConfigurationData.ConnectionType.ToLower() == "cm")
+                    {
+                        Log.Debug("HA Disabled | Type : CM selected");
                         CMConnectionManager.GetInstance().Start();
+                    }
                 }
 
                 // If HA enabled then decide wether to connect to CM or just start the service without connecting to CM.
@@ -45,13 +48,19 @@ namespace CMDataCollector
                     // TRealTimeDataSync.SyncManager.AlternateServerStatus += new TRealTimeDataSync.SyncManager.ServerStatus(OnStatusChange);
 
                     if (ConfigurationData.ConnectionType.ToLower() == "cm")
-                        CMConnectionManager.GetInstance().connectToCM = false;                  
+                    {
+                        Log.Debug("HA Enabled | Type : CM selected");
+                        CMConnectionManager.GetInstance().connectToCM = false;
+                    }                
                 }
 
                 // If connection-type is SIP then get realtime data from Tmac service and database.
                 // Irrespective of HA status start sip if it's enabled. If HA is enabled then OnStatusChange method will have data for SIP.
                 if (ConfigurationData.ConnectionType.ToLower() == "sip")
+                {
+                    Log.Debug("sip selected");
                     SIPManager.GetInstance().Start();
+                }
             }
             catch (Exception ex)
             {

@@ -246,12 +246,14 @@ namespace CMDataCollector.Connection
                         // this keep trying is required to handle data-mismatch between diff skills in same connection obj.
                         // doing this, control won't be passed to next sequence to execute untill we get whole data
                         // for executing skillid.
-                        
+                        Log.Debug("Waiting for Response");
                         while (!Responsereceived)
                         {
+                            //Log.Debug("No Response Received...");
                             Thread.Sleep(1000);
                         }
                         Thread.Sleep(100);
+                        Log.Debug("Response received. Execute next skill in loop");
                     }
                 }));
                 t.Start();
