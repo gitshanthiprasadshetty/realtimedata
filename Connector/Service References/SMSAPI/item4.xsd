@@ -1,0 +1,507 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xs:schema xmlns:tns="http://tempuri.org/" elementFormDefault="qualified" targetNamespace="http://tempuri.org/" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:import schemaLocation="http://localhost:55000/CM_SMS_API/?xsd=xsd2" namespace="http://schemas.datacontract.org/2004/07/AACC_API.AACCWS" />
+  <xs:import schemaLocation="http://localhost:55000/CM_SMS_API/?xsd=xsd3" namespace="http://schemas.datacontract.org/2004/07/SMS_API.SystemManagementService" />
+  <xs:import schemaLocation="http://localhost:55000/CM_SMS_API/?xsd=xsd4" namespace="http://schemas.microsoft.com/2003/10/Serialization/Arrays" />
+  <xs:import schemaLocation="http://localhost:55000/CM_SMS_API/?xsd=xsd5" namespace="http://schemas.datacontract.org/2004/07/SMS_API" />
+  <xs:element name="GetUserAACC">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" name="agentID" nillable="true" type="xs:string" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="GetUserAACCResponse">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element xmlns:q1="http://schemas.datacontract.org/2004/07/AACC_API.AACCWS" minOccurs="0" name="GetUserAACCResult" nillable="true" type="q1:UserDetails" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="AddUserAACC">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" name="agentID" nillable="true" type="xs:string" />
+        <xs:element minOccurs="0" name="domain" nillable="true" type="xs:string" />
+        <xs:element minOccurs="0" name="firstName" nillable="true" type="xs:string" />
+        <xs:element minOccurs="0" name="lastName" nillable="true" type="xs:string" />
+        <xs:element minOccurs="0" name="supervisorLocalID" type="xs:int" />
+        <xs:element minOccurs="0" name="lanID" nillable="true" type="xs:string" />
+        <xs:element minOccurs="0" name="type" nillable="true" type="xs:string" />
+        <xs:element minOccurs="0" name="voiceURI" nillable="true" type="xs:string" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="AddUserAACCResponse">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" name="AddUserAACCResult" type="xs:int" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="DeleteUserAACC">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" name="agentID" nillable="true" type="xs:string" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="DeleteUserAACCResponse">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" name="DeleteUserAACCResult" type="xs:int" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="UpdateUserAACC">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" name="agentID" nillable="true" type="xs:string" />
+        <xs:element minOccurs="0" name="supervisorLocalID" type="xs:int" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="UpdateUserAACCResponse">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" name="UpdateUserAACCResult" type="xs:int" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="GetSupervisors">
+    <xs:complexType>
+      <xs:sequence />
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="GetSupervisorsResponse">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element xmlns:q2="http://schemas.datacontract.org/2004/07/AACC_API.AACCWS" minOccurs="0" name="GetSupervisorsResult" nillable="true" type="q2:ArrayOfAgentBasicDetails" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="GetContactTypeList">
+    <xs:complexType>
+      <xs:sequence />
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="GetContactTypeListResponse">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element xmlns:q3="http://schemas.datacontract.org/2004/07/AACC_API.AACCWS" minOccurs="0" name="GetContactTypeListResult" nillable="true" type="q3:ArrayOfContactType" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="GetSkillSetsList">
+    <xs:complexType>
+      <xs:sequence />
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="GetSkillSetsListResponse">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element xmlns:q4="http://schemas.datacontract.org/2004/07/AACC_API.AACCWS" minOccurs="0" name="GetSkillSetsListResult" nillable="true" type="q4:ArrayOfSkillset" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="UpdateAgentEmailSkillSets">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" name="agentID" nillable="true" type="xs:string" />
+        <xs:element minOccurs="0" name="skillIdList" nillable="true" type="xs:string" />
+        <xs:element minOccurs="0" name="skillLevelList" nillable="true" type="xs:string" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="UpdateAgentEmailSkillSetsResponse">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" name="UpdateAgentEmailSkillSetsResult" type="xs:int" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="GetAgentSkillSetsList">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" name="loginId" nillable="true" type="xs:string" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="GetAgentSkillSetsListResponse">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element xmlns:q5="http://schemas.datacontract.org/2004/07/AACC_API.AACCWS" minOccurs="0" name="GetAgentSkillSetsListResult" nillable="true" type="q5:ArrayOfSkillset" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="GetAACCUserDetails">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" name="loginId" nillable="true" type="xs:string" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="GetAACCUserDetailsResponse">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element xmlns:q6="http://schemas.datacontract.org/2004/07/AACC_API.AACCWS" minOccurs="0" name="GetAACCUserDetailsResult" nillable="true" type="q6:AACCUserDetails" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="IsAACCUserExists">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" name="lanId" nillable="true" type="xs:string" />
+        <xs:element minOccurs="0" name="domain" nillable="true" type="xs:string" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="IsAACCUserExistsResponse">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" name="IsAACCUserExistsResult" type="xs:boolean" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="GetAgent">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" name="agentid" nillable="true" type="xs:string" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="GetAgentResponse">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element xmlns:q7="http://schemas.datacontract.org/2004/07/SMS_API.SystemManagementService" minOccurs="0" name="GetAgentResult" nillable="true" type="q7:AgentType" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="GetVDNDetails">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" name="vdn" nillable="true" type="xs:string" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="GetVDNDetailsResponse">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element xmlns:q8="http://schemas.datacontract.org/2004/07/SMS_API.SystemManagementService" minOccurs="0" name="GetVDNDetailsResult" nillable="true" type="q8:VDNType" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="GetSkillList">
+    <xs:complexType>
+      <xs:sequence />
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="GetSkillListResponse">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element xmlns:q9="http://schemas.datacontract.org/2004/07/SMS_API.SystemManagementService" minOccurs="0" name="GetSkillListResult" nillable="true" type="q9:ArrayOfHuntGroupType" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="GetAllSkillData">
+    <xs:complexType>
+      <xs:sequence />
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="GetAllSkillDataResponse">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element xmlns:q10="http://schemas.datacontract.org/2004/07/SMS_API.SystemManagementService" minOccurs="0" name="GetAllSkillDataResult" nillable="true" type="q10:ArrayOfHuntGroupType" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="GetAgentList">
+    <xs:complexType>
+      <xs:sequence />
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="GetAgentListResponse">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element xmlns:q11="http://schemas.datacontract.org/2004/07/SMS_API.SystemManagementService" minOccurs="0" name="GetAgentListResult" nillable="true" type="q11:ArrayOfAgentType" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="AddAgent">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" name="agentid" nillable="true" type="xs:string" />
+        <xs:element minOccurs="0" name="agentname" nillable="true" type="xs:string" />
+        <xs:element minOccurs="0" name="defaultSkill" nillable="true" type="xs:string" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="AddAgentResponse">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" name="AddAgentResult" type="xs:boolean" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="RemoveAgent">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" name="agentid" nillable="true" type="xs:string" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="RemoveAgentResponse">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" name="RemoveAgentResult" type="xs:boolean" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="AssignAgentSkills">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element xmlns:q12="http://schemas.microsoft.com/2003/10/Serialization/Arrays" minOccurs="0" name="agents" nillable="true" type="q12:ArrayOfstring" />
+        <xs:element xmlns:q13="http://schemas.microsoft.com/2003/10/Serialization/Arrays" minOccurs="0" name="skills" nillable="true" type="q13:ArrayOfstring" />
+        <xs:element xmlns:q14="http://schemas.microsoft.com/2003/10/Serialization/Arrays" minOccurs="0" name="skillLevels" nillable="true" type="q14:ArrayOfstring" />
+        <xs:element minOccurs="0" name="supervisorStation" nillable="true" type="xs:string" />
+        <xs:element minOccurs="0" name="secondsPerCall" type="xs:int" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="AssignAgentSkillsResponse">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element xmlns:q15="http://schemas.microsoft.com/2003/10/Serialization/Arrays" minOccurs="0" name="AssignAgentSkillsResult" nillable="true" type="q15:ArrayOfint" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="RemoveAgentSkills">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element xmlns:q16="http://schemas.microsoft.com/2003/10/Serialization/Arrays" minOccurs="0" name="agents" nillable="true" type="q16:ArrayOfstring" />
+        <xs:element xmlns:q17="http://schemas.microsoft.com/2003/10/Serialization/Arrays" minOccurs="0" name="skills" nillable="true" type="q17:ArrayOfstring" />
+        <xs:element minOccurs="0" name="supervisorStation" nillable="true" type="xs:string" />
+        <xs:element minOccurs="0" name="secondsPerCall" type="xs:int" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="RemoveAgentSkillsResponse">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element xmlns:q18="http://schemas.microsoft.com/2003/10/Serialization/Arrays" minOccurs="0" name="RemoveAgentSkillsResult" nillable="true" type="q18:ArrayOfint" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="GetAgentStation">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" name="agentLoginId" nillable="true" type="xs:string" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="GetAgentStationResponse">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" name="GetAgentStationResult" nillable="true" type="xs:string" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="UpdateMultiAgentSkills">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element xmlns:q19="http://schemas.microsoft.com/2003/10/Serialization/Arrays" minOccurs="0" name="agentCodes" nillable="true" type="q19:ArrayOfstring" />
+        <xs:element xmlns:q20="http://schemas.microsoft.com/2003/10/Serialization/Arrays" minOccurs="0" name="skillsList" nillable="true" type="q20:ArrayOfstring" />
+        <xs:element xmlns:q21="http://schemas.microsoft.com/2003/10/Serialization/Arrays" minOccurs="0" name="skillLevelsList" nillable="true" type="q21:ArrayOfstring" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="UpdateMultiAgentSkillsResponse">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element xmlns:q22="http://schemas.microsoft.com/2003/10/Serialization/Arrays" minOccurs="0" name="UpdateMultiAgentSkillsResult" nillable="true" type="q22:ArrayOfstring" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="UpdateAgentSkills">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" name="agentCode" nillable="true" type="xs:string" />
+        <xs:element xmlns:q23="http://schemas.microsoft.com/2003/10/Serialization/Arrays" minOccurs="0" name="skillsList" nillable="true" type="q23:ArrayOfstring" />
+        <xs:element xmlns:q24="http://schemas.microsoft.com/2003/10/Serialization/Arrays" minOccurs="0" name="skillLevelsList" nillable="true" type="q24:ArrayOfstring" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="UpdateAgentSkillsResponse">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element xmlns:q25="http://schemas.microsoft.com/2003/10/Serialization/Arrays" minOccurs="0" name="UpdateAgentSkillsResult" nillable="true" type="q25:ArrayOfstring" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="GetRegisteredIPStations">
+    <xs:complexType>
+      <xs:sequence />
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="GetRegisteredIPStationsResponse">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element xmlns:q26="http://schemas.datacontract.org/2004/07/SMS_API.SystemManagementService" minOccurs="0" name="GetRegisteredIPStationsResult" nillable="true" type="q26:ArrayOfRegisteredIPStationsType" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="RestartStation">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" name="stationid" nillable="true" type="xs:string" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="RestartStationResponse">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" name="RestartStationResult" type="xs:int" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="GetCapacity">
+    <xs:complexType>
+      <xs:sequence />
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="GetCapacityResponse">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element xmlns:q27="http://schemas.datacontract.org/2004/07/SMS_API.SystemManagementService" minOccurs="0" name="GetCapacityResult" nillable="true" type="q27:CapacityType" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="GetStatusStation">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" name="stationid" nillable="true" type="xs:string" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="GetStatusStationResponse">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element xmlns:q28="http://schemas.datacontract.org/2004/07/SMS_API.SystemManagementService" minOccurs="0" name="GetStatusStationResult" nillable="true" type="q28:StationStatusType" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="QueryData">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" name="operation" nillable="true" type="xs:string" />
+        <xs:element minOccurs="0" name="objectType" nillable="true" type="xs:string" />
+        <xs:element minOccurs="0" name="qualifier" nillable="true" type="xs:string" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="QueryDataResponse">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element xmlns:q29="http://schemas.datacontract.org/2004/07/SMS_API" minOccurs="0" name="QueryDataResult" nillable="true" type="q29:CM_ObjectType" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="ChangeStationCallAppearance">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" name="stationid" nillable="true" type="xs:string" />
+        <xs:element minOccurs="0" name="lineid" type="xs:int" />
+        <xs:element minOccurs="0" name="add" type="xs:boolean" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="ChangeStationCallAppearanceResponse">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" name="ChangeStationCallAppearanceResult" type="xs:boolean" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="ListBcmsSkill">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" name="skill" nillable="true" type="xs:string" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="ListBcmsSkillResponse">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element xmlns:q30="http://schemas.datacontract.org/2004/07/SMS_API.SystemManagementService" minOccurs="0" name="ListBcmsSkillResult" nillable="true" type="q30:ArrayOfBCMSSkillReportType" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="ListBcmsAgent">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" name="agentId" nillable="true" type="xs:string" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="ListBcmsAgentResponse">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element xmlns:q31="http://schemas.datacontract.org/2004/07/SMS_API.SystemManagementService" minOccurs="0" name="ListBcmsAgentResult" nillable="true" type="q31:ArrayOfBCMSAgentReportType" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="AddSkill">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" name="skillId" nillable="true" type="xs:string" />
+        <xs:element minOccurs="0" name="skillExtensionId" nillable="true" type="xs:string" />
+        <xs:element minOccurs="0" name="skillName" nillable="true" type="xs:string" />
+        <xs:element minOccurs="0" name="acceptableSL" type="xs:int" />
+        <xs:element minOccurs="0" name="timeout" type="xs:int" />
+        <xs:element minOccurs="0" name="priority" type="xs:int" />
+        <xs:element minOccurs="0" name="state" type="xs:boolean" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="AddSkillResponse">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" name="AddSkillResult" type="xs:boolean" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="UpdateSkill">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" name="skillId" nillable="true" type="xs:string" />
+        <xs:element minOccurs="0" name="skillExtensionId" nillable="true" type="xs:string" />
+        <xs:element minOccurs="0" name="skillName" nillable="true" type="xs:string" />
+        <xs:element minOccurs="0" name="acceptableSL" type="xs:int" />
+        <xs:element minOccurs="0" name="timeout" type="xs:int" />
+        <xs:element minOccurs="0" name="priority" type="xs:int" />
+        <xs:element minOccurs="0" name="state" type="xs:boolean" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="UpdateSkillResponse">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" name="UpdateSkillResult" type="xs:boolean" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="RemoveSkill">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" name="skillId" nillable="true" type="xs:string" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="RemoveSkillResponse">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" name="RemoveSkillResult" type="xs:int" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+</xs:schema>

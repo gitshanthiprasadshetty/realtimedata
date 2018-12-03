@@ -1,0 +1,669 @@
+<?xml version="1.0" encoding="utf-8"?>
+<wsdl:definitions xmlns:wsap="http://schemas.xmlsoap.org/ws/2004/08/addressing/policy" xmlns:wsa10="http://www.w3.org/2005/08/addressing" xmlns:tns="http://tempuri.org/" xmlns:msc="http://schemas.microsoft.com/ws/2005/12/wsdl/contract" xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/" xmlns:wsx="http://schemas.xmlsoap.org/ws/2004/09/mex" xmlns:wsp="http://schemas.xmlsoap.org/ws/2004/09/policy" xmlns:wsam="http://www.w3.org/2007/05/addressing/metadata" xmlns:wsa="http://schemas.xmlsoap.org/ws/2004/08/addressing" xmlns:soap12="http://schemas.xmlsoap.org/wsdl/soap12/" xmlns:wsaw="http://www.w3.org/2006/05/addressing/wsdl" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd" xmlns:xsd="http://www.w3.org/2001/XMLSchema" name="CMAPI" targetNamespace="http://tempuri.org/" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
+  <wsdl:types>
+    <xsd:schema targetNamespace="http://tempuri.org/Imports">
+      <xsd:import schemaLocation="http://localhost:55000/CM_SMS_API/?xsd=xsd0" namespace="http://tempuri.org/" />
+      <xsd:import schemaLocation="http://localhost:55000/CM_SMS_API/?xsd=xsd1" namespace="http://schemas.microsoft.com/2003/10/Serialization/" />
+      <xsd:import schemaLocation="http://localhost:55000/CM_SMS_API/?xsd=xsd2" namespace="http://schemas.datacontract.org/2004/07/AACC_API.AACCWS" />
+      <xsd:import schemaLocation="http://localhost:55000/CM_SMS_API/?xsd=xsd3" namespace="http://schemas.datacontract.org/2004/07/SMS_API.SystemManagementService" />
+      <xsd:import schemaLocation="http://localhost:55000/CM_SMS_API/?xsd=xsd4" namespace="http://schemas.microsoft.com/2003/10/Serialization/Arrays" />
+      <xsd:import schemaLocation="http://localhost:55000/CM_SMS_API/?xsd=xsd5" namespace="http://schemas.datacontract.org/2004/07/SMS_API" />
+    </xsd:schema>
+  </wsdl:types>
+  <wsdl:message name="IService_GetUserAACC_InputMessage">
+    <wsdl:part name="parameters" element="tns:GetUserAACC" />
+  </wsdl:message>
+  <wsdl:message name="IService_GetUserAACC_OutputMessage">
+    <wsdl:part name="parameters" element="tns:GetUserAACCResponse" />
+  </wsdl:message>
+  <wsdl:message name="IService_AddUserAACC_InputMessage">
+    <wsdl:part name="parameters" element="tns:AddUserAACC" />
+  </wsdl:message>
+  <wsdl:message name="IService_AddUserAACC_OutputMessage">
+    <wsdl:part name="parameters" element="tns:AddUserAACCResponse" />
+  </wsdl:message>
+  <wsdl:message name="IService_DeleteUserAACC_InputMessage">
+    <wsdl:part name="parameters" element="tns:DeleteUserAACC" />
+  </wsdl:message>
+  <wsdl:message name="IService_DeleteUserAACC_OutputMessage">
+    <wsdl:part name="parameters" element="tns:DeleteUserAACCResponse" />
+  </wsdl:message>
+  <wsdl:message name="IService_UpdateUserAACC_InputMessage">
+    <wsdl:part name="parameters" element="tns:UpdateUserAACC" />
+  </wsdl:message>
+  <wsdl:message name="IService_UpdateUserAACC_OutputMessage">
+    <wsdl:part name="parameters" element="tns:UpdateUserAACCResponse" />
+  </wsdl:message>
+  <wsdl:message name="IService_GetSupervisors_InputMessage">
+    <wsdl:part name="parameters" element="tns:GetSupervisors" />
+  </wsdl:message>
+  <wsdl:message name="IService_GetSupervisors_OutputMessage">
+    <wsdl:part name="parameters" element="tns:GetSupervisorsResponse" />
+  </wsdl:message>
+  <wsdl:message name="IService_GetContactTypeList_InputMessage">
+    <wsdl:part name="parameters" element="tns:GetContactTypeList" />
+  </wsdl:message>
+  <wsdl:message name="IService_GetContactTypeList_OutputMessage">
+    <wsdl:part name="parameters" element="tns:GetContactTypeListResponse" />
+  </wsdl:message>
+  <wsdl:message name="IService_GetSkillSetsList_InputMessage">
+    <wsdl:part name="parameters" element="tns:GetSkillSetsList" />
+  </wsdl:message>
+  <wsdl:message name="IService_GetSkillSetsList_OutputMessage">
+    <wsdl:part name="parameters" element="tns:GetSkillSetsListResponse" />
+  </wsdl:message>
+  <wsdl:message name="IService_UpdateAgentEmailSkillSets_InputMessage">
+    <wsdl:part name="parameters" element="tns:UpdateAgentEmailSkillSets" />
+  </wsdl:message>
+  <wsdl:message name="IService_UpdateAgentEmailSkillSets_OutputMessage">
+    <wsdl:part name="parameters" element="tns:UpdateAgentEmailSkillSetsResponse" />
+  </wsdl:message>
+  <wsdl:message name="IService_GetAgentSkillSetsList_InputMessage">
+    <wsdl:part name="parameters" element="tns:GetAgentSkillSetsList" />
+  </wsdl:message>
+  <wsdl:message name="IService_GetAgentSkillSetsList_OutputMessage">
+    <wsdl:part name="parameters" element="tns:GetAgentSkillSetsListResponse" />
+  </wsdl:message>
+  <wsdl:message name="IService_GetAACCUserDetails_InputMessage">
+    <wsdl:part name="parameters" element="tns:GetAACCUserDetails" />
+  </wsdl:message>
+  <wsdl:message name="IService_GetAACCUserDetails_OutputMessage">
+    <wsdl:part name="parameters" element="tns:GetAACCUserDetailsResponse" />
+  </wsdl:message>
+  <wsdl:message name="IService_IsAACCUserExists_InputMessage">
+    <wsdl:part name="parameters" element="tns:IsAACCUserExists" />
+  </wsdl:message>
+  <wsdl:message name="IService_IsAACCUserExists_OutputMessage">
+    <wsdl:part name="parameters" element="tns:IsAACCUserExistsResponse" />
+  </wsdl:message>
+  <wsdl:message name="IService_GetAgent_InputMessage">
+    <wsdl:part name="parameters" element="tns:GetAgent" />
+  </wsdl:message>
+  <wsdl:message name="IService_GetAgent_OutputMessage">
+    <wsdl:part name="parameters" element="tns:GetAgentResponse" />
+  </wsdl:message>
+  <wsdl:message name="IService_GetVDNDetails_InputMessage">
+    <wsdl:part name="parameters" element="tns:GetVDNDetails" />
+  </wsdl:message>
+  <wsdl:message name="IService_GetVDNDetails_OutputMessage">
+    <wsdl:part name="parameters" element="tns:GetVDNDetailsResponse" />
+  </wsdl:message>
+  <wsdl:message name="IService_GetSkillList_InputMessage">
+    <wsdl:part name="parameters" element="tns:GetSkillList" />
+  </wsdl:message>
+  <wsdl:message name="IService_GetSkillList_OutputMessage">
+    <wsdl:part name="parameters" element="tns:GetSkillListResponse" />
+  </wsdl:message>
+  <wsdl:message name="IService_GetAllSkillData_InputMessage">
+    <wsdl:part name="parameters" element="tns:GetAllSkillData" />
+  </wsdl:message>
+  <wsdl:message name="IService_GetAllSkillData_OutputMessage">
+    <wsdl:part name="parameters" element="tns:GetAllSkillDataResponse" />
+  </wsdl:message>
+  <wsdl:message name="IService_GetAgentList_InputMessage">
+    <wsdl:part name="parameters" element="tns:GetAgentList" />
+  </wsdl:message>
+  <wsdl:message name="IService_GetAgentList_OutputMessage">
+    <wsdl:part name="parameters" element="tns:GetAgentListResponse" />
+  </wsdl:message>
+  <wsdl:message name="IService_AddAgent_InputMessage">
+    <wsdl:part name="parameters" element="tns:AddAgent" />
+  </wsdl:message>
+  <wsdl:message name="IService_AddAgent_OutputMessage">
+    <wsdl:part name="parameters" element="tns:AddAgentResponse" />
+  </wsdl:message>
+  <wsdl:message name="IService_RemoveAgent_InputMessage">
+    <wsdl:part name="parameters" element="tns:RemoveAgent" />
+  </wsdl:message>
+  <wsdl:message name="IService_RemoveAgent_OutputMessage">
+    <wsdl:part name="parameters" element="tns:RemoveAgentResponse" />
+  </wsdl:message>
+  <wsdl:message name="IService_AssignAgentSkills_InputMessage">
+    <wsdl:part name="parameters" element="tns:AssignAgentSkills" />
+  </wsdl:message>
+  <wsdl:message name="IService_AssignAgentSkills_OutputMessage">
+    <wsdl:part name="parameters" element="tns:AssignAgentSkillsResponse" />
+  </wsdl:message>
+  <wsdl:message name="IService_RemoveAgentSkills_InputMessage">
+    <wsdl:part name="parameters" element="tns:RemoveAgentSkills" />
+  </wsdl:message>
+  <wsdl:message name="IService_RemoveAgentSkills_OutputMessage">
+    <wsdl:part name="parameters" element="tns:RemoveAgentSkillsResponse" />
+  </wsdl:message>
+  <wsdl:message name="IService_GetAgentStation_InputMessage">
+    <wsdl:part name="parameters" element="tns:GetAgentStation" />
+  </wsdl:message>
+  <wsdl:message name="IService_GetAgentStation_OutputMessage">
+    <wsdl:part name="parameters" element="tns:GetAgentStationResponse" />
+  </wsdl:message>
+  <wsdl:message name="IService_UpdateMultiAgentSkills_InputMessage">
+    <wsdl:part name="parameters" element="tns:UpdateMultiAgentSkills" />
+  </wsdl:message>
+  <wsdl:message name="IService_UpdateMultiAgentSkills_OutputMessage">
+    <wsdl:part name="parameters" element="tns:UpdateMultiAgentSkillsResponse" />
+  </wsdl:message>
+  <wsdl:message name="IService_UpdateAgentSkills_InputMessage">
+    <wsdl:part name="parameters" element="tns:UpdateAgentSkills" />
+  </wsdl:message>
+  <wsdl:message name="IService_UpdateAgentSkills_OutputMessage">
+    <wsdl:part name="parameters" element="tns:UpdateAgentSkillsResponse" />
+  </wsdl:message>
+  <wsdl:message name="IService_GetRegisteredIPStations_InputMessage">
+    <wsdl:part name="parameters" element="tns:GetRegisteredIPStations" />
+  </wsdl:message>
+  <wsdl:message name="IService_GetRegisteredIPStations_OutputMessage">
+    <wsdl:part name="parameters" element="tns:GetRegisteredIPStationsResponse" />
+  </wsdl:message>
+  <wsdl:message name="IService_RestartStation_InputMessage">
+    <wsdl:part name="parameters" element="tns:RestartStation" />
+  </wsdl:message>
+  <wsdl:message name="IService_RestartStation_OutputMessage">
+    <wsdl:part name="parameters" element="tns:RestartStationResponse" />
+  </wsdl:message>
+  <wsdl:message name="IService_GetCapacity_InputMessage">
+    <wsdl:part name="parameters" element="tns:GetCapacity" />
+  </wsdl:message>
+  <wsdl:message name="IService_GetCapacity_OutputMessage">
+    <wsdl:part name="parameters" element="tns:GetCapacityResponse" />
+  </wsdl:message>
+  <wsdl:message name="IService_GetStatusStation_InputMessage">
+    <wsdl:part name="parameters" element="tns:GetStatusStation" />
+  </wsdl:message>
+  <wsdl:message name="IService_GetStatusStation_OutputMessage">
+    <wsdl:part name="parameters" element="tns:GetStatusStationResponse" />
+  </wsdl:message>
+  <wsdl:message name="IService_QueryData_InputMessage">
+    <wsdl:part name="parameters" element="tns:QueryData" />
+  </wsdl:message>
+  <wsdl:message name="IService_QueryData_OutputMessage">
+    <wsdl:part name="parameters" element="tns:QueryDataResponse" />
+  </wsdl:message>
+  <wsdl:message name="IService_ChangeStationCallAppearance_InputMessage">
+    <wsdl:part name="parameters" element="tns:ChangeStationCallAppearance" />
+  </wsdl:message>
+  <wsdl:message name="IService_ChangeStationCallAppearance_OutputMessage">
+    <wsdl:part name="parameters" element="tns:ChangeStationCallAppearanceResponse" />
+  </wsdl:message>
+  <wsdl:message name="IService_ListBcmsSkill_InputMessage">
+    <wsdl:part name="parameters" element="tns:ListBcmsSkill" />
+  </wsdl:message>
+  <wsdl:message name="IService_ListBcmsSkill_OutputMessage">
+    <wsdl:part name="parameters" element="tns:ListBcmsSkillResponse" />
+  </wsdl:message>
+  <wsdl:message name="IService_ListBcmsAgent_InputMessage">
+    <wsdl:part name="parameters" element="tns:ListBcmsAgent" />
+  </wsdl:message>
+  <wsdl:message name="IService_ListBcmsAgent_OutputMessage">
+    <wsdl:part name="parameters" element="tns:ListBcmsAgentResponse" />
+  </wsdl:message>
+  <wsdl:message name="IService_AddSkill_InputMessage">
+    <wsdl:part name="parameters" element="tns:AddSkill" />
+  </wsdl:message>
+  <wsdl:message name="IService_AddSkill_OutputMessage">
+    <wsdl:part name="parameters" element="tns:AddSkillResponse" />
+  </wsdl:message>
+  <wsdl:message name="IService_UpdateSkill_InputMessage">
+    <wsdl:part name="parameters" element="tns:UpdateSkill" />
+  </wsdl:message>
+  <wsdl:message name="IService_UpdateSkill_OutputMessage">
+    <wsdl:part name="parameters" element="tns:UpdateSkillResponse" />
+  </wsdl:message>
+  <wsdl:message name="IService_RemoveSkill_InputMessage">
+    <wsdl:part name="parameters" element="tns:RemoveSkill" />
+  </wsdl:message>
+  <wsdl:message name="IService_RemoveSkill_OutputMessage">
+    <wsdl:part name="parameters" element="tns:RemoveSkillResponse" />
+  </wsdl:message>
+  <wsdl:portType name="IService">
+    <wsdl:operation name="GetUserAACC">
+      <wsdl:input wsaw:Action="http://tempuri.org/IService/GetUserAACC" message="tns:IService_GetUserAACC_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/IService/GetUserAACCResponse" message="tns:IService_GetUserAACC_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="AddUserAACC">
+      <wsdl:input wsaw:Action="http://tempuri.org/IService/AddUserAACC" message="tns:IService_AddUserAACC_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/IService/AddUserAACCResponse" message="tns:IService_AddUserAACC_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="DeleteUserAACC">
+      <wsdl:input wsaw:Action="http://tempuri.org/IService/DeleteUserAACC" message="tns:IService_DeleteUserAACC_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/IService/DeleteUserAACCResponse" message="tns:IService_DeleteUserAACC_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="UpdateUserAACC">
+      <wsdl:input wsaw:Action="http://tempuri.org/IService/UpdateUserAACC" message="tns:IService_UpdateUserAACC_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/IService/UpdateUserAACCResponse" message="tns:IService_UpdateUserAACC_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="GetSupervisors">
+      <wsdl:input wsaw:Action="http://tempuri.org/IService/GetSupervisors" message="tns:IService_GetSupervisors_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/IService/GetSupervisorsResponse" message="tns:IService_GetSupervisors_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="GetContactTypeList">
+      <wsdl:input wsaw:Action="http://tempuri.org/IService/GetContactTypeList" message="tns:IService_GetContactTypeList_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/IService/GetContactTypeListResponse" message="tns:IService_GetContactTypeList_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="GetSkillSetsList">
+      <wsdl:input wsaw:Action="http://tempuri.org/IService/GetSkillSetsList" message="tns:IService_GetSkillSetsList_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/IService/GetSkillSetsListResponse" message="tns:IService_GetSkillSetsList_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="UpdateAgentEmailSkillSets">
+      <wsdl:input wsaw:Action="http://tempuri.org/IService/UpdateAgentEmailSkillSets" message="tns:IService_UpdateAgentEmailSkillSets_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/IService/UpdateAgentEmailSkillSetsResponse" message="tns:IService_UpdateAgentEmailSkillSets_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="GetAgentSkillSetsList">
+      <wsdl:input wsaw:Action="http://tempuri.org/IService/GetAgentSkillSetsList" message="tns:IService_GetAgentSkillSetsList_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/IService/GetAgentSkillSetsListResponse" message="tns:IService_GetAgentSkillSetsList_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="GetAACCUserDetails">
+      <wsdl:input wsaw:Action="http://tempuri.org/IService/GetAACCUserDetails" message="tns:IService_GetAACCUserDetails_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/IService/GetAACCUserDetailsResponse" message="tns:IService_GetAACCUserDetails_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="IsAACCUserExists">
+      <wsdl:input wsaw:Action="http://tempuri.org/IService/IsAACCUserExists" message="tns:IService_IsAACCUserExists_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/IService/IsAACCUserExistsResponse" message="tns:IService_IsAACCUserExists_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="GetAgent">
+      <wsdl:input wsaw:Action="http://tempuri.org/IService/GetAgent" message="tns:IService_GetAgent_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/IService/GetAgentResponse" message="tns:IService_GetAgent_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="GetVDNDetails">
+      <wsdl:input wsaw:Action="http://tempuri.org/IService/GetVDNDetails" message="tns:IService_GetVDNDetails_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/IService/GetVDNDetailsResponse" message="tns:IService_GetVDNDetails_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="GetSkillList">
+      <wsdl:input wsaw:Action="http://tempuri.org/IService/GetSkillList" message="tns:IService_GetSkillList_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/IService/GetSkillListResponse" message="tns:IService_GetSkillList_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="GetAllSkillData">
+      <wsdl:input wsaw:Action="http://tempuri.org/IService/GetAllSkillData" message="tns:IService_GetAllSkillData_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/IService/GetAllSkillDataResponse" message="tns:IService_GetAllSkillData_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="GetAgentList">
+      <wsdl:input wsaw:Action="http://tempuri.org/IService/GetAgentList" message="tns:IService_GetAgentList_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/IService/GetAgentListResponse" message="tns:IService_GetAgentList_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="AddAgent">
+      <wsdl:input wsaw:Action="http://tempuri.org/IService/AddAgent" message="tns:IService_AddAgent_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/IService/AddAgentResponse" message="tns:IService_AddAgent_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="RemoveAgent">
+      <wsdl:input wsaw:Action="http://tempuri.org/IService/RemoveAgent" message="tns:IService_RemoveAgent_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/IService/RemoveAgentResponse" message="tns:IService_RemoveAgent_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="AssignAgentSkills">
+      <wsdl:input wsaw:Action="http://tempuri.org/IService/AssignAgentSkills" message="tns:IService_AssignAgentSkills_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/IService/AssignAgentSkillsResponse" message="tns:IService_AssignAgentSkills_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="RemoveAgentSkills">
+      <wsdl:input wsaw:Action="http://tempuri.org/IService/RemoveAgentSkills" message="tns:IService_RemoveAgentSkills_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/IService/RemoveAgentSkillsResponse" message="tns:IService_RemoveAgentSkills_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="GetAgentStation">
+      <wsdl:input wsaw:Action="http://tempuri.org/IService/GetAgentStation" message="tns:IService_GetAgentStation_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/IService/GetAgentStationResponse" message="tns:IService_GetAgentStation_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="UpdateMultiAgentSkills">
+      <wsdl:input wsaw:Action="http://tempuri.org/IService/UpdateMultiAgentSkills" message="tns:IService_UpdateMultiAgentSkills_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/IService/UpdateMultiAgentSkillsResponse" message="tns:IService_UpdateMultiAgentSkills_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="UpdateAgentSkills">
+      <wsdl:input wsaw:Action="http://tempuri.org/IService/UpdateAgentSkills" message="tns:IService_UpdateAgentSkills_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/IService/UpdateAgentSkillsResponse" message="tns:IService_UpdateAgentSkills_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="GetRegisteredIPStations">
+      <wsdl:input wsaw:Action="http://tempuri.org/IService/GetRegisteredIPStations" message="tns:IService_GetRegisteredIPStations_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/IService/GetRegisteredIPStationsResponse" message="tns:IService_GetRegisteredIPStations_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="RestartStation">
+      <wsdl:input wsaw:Action="http://tempuri.org/IService/RestartStation" message="tns:IService_RestartStation_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/IService/RestartStationResponse" message="tns:IService_RestartStation_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="GetCapacity">
+      <wsdl:input wsaw:Action="http://tempuri.org/IService/GetCapacity" message="tns:IService_GetCapacity_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/IService/GetCapacityResponse" message="tns:IService_GetCapacity_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="GetStatusStation">
+      <wsdl:input wsaw:Action="http://tempuri.org/IService/GetStatusStation" message="tns:IService_GetStatusStation_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/IService/GetStatusStationResponse" message="tns:IService_GetStatusStation_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="QueryData">
+      <wsdl:input wsaw:Action="http://tempuri.org/IService/QueryData" message="tns:IService_QueryData_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/IService/QueryDataResponse" message="tns:IService_QueryData_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="ChangeStationCallAppearance">
+      <wsdl:input wsaw:Action="http://tempuri.org/IService/ChangeStationCallAppearance" message="tns:IService_ChangeStationCallAppearance_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/IService/ChangeStationCallAppearanceResponse" message="tns:IService_ChangeStationCallAppearance_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="ListBcmsSkill">
+      <wsdl:input wsaw:Action="http://tempuri.org/IService/ListBcmsSkill" message="tns:IService_ListBcmsSkill_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/IService/ListBcmsSkillResponse" message="tns:IService_ListBcmsSkill_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="ListBcmsAgent">
+      <wsdl:input wsaw:Action="http://tempuri.org/IService/ListBcmsAgent" message="tns:IService_ListBcmsAgent_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/IService/ListBcmsAgentResponse" message="tns:IService_ListBcmsAgent_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="AddSkill">
+      <wsdl:input wsaw:Action="http://tempuri.org/IService/AddSkill" message="tns:IService_AddSkill_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/IService/AddSkillResponse" message="tns:IService_AddSkill_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="UpdateSkill">
+      <wsdl:input wsaw:Action="http://tempuri.org/IService/UpdateSkill" message="tns:IService_UpdateSkill_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/IService/UpdateSkillResponse" message="tns:IService_UpdateSkill_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="RemoveSkill">
+      <wsdl:input wsaw:Action="http://tempuri.org/IService/RemoveSkill" message="tns:IService_RemoveSkill_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/IService/RemoveSkillResponse" message="tns:IService_RemoveSkill_OutputMessage" />
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:binding name="BasicHttpBinding_IService" type="tns:IService">
+    <soap:binding transport="http://schemas.xmlsoap.org/soap/http" />
+    <wsdl:operation name="GetUserAACC">
+      <soap:operation soapAction="http://tempuri.org/IService/GetUserAACC" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="AddUserAACC">
+      <soap:operation soapAction="http://tempuri.org/IService/AddUserAACC" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="DeleteUserAACC">
+      <soap:operation soapAction="http://tempuri.org/IService/DeleteUserAACC" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="UpdateUserAACC">
+      <soap:operation soapAction="http://tempuri.org/IService/UpdateUserAACC" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetSupervisors">
+      <soap:operation soapAction="http://tempuri.org/IService/GetSupervisors" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetContactTypeList">
+      <soap:operation soapAction="http://tempuri.org/IService/GetContactTypeList" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetSkillSetsList">
+      <soap:operation soapAction="http://tempuri.org/IService/GetSkillSetsList" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="UpdateAgentEmailSkillSets">
+      <soap:operation soapAction="http://tempuri.org/IService/UpdateAgentEmailSkillSets" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetAgentSkillSetsList">
+      <soap:operation soapAction="http://tempuri.org/IService/GetAgentSkillSetsList" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetAACCUserDetails">
+      <soap:operation soapAction="http://tempuri.org/IService/GetAACCUserDetails" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="IsAACCUserExists">
+      <soap:operation soapAction="http://tempuri.org/IService/IsAACCUserExists" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetAgent">
+      <soap:operation soapAction="http://tempuri.org/IService/GetAgent" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetVDNDetails">
+      <soap:operation soapAction="http://tempuri.org/IService/GetVDNDetails" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetSkillList">
+      <soap:operation soapAction="http://tempuri.org/IService/GetSkillList" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetAllSkillData">
+      <soap:operation soapAction="http://tempuri.org/IService/GetAllSkillData" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetAgentList">
+      <soap:operation soapAction="http://tempuri.org/IService/GetAgentList" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="AddAgent">
+      <soap:operation soapAction="http://tempuri.org/IService/AddAgent" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="RemoveAgent">
+      <soap:operation soapAction="http://tempuri.org/IService/RemoveAgent" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="AssignAgentSkills">
+      <soap:operation soapAction="http://tempuri.org/IService/AssignAgentSkills" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="RemoveAgentSkills">
+      <soap:operation soapAction="http://tempuri.org/IService/RemoveAgentSkills" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetAgentStation">
+      <soap:operation soapAction="http://tempuri.org/IService/GetAgentStation" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="UpdateMultiAgentSkills">
+      <soap:operation soapAction="http://tempuri.org/IService/UpdateMultiAgentSkills" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="UpdateAgentSkills">
+      <soap:operation soapAction="http://tempuri.org/IService/UpdateAgentSkills" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetRegisteredIPStations">
+      <soap:operation soapAction="http://tempuri.org/IService/GetRegisteredIPStations" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="RestartStation">
+      <soap:operation soapAction="http://tempuri.org/IService/RestartStation" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetCapacity">
+      <soap:operation soapAction="http://tempuri.org/IService/GetCapacity" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetStatusStation">
+      <soap:operation soapAction="http://tempuri.org/IService/GetStatusStation" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="QueryData">
+      <soap:operation soapAction="http://tempuri.org/IService/QueryData" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="ChangeStationCallAppearance">
+      <soap:operation soapAction="http://tempuri.org/IService/ChangeStationCallAppearance" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="ListBcmsSkill">
+      <soap:operation soapAction="http://tempuri.org/IService/ListBcmsSkill" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="ListBcmsAgent">
+      <soap:operation soapAction="http://tempuri.org/IService/ListBcmsAgent" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="AddSkill">
+      <soap:operation soapAction="http://tempuri.org/IService/AddSkill" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="UpdateSkill">
+      <soap:operation soapAction="http://tempuri.org/IService/UpdateSkill" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="RemoveSkill">
+      <soap:operation soapAction="http://tempuri.org/IService/RemoveSkill" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:service name="CMAPI">
+    <wsdl:port name="BasicHttpBinding_IService" binding="tns:BasicHttpBinding_IService">
+      <soap:address location="http://localhost:55000/CM_SMS_API/" />
+    </wsdl:port>
+  </wsdl:service>
+</wsdl:definitions>
