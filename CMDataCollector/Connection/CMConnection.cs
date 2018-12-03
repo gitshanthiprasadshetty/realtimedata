@@ -207,9 +207,9 @@ namespace CMDataCollector.Connection
         /// Execute BCMS command once all connection state is success.
         /// </summary>
         /// <param name="skillRange"></param>
-        public void ExecuteBcmsCommand(List<string> skillRange)
+        public void ExecuteSkillCommand(List<string> skillRange)
         { 
-            Log.Debug("ExecuteCommand:" + ConnectionKey);
+            Log.Debug("ExecuteSkillCommand:" + ConnectionKey);
             try
             {
                 var t = new Thread(new ThreadStart(delegate
@@ -258,6 +258,70 @@ namespace CMDataCollector.Connection
                 }));
                 t.Start();
                 Thread.Sleep(100);
+            }
+            catch (Exception ex)
+            {
+                Log.Error("Exception in bcms ExecuteCommand :" + ConnectionKey, ex);
+                //  return false;
+            }
+        }
+
+
+        /// <summary>
+        /// Execute BCMS command once all connection state is success.
+        /// </summary>
+        /// <param name="skillRange"></param>
+        public void ExecuteHuntCommand(List<string> huntStartValues)
+        {
+            Log.Debug("ExecuteHuntCommand:" + ConnectionKey);
+            try
+            {               
+                    var t = new Thread(new ThreadStart(delegate
+                    {
+                        foreach (var huntStartValue in huntStartValues)
+                        {
+                            // execute monitor command for each skills.
+                            Log.Debug("ExecuteCommand: Hunt to monitor:[" + huntStartValue + "]:" + ConnectionKey);
+                            Responsereceived = false;
+
+                            string huntStartValue1 = huntStartValue;
+                            var t1 = new Thread(new ThreadStart(delegate
+                            {
+                                string c = "c mon traffic hunt-groups " + huntStartValue1 + "\r\nt";
+                                Log.Debug("ExecuteCommand command [" + c + "]:" + ConnectionKey);
+                                _commandReponse = _conn.SendCommand(c);
+                                Log.Debug("ExecuteCommand commandReponse :[" + _commandReponse + "]:" + ConnectionKey);
+
+                                if (_commandReponse == -1)
+                                {
+                                    Log.Debug("ExecuteCommand failed: Reconnect:" + ConnectionKey);
+                                    Responsereceived = true;
+                                    //reset the connection
+                                    //set the state to not connected and connect again
+                                    State = new ConnectionNotEstablishedState(ConnectionKey);
+                                    ConnectionStateStatus = "ConnectionNotEstablishedState";
+                                    State.Connect();
+                                }
+                            }));
+                            t1.Start();
+
+                            // if no data/resposnce is received keep trying..
+
+                            // this keep trying is required to handle data-mismatch between diff skills in same connection obj.
+                            // doing this, control won't be passed to next sequence to execute untill we get whole data
+                            // for executing skillid.
+                            Log.Debug("Waiting for Response");
+                            while (!Responsereceived)
+                            {
+                                //Log.Debug("No Response Received...");
+                                Thread.Sleep(1000);
+                            }
+                            Thread.Sleep(100);
+                            Log.Debug("Response received. Execute next skill in loop");
+                        }
+                    }));
+                    t.Start();                
+                Thread.Sleep(1000);
             }
             catch (Exception ex)
             {

@@ -20,6 +20,12 @@ namespace CMDataCollector
         [OperationContract]
         List<TrunkGroupTraffic> MonitorTrunkTraffic();
 
+        [OperationContract]
+        List<HuntGroupTraffic> MonitorAllHuntTraffics();
+
+        [OperationContract]
+        HuntGroupTraffic MonitorHuntTraffic(string huntGroupNumber);
+
         /// <summary>
         /// 
         /// </summary>

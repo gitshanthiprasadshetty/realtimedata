@@ -19,7 +19,7 @@ namespace CMDataCollector.Utilities
         /// <summary>
         /// Logger
         /// </summary>
-        private static Logger.Logger Log = new Logger.Logger(typeof(ConfigurationData));    
+        private static Logger.Logger log = new Logger.Logger(typeof(ConfigurationData));    
 
         /// <summary>
         /// IP Address of CM
@@ -47,9 +47,14 @@ namespace CMDataCollector.Utilities
         public static string skillsToMonitor { get; set; }
 
         /// <summary>
-        /// Total commands to run :{bcms='monitor bcms skill n', trunk='monitor traffic trunk-groups'}
+        /// Total commands to run :{bcms='monitor bcms skill n', trunk='monitor bcms system'}
         /// </summary>
         public static string[] CommandsToRun { get; set; }
+
+        /// <summary>
+        /// Type of monitor commands to run 
+        /// </summary>
+        public static string CommandType { get; set; }
 
         /// <summary>
         /// total number of skills to be taken per connection
@@ -110,17 +115,30 @@ namespace CMDataCollector.Utilities
         /// DB Connection string
         /// </summary>
         public static string ConntnString { get; set; }
+
+        /// <summary>
+        /// freq
+        /// </summary>
+        public static int HuntFrequency { get; set; }
+
+        /// <summary>
+        /// Range of hunt group to be monitored.
+        /// </summary>
+        public static List<int> HuntGroups { get; set; }
+
+        public static List<int> Skills { get; set; }
         #endregion
 
         static string userName = ConfigurationSettings.AppSettings["userName"].ToString();
         static string password = ConfigurationSettings.AppSettings["password"].ToString();        
+
 
         /// <summary>
         /// Load all config data
         /// </summary>
         public static void LoadConfig()
         {
-            Log.Debug("LoadConfig()");
+            log.Debug("LoadConfig()");
             try
             {
                 Channel();
@@ -135,6 +153,9 @@ namespace CMDataCollector.Utilities
                 ConnectionType = ConfigurationSettings.AppSettings["Type"];
                 var val = ConfigurationSettings.AppSettings["CommandsToRun"];
                 CommandsToRun = val.Split(',');
+                CommandType = ConfigurationSettings.AppSettings["CommandType"];
+                HuntFrequency = Convert.ToInt32(ConfigurationSettings.AppSettings["HuntFrequency"]);
+
                 try
                 {
                     Port = Convert.ToInt32(ConfigurationSettings.AppSettings["port"]);
@@ -145,11 +166,35 @@ namespace CMDataCollector.Utilities
                 }
                 try
                 {
+                    string[] HuntRange = ConfigurationSettings.AppSettings["HuntRange"].Split(';');
+                    HuntGroups = new List<int>();
+                    for (int i = 0; i < HuntRange.Length; i++)
+                    {
+                        HuntGroups.AddRange(Enumerable.Range(Convert.ToInt32(HuntRange[i].Split('-')[0]), 
+                            (Convert.ToInt32(HuntRange[i].Split('-')[1]) - Convert.ToInt32(HuntRange[i].Split('-')[0])) + 1));
+                    }
+
                     MaxTriesOnCMConFailure = Convert.ToInt32(ConfigurationSettings.AppSettings["MaxTriesOnConnectionFailure"]);
                     skillsPerConnection = Convert.ToInt32(ConfigurationSettings.AppSettings["skillsPerConnection"]);
                     HAEnabled = Convert.ToInt32(ConfigurationSettings.AppSettings["HAEnabled"]);
+
+
+                    if (CommandType.ToLower() == "traffic")
+                    {
+                        var result = Connector.Proxy.SMSAPIProxy.GetSkills();
+                        if (result != null)
+                        {
+                            log.Info("Total Skills Obtained from SMSAPI : " + result.Count);
+                            Skills = result.Select(x => Convert.ToInt32(x.group_NumberField)).ToList();
+                            log.Info("Total Skills from config info : " + HuntGroups.Count);
+                            HuntGroups = HuntGroups?.Where(x => Skills.Contains(x)).ToList();
+                            log.Info("Total Skills to monitor after applying filter : " + HuntGroups.Count);
+                        }
+                        else
+                            log.Info("No data obtained from smsapi");
+                    }
                 }
-                catch (Exception)
+                catch (Exception ex)
                 {
                     skillsPerConnection = GetSkillsPerConnection();
                     HAEnabled = 0;
@@ -159,13 +204,13 @@ namespace CMDataCollector.Utilities
             }
             catch (Exception ex)
             {
-                Log.Error("Error in LoadConfig() : " + ex);
+                log.Error("Error in LoadConfig() : " + ex);
             }
         }
 
         static int GetSkillsPerConnection()
         {
-            Log.Debug("GetSkillsPerConnection()");
+            log.Debug("GetSkillsPerConnection()");
             try
             {
                 if (skillList.Count() > 2)
@@ -173,7 +218,7 @@ namespace CMDataCollector.Utilities
             }
             catch (Exception ex)
             {
-                Log.Error("Error in GetSkillsPerConnection() : " + ex);
+                log.Error("Error in GetSkillsPerConnection() : " + ex);
             }
             return 1;
         }
@@ -183,31 +228,39 @@ namespace CMDataCollector.Utilities
         /// </summary>
         public static int GetNumberOfConnectionsToEstablish()
         {
-            Log.Debug("GetNumberOfConnectionsToEstablish()");
+            log.Debug("GetNumberOfConnectionsToEstablish()");
             try
             {
-                List<int> skills = new List<int>();
-                Log.Debug(skillList.Count().ToString());
-                foreach (var skil in skillList)
-                {
-                    skills.Add(Convert.ToInt32(skil));
-                }
-                Log.Debug("skillsPerConnection : "+ skillsPerConnection);
-                double skillListCount = ((double)skills.Count() / skillsPerConnection);
-
-                string s = skillListCount.ToString("0.00");
-                string[] sl = s.Split('.');
                 int totalConnections = 0;
+                double count = 0;
+                List<int> totalSkills = null;
+
+                if (CommandType.ToLower() == "bcms")
+                    totalSkills = skillList?.Select(x => Int32.TryParse(x, out int n) ? n : (int?)null).Where(n => n.HasValue)?.Select(n => n.Value).ToList();
+                else if (CommandType.ToLower() == "traffic")
+                {
+                    totalSkills = HuntGroups;
+                    log.Info("Total Skills to monitor : " + totalSkills.Count);
+                    log.Info("HuntFrequency : " + HuntFrequency);
+                    if (totalSkills.Count > (HuntFrequency * 32))
+                        skillsPerConnection = HuntFrequency * 32;
+                    else
+                        return 1;
+                }         
+
+                count = (double)totalSkills.Count / skillsPerConnection;
+                string s = count.ToString("0.00");
+                string[] sl = s.Split('.');
                 if (Convert.ToInt32(sl[1]) > 0 && Convert.ToInt32(sl[0]) > 0) totalConnections = Convert.ToInt32(sl[0]) + 1;
                 if (Convert.ToInt32(sl[1]) > 0 && Convert.ToInt32(sl[0]) < 0) totalConnections = 1;
-                if (Convert.ToInt32(sl[1]) == 0 && Convert.ToInt32(sl[0]) > 0) totalConnections=Convert.ToInt32(sl[0]);
+                if (Convert.ToInt32(sl[1]) == 0 && Convert.ToInt32(sl[0]) > 0) totalConnections = Convert.ToInt32(sl[0]);
 
-                Log.Debug("Total Connections to make : " + totalConnections);
+                log.Debug("Total Connections to make : " + totalConnections);
                 return totalConnections;
             }
             catch (Exception ex)
             {
-                Log.Error("Error in GetNumberOfConnectionsToEstablish() : " + ex);
+                log.Error("Error in GetNumberOfConnectionsToEstablish() : " + ex);
                 return 0;
             }
         }
@@ -217,7 +270,7 @@ namespace CMDataCollector.Utilities
         /// </summary>
         public static void DecryptCredentials()
         {
-            Log.Debug("DecryptCredentials()");
+            log.Debug("DecryptCredentials()");
             try
             {
                 // try decrypting if fails pass the actual value in config.
@@ -236,7 +289,7 @@ namespace CMDataCollector.Utilities
             }
             catch (Exception ex)
             {
-                Log.Error("Error in DecryptCredentials() : " + ex);
+                log.Error("Error in DecryptCredentials() : " + ex);
             }
         }
 
@@ -245,7 +298,7 @@ namespace CMDataCollector.Utilities
         /// </summary>
         public static void Channel()
         {
-            Log.Debug("Channel");
+            log.Debug("Channel");
             try
             {
                 // clear the in-memory data.
@@ -253,13 +306,13 @@ namespace CMDataCollector.Utilities
                 var section = (ConfigSection)ConfigurationManager.GetSection("TRealTimeDataServiceSettings");
                 foreach (BCMSInstanceData data in section.BCMSServiceItems)
                 {
-                    Log.Debug("Add skills for channel : " + data.ChannelName);
+                    log.Debug("Add skills for channel : " + data.ChannelName);
                     channelObj.Add(data.ChannelName, data.SkillId.Split(',').ToList());
                 }
             }
             catch (Exception ex)
             {
-                Log.Error("Error in Channel() : " + ex);
+                log.Error("Error in Channel() : " + ex);
             }
         }
         
@@ -270,19 +323,19 @@ namespace CMDataCollector.Utilities
         /// <returns>return channel name for given skillId</returns>
         public static string GetChannel(string skillId)
         {
-            Log.Debug("GetChannel()" + skillId);
+            log.Debug("GetChannel()" + skillId);
             try
             {
                 var result = "";
                 if (channelObj != null)
                     result = channelObj.FirstOrDefault(x => x.Value.Contains(skillId)).Key;
 
-                Log.Debug("GetChannel return value = " + result);
+                log.Debug("GetChannel return value = " + result);
                 return result;
             }
             catch (Exception ex)
             {
-                Log.Error("Error in GetChannel(): for skillId = : " + skillId + Environment.NewLine + ex);
+                log.Error("Error in GetChannel(): for skillId = : " + skillId + Environment.NewLine + ex);
                 return "";
             }
         }
@@ -294,7 +347,6 @@ namespace CMDataCollector.Utilities
         {
             try
             {
-                Log.Debug("FetchExtenSkillData()");
                 if (channelObj != null)
                 {
                     //var emailSkillIds = channelObj.FirstOrDefault(x => x.Key.ToLower() == "email").Value.ToList();
@@ -310,53 +362,107 @@ namespace CMDataCollector.Utilities
                         }
                     }
 
-                    if (!string.IsNullOrEmpty(skillIds)) {
+                    if (!string.IsNullOrEmpty(skillIds))
+                    {
 
                         if (skillIds.StartsWith(","))
                             skillIds = skillIds.Remove(0, 1);
 
                         if (skillIds.EndsWith(","))
                             skillIds = skillIds.Substring(0, skillIds.Length - 1);
-
-                        string sql = @"select SkillID,SkillExtension,SkillName from TMAC_Skills with (nolock) Where SkillID in (" + skillIds + ")";
-                        //DataTable result = CMDataCollector.Utilities.SqlDataAccess.ExecuteDataTable(sql,);
-                        DataTable result = SqlDataAccess.ExecuteDataTable(sql, ConntnString);
-                        
-                        if (result != null)
-                        {
-                            Log.Debug("Skill to Extension mapping");
-                            foreach (DataRow entry in result.Rows)
-                            {
-                                // add to dictionary object to maintain a skill-Extn mapping.
-                                try
-                                {
-                                    _skillExtnInfo.Add(entry.ItemArray[1].ToString(), new SIPDataCollector.Models.SkillExtensionInfo
-                                    {
-                                        SkillId = entry.ItemArray[0].ToString(),
-                                        ExtensionId = entry.ItemArray[1].ToString(),
-                                        SkillName = entry.ItemArray[2].ToString()
-                                    });
-                                }
-                                catch (Exception ex)
-                                {
-                                    Log.Warn("Warning! while adding values to dictionary");
-                                    Log.Error("Message : ", ex);
-                                }
-                            }
-                            Log.Debug("completed mapping of skill-extension");
-                        }
                     }
+
+                    if (ConnectionType.ToLower() == "cm" && !string.IsNullOrEmpty(skillIds))
+                        FetchCMExtnSkillData(skillIds);
+                    else if(ConnectionType.ToLower() == "sip" && !string.IsNullOrEmpty(skillIds))
+                        FetchSIPExtnSkillData(skillIds);
                 }
             }
             catch (Exception ex)
             {
-                Log.Error("Error in FetchExtenSkillData: " + ex);
+                log.Error("Error in FetchExtenSkillData: " , ex);
+            }
+        }
+
+        static void FetchCMExtnSkillData(string skillIds)
+        {
+            log.Debug("FetchCMExtnSkillData()");
+            try
+            {
+                string[] values = skillIds.Split(',');
+                var skilldata = Connector.Proxy.SMSAPIProxy.GetSkills();
+                Connector.SMSAPI.HuntGroupType huntGroupData = null;
+                if(skilldata != null && values != null)
+                {
+                    foreach (var skill in values)
+                    {
+                        huntGroupData = skilldata.FirstOrDefault(x => x.group_NumberField == skill);
+                        if (huntGroupData != null)
+                        {
+                            _skillExtnInfo.Add(huntGroupData.group_ExtensionField, new SIPDataCollector.Models.SkillExtensionInfo
+                            {
+                                SkillId = huntGroupData.group_NumberField,
+                                ExtensionId = huntGroupData.group_ExtensionField,
+                                SkillName = huntGroupData.group_NameField,
+                            });
+                        }
+                        else
+                            log.Info("Failed to add to SkillExtnInfo , No huntgroup data obtained from smsapi for skill : " + skill);
+                    }
+                    log.Debug("completed mapping of skill-extension");
+                }
+            }
+            catch (Exception ex)
+            {
+                log.Error("Error in FetchCMExtnSkillData: " , ex);
+            }
+        }
+
+        static void FetchSIPExtnSkillData(string skillIds)
+        {
+            try
+            {
+                log.Debug("FetchExtenSkillData()");
+
+                string sql = @"select SkillID,SkillExtension,SkillName from TMAC_Skills with (nolock) Where SkillID in (" + skillIds + ")";
+
+                log.Info("sql = " + sql);
+
+                DataTable result = SqlDataAccess.ExecuteDataTable(sql, ConntnString);
+
+                if (result != null)
+                {
+                    log.Debug("Skill to Extension mapping");
+                    foreach (DataRow entry in result.Rows)
+                    {
+                        // add to dictionary object to maintain a skill-Extn mapping.
+                        try
+                        {
+                            _skillExtnInfo.Add(entry.ItemArray[1].ToString(), new SIPDataCollector.Models.SkillExtensionInfo
+                            {
+                                SkillId = entry.ItemArray[0].ToString(),
+                                ExtensionId = entry.ItemArray[1].ToString(),
+                                SkillName = entry.ItemArray[2].ToString()
+                            });
+                        }
+                        catch (Exception ex)
+                        {
+                            log.Warn("Warning! while adding values to dictionary");
+                            log.Error("Message : ", ex);
+                        }
+                    }
+                    log.Debug("completed mapping of skill-extension");
+                }
+            }
+            catch (Exception ex)
+            {
+                log.Error("Error in FetchSIPExtnSkillData: ", ex);
             }
         }
 
         public static string GetExtensionId(string skillId)
         {
-            Log.Debug("GetExtensionId()" + skillId);
+            log.Debug("GetExtensionId()" + skillId);
             try
             {
                 if (_skillExtnInfo != null)
@@ -364,7 +470,7 @@ namespace CMDataCollector.Utilities
             }
             catch (Exception ex)
             {
-                Log.Error("Error in GetExtensionId: " + ex);
+                log.Error("Error in GetExtensionId: " + ex);
             }
             return null;
         }

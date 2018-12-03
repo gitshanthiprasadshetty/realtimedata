@@ -90,7 +90,9 @@
     <Compile Include="Connection\ConnectionNotEstablishedState.cs" />
     <Compile Include="Connection\ConnectionState.cs" />
     <Compile Include="Connection\ConnectionTerminalType.cs" />
+    <Compile Include="DataParser\HuntGroupTrafficParser.cs" />
     <Compile Include="Models\BcmsSystem.cs" />
+    <Compile Include="Models\HuntGroupTraffic.cs" />
     <Compile Include="Service References\THistoricalData\Reference.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>

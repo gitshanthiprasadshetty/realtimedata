@@ -86,6 +86,43 @@ namespace CMDataCollector
         }
 
         /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        public List<HuntGroupTraffic> MonitorAllHuntTraffics()
+        {
+            try
+            {
+                Log.Debug("MonitorAllHuntTraffics :");
+                return CacheMemory.GetHuntTrafficDetails();
+            }
+            catch (Exception ex)
+            {
+                Log.Error("Error in MonitorAllHuntTraffics : " + ex);
+            }
+            return null;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        public HuntGroupTraffic MonitorHuntTraffic(string huntGroupNumber)
+        {
+            try
+            {
+                Log.Debug("MonitorHuntTraffic :");
+                var result = CacheMemory.GetHuntTrafficDetails();
+                return result?.FirstOrDefault(x => x.HuntGroup == huntGroupNumber);
+            }
+            catch (Exception ex)
+            {
+                Log.Error("Error in MonitorHuntTraffic : " + ex);                
+            }
+            return null;
+        }
+
+        /// <summary>
         /// Status of current service
         /// When service is up = > true, down => no output
         /// </summary>

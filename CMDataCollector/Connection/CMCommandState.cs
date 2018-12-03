@@ -61,19 +61,23 @@ namespace CMDataCollector.Connection
                 {
                     _connValue = CMConnectionManager.GetInstance().GetConnectionValue(_connectionKey);
 
-                    // check which command to run
-                    if (_connValue.SkillRange.Contains("trunk"))
+                    if(ConfigurationData.CommandType.ToLower() == "traffic")
                     {
-                        // this will be called only once and runs in sep thread if trunk is enabled, 
-                        _connValue.ExecuteTrunkCommand();
+                        // check which command to run
+                        if (_connValue.SkillRange.Contains("trunk"))
+                        {
+                            // this will be called only once and runs in sep thread if trunk is enabled, 
+                            _connValue.ExecuteTrunkCommand();
+                        }
+                        else
+                        {
+                            _connValue.ExecuteHuntCommand(_connValue.SkillRange);
+                        }
                     }
                     else
                     {
-                        //foreach (var skills in _connValue.SkillRange) {
-                        //    Log.Debug("ExecuteCommand : skill" + skills + " to monitor for connection key : "+ _connectionKey);
-                        //}
                         Log.Debug("executing for skill connection key is : " + _connectionKey);
-                        _connValue.ExecuteBcmsCommand(_connValue.SkillRange);
+                        _connValue.ExecuteSkillCommand(_connValue.SkillRange);
                     }
                 }
                 catch (Exception ex)
@@ -97,6 +101,13 @@ namespace CMDataCollector.Connection
             try
             {
                 Log.Debug("DataReceived : " + _connectionKey + Environment.NewLine + "[" + data + "]");
+
+                if (ConfigurationData.CommandType.ToLower() == "traffic")
+                {
+                    ProcessHuntTrafficData(data);
+                    return;
+                }
+
                 _connValue = CMConnectionManager.GetInstance().GetConnectionValue(_connectionKey);
                 string data1 = data;
                 data1 = data1.Replace("\0", "");
@@ -269,6 +280,20 @@ namespace CMDataCollector.Connection
             catch (Exception ex)
             {
                 Log.Error("Error in ProcessData : " + ex);
+            }
+        }
+
+        void ProcessHuntTrafficData(string data)
+        {
+            Log.Debug("ProcessHuntTrafficData");
+            try
+            {
+                _connValue.Responsereceived = true;
+                HuntGroupTrafficParser.HuntTrafficParser(data);
+            }
+            catch (Exception ex)
+            {
+                Log.Error("Error in ProcessHuntTrafficData : ", ex);
             }
         }
 

@@ -31,6 +31,11 @@ namespace CMDataCollector.Utilities
         /// </summary>
         static readonly ConcurrentDictionary<int, TrunkGroupTraffic> trunkCachObj = new ConcurrentDictionary<int, TrunkGroupTraffic>();
 
+        /// <summary>
+        /// Holds trunk related data
+        /// </summary>
+        static readonly ConcurrentDictionary<string, HuntGroupTraffic> huntTrafficCachObj = new ConcurrentDictionary<string, HuntGroupTraffic>();
+
         static readonly ConcurrentDictionary<string, BcmsSystem> systemCachObj = new ConcurrentDictionary<string, BcmsSystem>();
 
         /// <summary>
@@ -85,24 +90,9 @@ namespace CMDataCollector.Utilities
         {
             Log.Debug("CacheMemory[GetBcmsData]");
             try
-            {
-                // log.Debug("CacheMemory[GetBcmsData] :: isUpdateStarted" + CMConnectionManager.isUpdateStarted);
-                // need to skip this thread from starting, when this service is not connected to cm
-                if (CMConnectionManager.GetInstance().connectToCM)
-                {
-                    Log.Debug("CacheMemory[GetBcmsData] :: IsUpdateStarted : " + CMConnectionManager.GetInstance().IsUpdateStarted +
-                               " | IsBcmsEnabled :"+ CMConnectionManager.GetInstance().IsBcmsEnabled);
-                    if (!CMConnectionManager.GetInstance().IsUpdateStarted)
-                    {
-                        CMConnectionManager.GetInstance().IsUpdateStarted = true;
-                        var u = new Thread(new ThreadStart(delegate
-                        {
-                            Log.Debug("CacheMemory[GetBcmsData] :: UpdateDashboard");
-                            CMConnectionManager.GetInstance().UpdateDashboard();
-                        }));
-                        u.Start();
-                    }   
-                }
+            {              
+                // initiate update
+                InitiateUpdateThread();
 
                 Log.Debug("check for type : cm or sip");
                 // check the connection type before getting data. If SIP read from sip cache else cm cache obj
@@ -705,7 +695,7 @@ namespace CMDataCollector.Utilities
 
         #endregion
 
-        #region Trunk
+        #region Traffic
 
         /// <summary>
         /// Add/Update trunk-data to trunk cache-object.
@@ -749,6 +739,54 @@ namespace CMDataCollector.Utilities
                         _trunkDataListObj.Add(_trunkDataObj);
                     }
                     return _trunkDataListObj;
+                }
+            }
+            catch (Exception ex)
+            {
+                Log.Error("Error in CacheMemory[GetTrunkTrafficDetails] : " + ex);
+            }
+            return null;
+        }
+
+        public static void AddOrUpdateCacheMemory(HuntGroupTraffic data)
+        {
+            Log.Debug("AddOrUpdateCacheMemory()");
+            try
+            {
+                if (data != null)
+                {
+                    Log.Debug("CacheMemory[UpdateCacheMemory] hunt group : " + data.HuntGroup);
+                    huntTrafficCachObj.AddOrUpdate(data.HuntGroup, data,
+                    (k, v) => data);
+                }
+            }
+            catch (Exception ex)
+            {
+                Log.Error("Error in CacheMemory[UpdateCacheMemory] : " + ex);
+            }
+        }
+
+        public static List<HuntGroupTraffic> GetHuntTrafficDetails()
+        {
+            Log.Debug("CacheMemory[GetTrunkTrafficDetails]");
+            try
+            {
+                // initiate update
+                InitiateUpdateThread();
+
+                if (huntTrafficCachObj != null && huntTrafficCachObj.Count() > 0)
+                {
+                    //HuntGroupTraffic _huntDataObj = new HuntGroupTraffic();
+                    //List<HuntGroupTraffic> _huntDataListObj = new List<HuntGroupTraffic>();
+
+                    return huntTrafficCachObj.Values.ToList();
+
+                    //foreach (var entry in huntTrafficCachObj)
+                    //{
+                    //    _huntDataObj = entry.Value;
+                    //    _huntDataListObj.Add(_huntDataObj);
+                    //}
+                    // return _huntDataListObj;
                 }
             }
             catch (Exception ex)
@@ -814,6 +852,39 @@ namespace CMDataCollector.Utilities
                 Log.Error("Error in CacheMemory[UpdateCacheData] : " + ex);
             }
         }
+        #endregion
+
+
+        #region globalmethods
+
+        private static void InitiateUpdateThread()
+        {            
+            try
+            {
+                // log.Debug("CacheMemory[GetBcmsData] :: isUpdateStarted" + CMConnectionManager.isUpdateStarted);
+                // need to skip this thread from starting, when this service is not connected to cm
+                if (CMConnectionManager.GetInstance().connectToCM)
+                {
+                    Log.Debug("CacheMemory[GetBcmsData] :: IsUpdateStarted : " + CMConnectionManager.GetInstance().IsUpdateStarted +
+                               " | IsBcmsEnabled :" + CMConnectionManager.GetInstance().isBcmsEnabled + " | IstrafficEnabled :" + CMConnectionManager.GetInstance().isTrafficEnabled);
+                    if (!CMConnectionManager.GetInstance().IsUpdateStarted)
+                    {
+                        CMConnectionManager.GetInstance().IsUpdateStarted = true;
+                        var u = new Thread(new ThreadStart(delegate
+                        {
+                            Log.Debug("CacheMemory[GetBcmsData] :: UpdateDashboard");
+                            CMConnectionManager.GetInstance().UpdateDashboard();
+                        }));
+                        u.Start();
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Log.Error("Error in InitiateUpdateThread() : ", ex);
+            }
+        }
+
         #endregion
 
         #region not used

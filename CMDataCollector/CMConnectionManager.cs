@@ -17,9 +17,9 @@ namespace CMDataCollector
         public bool connectToCM;
 
         /// <summary>
-        /// Log Defination
+        /// log Defination
         /// </summary>
-        private static readonly Logger.Logger Log = new Logger.Logger(typeof(CMConnectionManager));
+        private static readonly Logger.Logger log = new Logger.Logger(typeof(CMConnectionManager));
 
         /// <summary>
         /// Instance of an Cache mem class
@@ -40,22 +40,28 @@ namespace CMDataCollector
         /// <summary>
         /// 
         /// </summary>
-        public bool IsBcmsEnabled;
+        public bool isBcmsEnabled;
 
         /// <summary>
         /// 
         /// </summary>
-        public bool IsTrunkEnabled;
+        public bool isTrafficEnabled;
 
         /// <summary>
         /// 
         /// </summary>
-        public bool IsSystemEnabled;
+        public bool isTrunkEnabled;
 
         /// <summary>
         /// 
         /// </summary>
-        public bool IsListEnabled;
+        public bool isHuntEnabled;
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public bool isSystemEnabled;
+
         #endregion
 
         #region Singleton
@@ -95,7 +101,7 @@ namespace CMDataCollector
         /// </summary>
         static void CreateConnectionToCm()
         {
-            Log.Debug("[CreateConnectionToCm]");
+            log.Debug("[CreateConnectionToCm]");
             try
             {
                 if (CM != null && CM.Count > 0)
@@ -106,7 +112,7 @@ namespace CMDataCollector
                         var entry1 = entry;
                         var s = new Thread(new ThreadStart(delegate
                         {
-                        Log.Debug("Open Connection : " + entry1.Key);
+                        log.Debug("Open Connection : " + entry1.Key);
                         var con = entry1.Value;
                         con.State = new ConnectionNotEstablishedState(entry1.Key);
                         con.ConnectionStateStatus = "ConnectionNotEstablishedState";
@@ -120,7 +126,7 @@ namespace CMDataCollector
             }
             catch (Exception ex)
             {
-                Log.Error("Error in [CreateConnectionToCm] : " + ex);
+                log.Error("Error in [CreateConnectionToCm] : " + ex);
             }
         }
 
@@ -131,16 +137,89 @@ namespace CMDataCollector
         /// <returns>returns cm conection key value for given skillid</returns>
         private static string GetConnectionKeyForSkill(string skillId)
         {
-            Log.Debug("[GetConnectionKeyForSkill] " + skillId);
+            log.Debug("[GetConnectionKeyForSkill] " + skillId);
             try
             {
                 var connectionKey = CM.FirstOrDefault(x => x.Value.SkillRange.Contains(skillId)).Key;
-                Log.Debug("[GetConnectionKeyForSkill] connectionKey" + connectionKey);
+                log.Debug("[GetConnectionKeyForSkill] connectionKey" + connectionKey);
                 return connectionKey;
             }
             catch (Exception ex)
             {
-                Log.Error("Error in [GetConnectionKeyForSkill] : " + ex);
+                log.Error("Error in [GetConnectionKeyForSkill] : " + ex);
+                return null;
+            }
+        }
+
+        List<int> processedHuntGroups = null;
+        int? GenerateNextHuntStartValue()
+        {
+            log.Debug("GenerateNextHuntStartValue()");
+            try
+            {
+                // huntgroup numbers to be monitored
+                List<int> values = ConfigurationData.HuntGroups.ToList();
+
+                // last processedvalue 
+                int lowerBoundaryValue = processedHuntGroups.Last() + 32;
+
+                // get next min huntgroup from huntgroupnumbers
+                if (lowerBoundaryValue <= values.Max())
+                    return values?.Where(x => x > lowerBoundaryValue).Min();
+            }
+            catch (Exception ex)
+            {
+                log.Error("Error in GenerateNextHuntStartValue : ", ex);
+            }
+            return -1;
+        }
+
+        /// <summary>
+        /// Returns list of data to be put under each connection 
+        /// </summary>
+        /// <param name="totalConn">max connection that can be established to cm</param>
+        /// <param name="huntStartValue">start value of hunt traffic</param>
+        /// <returns>returns bundled list to caller</returns>
+        List<List<string>> GetHuntBatchs(int totalConn, int huntStartValue)
+        {
+            try
+            {
+                log.Debug("GetHuntBatchs()");
+                int cnt = 1;
+                processedHuntGroups = new List<int>();
+                processedHuntGroups.Add(huntStartValue);
+
+                List<string> batchData = new List<string>();
+                batchData.Add(huntStartValue.ToString());
+                // total list of skills startvalues; since one page contains data of 32 skills we 
+                // need to form logic to have all initial skillvalues in the list. i.e. hunt startvalues.
+                List<List<string>> listobj = new List<List<string>>();
+
+                // map skills to each connection keeping total connections to establish in mind.
+                for (int i = 0; i < totalConn; i++)
+                {                    
+                    do
+                    {
+                        huntStartValue = GenerateNextHuntStartValue() ?? -1;
+                        if (huntStartValue == -1)
+                            break;
+
+                        processedHuntGroups.Add(huntStartValue);
+                        batchData.Add(huntStartValue.ToString());
+                        cnt++;
+                    } while (cnt < ConfigurationData.HuntFrequency);
+
+                    if (batchData.Count > 0)
+                        listobj.Add(batchData);
+
+                    batchData = new List<string>();
+                    cnt = 0;
+                }
+                return listobj;
+            }
+            catch (Exception ex)
+            {
+                log.Error("Error in GetHuntBatchs : ", ex);
                 return null;
             }
         }
@@ -154,35 +233,34 @@ namespace CMDataCollector
         /// </summary>
         public void Start()
         {
-            Log.Debug("[start]");
+            log.Debug("[start]");
             try
             {
                 // change flag status to true.
                 connectToCM = true;
 
                 //
-                IsUpdateStarted = true;
+                IsUpdateStarted = false;
 
                 // initialize the starting connection key
                 int noOfConn = 1;
 
                 // test 
                 //ConfigurationData.LoadConfig();
-
-                // check if monitor bcms command to be executed.
-                IsBcmsEnabled = ConfigurationData.CommandsToRun.Contains("bcms");
-                if (IsBcmsEnabled)
+                // get total number of connections to be established to cm based on skills.
+                var totalConnCount = ConfigurationData.GetNumberOfConnectionsToEstablish();
+                if (totalConnCount <= 0)
                 {
+                    log.Debug("[start] : NumberOfConnectionsToEstablish" + totalConnCount);
+                    return;
+                }
+                // check if monitor bcms command to be executed.
+                if (ConfigurationData.CommandType.ToLower() == "bcms")
+                {
+                    log.Info("Monitor bcms is enabled");
                     IsUpdateStarted = false;
-
-                    // get total number of connections to be established to cm based on skills.
-                    var totalConnCount = ConfigurationData.GetNumberOfConnectionsToEstablish();
-                    if (totalConnCount <= 0)
-                    {
-                        Log.Debug("[start] : NumberOfConnectionsToEstablish" + totalConnCount);
-                        return;
-                    }
-                    Log.Debug("[start] : NumberOfConnectionsToEstablish" + totalConnCount);
+                  
+                    log.Debug("[start] : NumberOfConnectionsToEstablish" + totalConnCount);
 
                     // start of skill index assigned as zero
                     int skillStartIndex = 0;
@@ -193,7 +271,7 @@ namespace CMDataCollector
                     // get all skills tobe monitored from config.
                     var skillList = ConfigurationData.skillList;
 
-                    Log.Debug("[start] Total skillList Count:" + skillList.Count());
+                    log.Debug("[start] Total skillList Count:" + skillList.Count());
                     for (noOfConn = 1; noOfConn <= totalConnCount; noOfConn++)
                     {
                         var skillRange = new List<string>();
@@ -211,59 +289,74 @@ namespace CMDataCollector
                         maxSkillsPerConn += tempMaxSkillsPerConn;
 
                         CM.Add(noOfConn.ToString(), new CMConnection(noOfConn.ToString(), skillRange));
-                        Log.Debug("[start] _cm dictionary key : " + noOfConn);
+                        log.Debug("[start] _cm dictionary key : " + noOfConn);
                         foreach (var entry in skillRange)
                         {
-                            Log.Debug("[start] _cm dictionary values[Skills] : " + entry);
+                            log.Debug("[start] _cm dictionary values[Skills] : " + entry);
                         }
                     }
 
 
+                    // check if we need to monitor 'system data' as well
+                    isSystemEnabled = ConfigurationData.CommandsToRun.Contains("system");
+                    if (isSystemEnabled)
+                    {
+                        log.Debug("System Enabled");
+                        int key = noOfConn + 1;
+                        CM.Add(key.ToString(), new CMConnection(key.ToString(), new List<string> { "system" }));
+                    }
+
                     // start monitoring bcms historical report
                     var bcmsReport = new Thread(new ThreadStart(delegate
                     {
-                        Log.Debug("[start] ListBcmsSkill");
+                        log.Debug("[start] ListBcmsSkill");
                         _listBcmsObj.ListBcmsSkill();
                     }));
                     bcmsReport.Start();
-                }                
-
-                // check if we need to monitor 'trunk traffic' as well
-                IsTrunkEnabled = ConfigurationData.CommandsToRun.Contains("trunk");
-                if (IsTrunkEnabled)
-                {
-                    Log.Debug("trunk enabled");
-                    // since we are establishing only one connection to CM if trunk is to be monitored, so
-                    // take next followed connectionkey as a connection key to trunk.
-                    int key = noOfConn;
-                    // instead of skillRange adding "trunk" as a string just to filter/get proper connectionkey
-                    // in further states.
-                    CM.Add(key.ToString(), new CMConnection(key.ToString(), new List<string> { "trunk" }));
                 }
 
-                // check if we need to monitor 'system data' as well
-                IsSystemEnabled = ConfigurationData.CommandsToRun.Contains("system");
-                if (IsSystemEnabled)
+                if (ConfigurationData.CommandType.ToLower() == "traffic")
                 {
-                    Log.Debug("System Enabled");
-                    int key = noOfConn + 1;
-                    CM.Add(key.ToString(), new CMConnection(key.ToString(), new List<string> { "system" }));
+                    log.Info("Monitor traffic is enabled.");
+                    // check if we need to monitor 'trunk traffic' as well
+                    isHuntEnabled = ConfigurationData.CommandsToRun.Contains("hunt");
+                    if (isHuntEnabled)
+                    {
+                        log.Debug("hunt enabled");
+
+                        // there two below methods are used when skillsperconnection frequency is not set. else use frequ
+                        int huntStartValue = ConfigurationData.HuntGroups.Min();
+                        List<List<string>> obj = GetHuntBatchs(totalConnCount, huntStartValue);
+
+                        if (obj != null)
+                        {
+                            log.Debug("Total Connections established : " + obj.Count);
+                            for (int i = 0; i < obj.Count; i++)
+                            {
+                                CM.Add((i + 1).ToString(), new CMConnection((i + 1).ToString(), obj[i]));
+                            }
+                        }
+                    }
+
+                    // check if we need to monitor 'trunk traffic' as well
+                    isTrunkEnabled = ConfigurationData.CommandsToRun.Contains("trunk");
+                    if (isTrunkEnabled)
+                    {
+                        log.Debug("trunk enabled");
+                        // since we are establishing only one connection to CM if trunk is to be monitored, so
+                        // take next followed connectionkey as a connection key to trunk.
+                        int key = noOfConn;
+                        // instead of skillRange adding "trunk" as a string just to filter/get proper connectionkey
+                        // in further states.
+                        CM.Add(key.ToString(), new CMConnection(key.ToString(), new List<string> { "trunk" }));
+                    }
                 }
 
-                // check if we need to monitor 'system data' as well
-                IsListEnabled = ConfigurationData.CommandsToRun.Contains("list");
-                if (IsListEnabled)
-                {
-                    Log.Debug("List Enabled");
-                    int key = noOfConn + 1;
-                    CM.Add(key.ToString(), new CMConnection(key.ToString(), new List<string> { "list" }));
-                }
-                // create connection to cm
                 CreateConnectionToCm();
             }
             catch (Exception ex)
             {
-                Log.Error("Error in [start] : " + ex);
+                log.Error("Error in [start] : " + ex);
             }
         }
 
@@ -274,7 +367,7 @@ namespace CMDataCollector
         /// <returns>returns cmconnection class object for given connectionid</returns>
         public CMConnection GetConnectionValue(string key)
         {
-            Log.Debug("[GetConnectionValue]");
+            log.Debug("[GetConnectionValue]");
             try
             {
                 if (CM.ContainsKey(key))
@@ -285,7 +378,7 @@ namespace CMDataCollector
             }
             catch (Exception ex)
             {
-                Log.Error("Error in [GetConnectionValue] : " + ex);
+                log.Error("Error in [GetConnectionValue] : " + ex);
             }
             return null;
         }
@@ -298,29 +391,29 @@ namespace CMDataCollector
         /// </summary>
         public void UpdateDashboard()
         {
-            Log.Debug("[UpdateDashboard]");
+            log.Debug("[UpdateDashboard]");
             try
             {
                 // bool isUpdateStarted = true;
                 // 10-03-2017 : since this cache returns only count for bcms.               
-                Log.Debug("UpdateDashboard : All connections are created and updated to cache, now keep updating.");
+                log.Debug("UpdateDashboard : All connections are created and updated to cache, now keep updating.");
                 while (true)
                 {
-                    Log.Debug("UpdateDashboard");
+                    log.Debug("UpdateDashboard");
 
                     // commenting below getcachecount method. Assuming CM connection will be establsihed for all
                     // requested skills. If some wrong skill-id is passed then cachecount will be always false and 
                     // Update never happens.
 
                     //bool result = CacheMemory.GetCacheCount();
-                    //Log.Debug("CMConnectionManager[UpdateDashboard] Is all given skills Monitored once" + result);
+                    //log.Debug("CMConnectionManager[UpdateDashboard] Is all given skills Monitored once" + result);
                     //if (result)
                     //{
                         // implies all the skills are monitored once, now try updating
                         // 10-03-2017 : since we have trunk related key also in this 'CM' object , 
                         // either we need to skip this connection from executing to maintain bcms execution seperatly or 
                         // need to handle.
-                        Log.Debug("Total count in CM : " + CM.Count);
+                        log.Debug("Total count in CM : " + CM.Count);
                         foreach (var entry in CM)
                         {
                             //// skip if current CMconnection is to monitor trunk/system.
@@ -333,10 +426,10 @@ namespace CMDataCollector
                             // if current connection state status is not commandstate 
                             // then terminal connection state has not happend. So cant execute commands,
                             // wait for some time.
-                            Log.Debug("[UpdateDashboard] ConnectionStateStatus: " + con.ConnectionStateStatus);
+                            log.Debug("[UpdateDashboard] ConnectionStateStatus: " + con.ConnectionStateStatus);
                             if (con.ConnectionStateStatus == "CMCommandState")
                             {
-                                Log.Debug("[UpdateDashboard] Run Execute command for cm connection key = " + entry.Key);
+                                log.Debug("[UpdateDashboard] Run Execute command for cm connection key = " + entry.Key);
                                 con.State = new CMCommandState(entry.Key);
                                 con.State.ExecuteCommand();
                             }
@@ -350,7 +443,7 @@ namespace CMDataCollector
             }
             catch (Exception ex)
             {
-                Log.Error("Error in [UpdateDashboard] : " + ex);
+                log.Error("Error in [UpdateDashboard] : " + ex);
             }    
         }
 
@@ -360,7 +453,7 @@ namespace CMDataCollector
         /// <param name="skillId"></param>
         public void ExecuteCommandForSkill(string skillId)
         {
-            Log.Debug("[ExecuteCommandForSkill] " + skillId);
+            log.Debug("[ExecuteCommandForSkill] " + skillId);
             try
             {
                 // get the CM key for skillid given
@@ -370,7 +463,7 @@ namespace CMDataCollector
                     // get the CMconnection value using key from dictionary.
                     var connectionValue = CM.FirstOrDefault(x => x.Key == key).Value;
                     var con = connectionValue;
-                    Log.Debug("[ExecuteCommandForSkill] ConnectionStateStatus: " + con.ConnectionStateStatus);
+                    log.Debug("[ExecuteCommandForSkill] ConnectionStateStatus: " + con.ConnectionStateStatus);
                     if (con.ConnectionStateStatus == "CMCommandState")
                     {
                         // this will again do execute for all skillrange present in that CMConnection object instead for a single skillid.
@@ -381,7 +474,7 @@ namespace CMDataCollector
             }
             catch (Exception ex)
             {
-                Log.Error("Error in [ExecuteCommandForSkill] : " + ex);
+                log.Error("Error in [ExecuteCommandForSkill] : " + ex);
             }
         }
 

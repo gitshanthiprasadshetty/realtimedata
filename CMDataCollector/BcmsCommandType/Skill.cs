@@ -23,7 +23,7 @@ namespace CMDataCollector.BcmsCommandType
         {
             Log.Debug("Run command for connection : " + _connectionKey);
             _connValue = CMConnectionManager.GetInstance().GetConnectionValue(_connectionKey);
-            _connValue.ExecuteBcmsCommand(_connValue.SkillRange);
+            _connValue.ExecuteSkillCommand(_connValue.SkillRange);
         }
 
         internal override void DataReceived(string data)
