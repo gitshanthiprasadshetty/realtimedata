@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.ServiceModel;
+using System.ServiceModel.Web;
 using CMDataCollector.Models;
 using System.Runtime.Serialization;
 
@@ -12,32 +13,35 @@ namespace CMDataCollector
     public interface IRealtimeDataService
     {
         [OperationContract]
+        [WebInvoke(Method = "GET", UriTemplate = "/MonitorBcms", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.Bare)]
         List<BcmsDashboard> MonitorBcms();
 
         [OperationContract]
+        [WebInvoke(Method = "GET", UriTemplate = "/MonitorBcmsForSkill/{skillToMonitor}", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.Bare)]
         BcmsDashboard MonitorBcmsForSkill(string skillToMonitor);
 
         [OperationContract]
+        [WebInvoke(Method = "GET", UriTemplate = "/MonitorTrunkTraffic", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.Bare)]
         List<TrunkGroupTraffic> MonitorTrunkTraffic();
 
         [OperationContract]
+        [WebInvoke(Method ="GET", UriTemplate = "/MonitorAllHuntTraffics", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.Bare)]
         List<HuntGroupTraffic> MonitorAllHuntTraffics();
 
         [OperationContract]
+        [WebInvoke(Method = "GET", UriTemplate = "/MonitorHuntTraffic/{huntGroupNumber}", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.Bare)]
         HuntGroupTraffic MonitorHuntTraffic(string huntGroupNumber);
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="skillName"></param>
-        /// <returns></returns>
         [OperationContract]
+        [WebInvoke(Method = "GET", UriTemplate = "/MonitorBcmsSystem/{skillName}", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.Bare)]
         List<BcmsSystem> MonitorBcmsSystem(string skillName);
 
         [OperationContract]
+        [WebInvoke(Method = "GET", UriTemplate = "/IsRunning", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.Bare)]
         bool IsRunning();
 
         [OperationContract]
+        [WebInvoke(Method = "GET", UriTemplate = "/IsConnectedToCM", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.Bare)]
         bool IsConnectedToCM();
     }
 }
