@@ -1,14 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Configuration;
-using System.IO;
-using System.Xml;
-using SIPDataCollector.Utilities;
-using System.Data;
+﻿using ConfigurationProvider;
 using Connector.DbLayer;
-using ConfigurationProvider;
+using System;
+using System.Collections.Generic;
+using System.Configuration;
+using System.Data;
+using System.Linq;
 
 namespace CMDataCollector.Utilities
 {
@@ -19,12 +15,12 @@ namespace CMDataCollector.Utilities
         /// <summary>
         /// Logger
         /// </summary>
-        private static Logger.Logger log = new Logger.Logger(typeof(ConfigurationData));    
+        private static Logger.Logger log = new Logger.Logger(typeof(ConfigurationData));
 
         /// <summary>
         /// IP Address of CM
         /// </summary>
-        public static string ServerAddress { get; set;}
+        public static string ServerAddress { get; set; }
 
         /// <summary>
         /// CM Login username
@@ -34,7 +30,7 @@ namespace CMDataCollector.Utilities
         /// <summary>
         /// CM Login Password
         /// </summary>
-        public static string Password { get; set;}
+        public static string Password { get; set; }
 
         /// <summary>
         /// CM connection Port
@@ -127,10 +123,13 @@ namespace CMDataCollector.Utilities
         public static List<int> HuntGroups { get; set; }
 
         public static List<int> Skills { get; set; }
+
+        public static string TlsVersion { get; set; }
+
         #endregion
 
         static string userName = ConfigurationSettings.AppSettings["userName"].ToString();
-        static string password = ConfigurationSettings.AppSettings["password"].ToString();        
+        static string password = ConfigurationSettings.AppSettings["password"].ToString();
 
 
         /// <summary>
@@ -148,13 +147,14 @@ namespace CMDataCollector.Utilities
                 skillsToMonitor = ConfigurationSettings.AppSettings["skillsToMonitor"];
                 skillList = skillsToMonitor.Split(',');
                 DashboardRefreshTime = Convert.ToInt32(ConfigurationSettings.AppSettings["DashboardRefreshTime"]);
-                ReportRefreshTime = Convert.ToInt32(ConfigurationSettings.AppSettings["HistoricalReportRefreshTime"]); 
+                ReportRefreshTime = Convert.ToInt32(ConfigurationSettings.AppSettings["HistoricalReportRefreshTime"]);
                 ActionOnCMConFailure = ConfigurationSettings.AppSettings["ActionOnCMConFailure"].ToLower();
                 ConnectionType = ConfigurationSettings.AppSettings["Type"];
                 var val = ConfigurationSettings.AppSettings["CommandsToRun"];
                 CommandsToRun = val.Split(',');
                 CommandType = ConfigurationSettings.AppSettings["CommandType"];
                 HuntFrequency = Convert.ToInt32(ConfigurationSettings.AppSettings["HuntFrequency"]);
+                TlsVersion = ConfigurationManager.AppSettings["TlsVersion"];
 
                 try
                 {
@@ -170,7 +170,7 @@ namespace CMDataCollector.Utilities
                     HuntGroups = new List<int>();
                     for (int i = 0; i < HuntRange.Length; i++)
                     {
-                        HuntGroups.AddRange(Enumerable.Range(Convert.ToInt32(HuntRange[i].Split('-')[0]), 
+                        HuntGroups.AddRange(Enumerable.Range(Convert.ToInt32(HuntRange[i].Split('-')[0]),
                             (Convert.ToInt32(HuntRange[i].Split('-')[1]) - Convert.ToInt32(HuntRange[i].Split('-')[0])) + 1));
                     }
 
@@ -246,7 +246,7 @@ namespace CMDataCollector.Utilities
                         skillsPerConnection = HuntFrequency * 32;
                     else
                         return 1;
-                }         
+                }
 
                 count = (double)totalSkills.Count / skillsPerConnection;
                 string s = count.ToString("0.00");
@@ -315,7 +315,7 @@ namespace CMDataCollector.Utilities
                 log.Error("Error in Channel() : " + ex);
             }
         }
-        
+
         /// <summary>
         /// Gets the channel for given skill
         /// </summary>
@@ -374,13 +374,13 @@ namespace CMDataCollector.Utilities
 
                     if (ConnectionType.ToLower() == "cm" && !string.IsNullOrEmpty(skillIds))
                         FetchCMExtnSkillData(skillIds);
-                    else if(ConnectionType.ToLower() == "sip" && !string.IsNullOrEmpty(skillIds))
+                    else if (ConnectionType.ToLower() == "sip" && !string.IsNullOrEmpty(skillIds))
                         FetchSIPExtnSkillData(skillIds);
                 }
             }
             catch (Exception ex)
             {
-                log.Error("Error in FetchExtenSkillData: " , ex);
+                log.Error("Error in FetchExtenSkillData: ", ex);
             }
         }
 
@@ -392,7 +392,7 @@ namespace CMDataCollector.Utilities
                 string[] values = skillIds.Split(',');
                 var skilldata = Connector.Proxy.SMSAPIProxy.GetSkills();
                 Connector.SMSAPI.HuntGroupType huntGroupData = null;
-                if(skilldata != null && values != null)
+                if (skilldata != null && values != null)
                 {
                     foreach (var skill in values)
                     {
@@ -414,7 +414,7 @@ namespace CMDataCollector.Utilities
             }
             catch (Exception ex)
             {
-                log.Error("Error in FetchCMExtnSkillData: " , ex);
+                log.Error("Error in FetchCMExtnSkillData: ", ex);
             }
         }
 

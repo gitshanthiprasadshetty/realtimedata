@@ -7,7 +7,7 @@ namespace CMDataCollector.Connection
         /// <summary>
         /// Logger
         /// </summary>
-        private static readonly Logger.Logger Log = new Logger.Logger(typeof (ConnectionTerminalType));
+        private static readonly Logger.Logger Log = new Logger.Logger(typeof(ConnectionTerminalType));
 
         /// <summary>
         /// Unique CM-Connection key 
@@ -38,14 +38,14 @@ namespace CMDataCollector.Connection
         {
             Log.Debug("TerminalType:" + _connectionKey);
             try
-            {                
+            {
                 _connValue = CMConnectionManager.GetInstance().GetConnectionValue(_connectionKey);
-                if(_connValue.TerminalType())
+                if (_connValue.TerminalType())
                 {
                     Log.Debug("TerminalType : TerminalType command executed successfully");
                 }
                 //send ossi command
-                else 
+                else
                 {
                     Log.Debug("TerminalType command executed failed. Retrying again");
                     _connValue.State = new ConnectionNotEstablishedState(_connectionKey);
@@ -78,7 +78,7 @@ namespace CMDataCollector.Connection
 
                 // 24/11/2017
                 // ---------------
-
+                Log.Debug("DataReceived : previous chuck of data in connection " + _connValue.dataReceived);
                 string data1 = data;
                 if (data1.Trim().ToLower().StartsWith("o") && data1.Trim().EndsWith("\nt"))
                 {
@@ -86,11 +86,12 @@ namespace CMDataCollector.Connection
                     Log.Debug("Received Terminal datatype as :" + data1);
                 }
                 else
-                {            
+                {
                     if (_connValue.DataReceived == "" && data1.Trim().ToLower().StartsWith("o"))
                     {
-                        Log.Debug("DataReceived : first chunk of data is received ");
+                        Log.Debug("DataReceived : first chunk of data is received " + data1);
                         _connValue.DataReceived = data1;
+                        Log.Debug("DataReceived : data after binding = " + _connValue.dataReceived);
                     }
                     else if (_connValue.DataReceived != "" && (_connValue.DataReceived.Trim().ToLower().StartsWith("o")))
                     {
@@ -98,8 +99,9 @@ namespace CMDataCollector.Connection
                         _connValue.DataReceived += data1;
                         Log.Debug("DataReceived : combined data is " + _connValue.DataReceived);
                     }
-                    else if(_connValue.DataReceived != "" && !(_connValue.DataReceived.Trim().ToLower().StartsWith("o")))
+                    else if (_connValue.DataReceived != "" && !(_connValue.DataReceived.Trim().ToLower().StartsWith("o")))
                     {
+                        Log.Info("DataReceived: previous connection terminal data is empty, and not starting with letter o : ");
                         _connValue.DataReceived = "";
                     }
                 }
@@ -121,7 +123,7 @@ namespace CMDataCollector.Connection
                         Log.Debug("Change state to CMCommandState:" + _connectionKey);
                         _connValue.State.ExecuteCommand();
                     }
-                }                
+                }
             }
             catch (Exception ex)
             {
