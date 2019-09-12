@@ -11,7 +11,7 @@ using Connector.Proxy;
 
 namespace SIPDataCollector
 {
-    public class SIPManager
+    public class SIPManager : ISipDataCollector
     {
         #region Global Declaration
 
@@ -60,9 +60,9 @@ namespace SIPDataCollector
         /// <summary>
         /// Constructor
         /// </summary>
-        private SIPManager()
-        {
-        }
+        //private SIPManager()
+        //{
+        //}
 
         /// <summary>
         /// singleton instance of class

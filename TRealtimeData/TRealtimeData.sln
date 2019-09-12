@@ -15,6 +15,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TRealTimeDataSync", "..\TRe
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ZTestApp", "..\TestApp\ZTestApp.csproj", "{3D3023AF-FC8D-4C77-82EC-7D3568F96D5E}"
 EndProject
+Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "TRealtimeDataInstaller", "TRealtimeDataInstaller\TRealtimeDataInstaller.vdproj", "{90483F6F-07EC-41D2-9B60-643DD92CA813}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -69,6 +71,10 @@ Global
 		{3D3023AF-FC8D-4C77-82EC-7D3568F96D5E}.Release|Any CPU.ActiveCfg = Release|x86
 		{3D3023AF-FC8D-4C77-82EC-7D3568F96D5E}.Release|x86.ActiveCfg = Release|x86
 		{3D3023AF-FC8D-4C77-82EC-7D3568F96D5E}.Release|x86.Build.0 = Release|x86
+		{90483F6F-07EC-41D2-9B60-643DD92CA813}.Debug|Any CPU.ActiveCfg = Debug
+		{90483F6F-07EC-41D2-9B60-643DD92CA813}.Debug|x86.ActiveCfg = Debug
+		{90483F6F-07EC-41D2-9B60-643DD92CA813}.Release|Any CPU.ActiveCfg = Release
+		{90483F6F-07EC-41D2-9B60-643DD92CA813}.Release|x86.ActiveCfg = Release
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

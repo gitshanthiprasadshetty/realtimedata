@@ -337,7 +337,7 @@ namespace CMDataCollector
                             }
                         }
                     }
-
+                    
                     // check if we need to monitor 'trunk traffic' as well
                     isTrunkEnabled = ConfigurationData.CommandsToRun.Contains("trunk");
                     if (isTrunkEnabled)

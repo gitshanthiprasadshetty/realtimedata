@@ -18,6 +18,8 @@ namespace TRealtimeData
                 new TRealtimeService()
             };
             ServiceBase.Run(ServicesToRun);
+            //TRealtimeService t = new TRealtimeService();
+            //t.OnStart(null);
             //BCMSDashboardManager.Start();
             //Console.ReadLine();
         }
