@@ -1,6 +1,9 @@
-﻿using CMDataCollector.Utilities;
+﻿using CMDataCollector.Models;
+using CMDataCollector.Utilities;
 using SIPDataCollector;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using System.Net.Security;
 using System.Security.Cryptography.X509Certificates;
@@ -49,13 +52,13 @@ namespace CMDataCollector
                     // Start Data sync-manager
                     // TRealTimeDataSync.SyncManager.Start();
                     // Declare Alternateserverstatus event, this will be triggered for every 10sec.
-                    // TRealTimeDataSync.SyncManager.AlternateServerStatus += new TRealTimeDataSync.SyncManager.ServerStatus(OnStatusChange);
+                    TRealTimeDataSync.SyncManager.AlternateServerStatus += new TRealTimeDataSync.SyncManager.ServerStatus(OnStatusChange);
 
-                    //if (ConfigurationData.ConnectionType.ToLower() == "cm")
-                    //{
+                    if (ConfigurationData.ConnectionType.ToLower() == "cm")
+                    {
                         Log.Debug("HA Enabled | Type : CM selected");
                         CMConnectionManager.GetInstance().connectToCM = false;
-                    //}
+                    }
                 }
 
                 // If connection-type is SIP then get realtime data from Tmac service and database.
@@ -138,7 +141,6 @@ namespace CMDataCollector
         /// </summary>
         static void OnStatusChange()
         {
-            /*
             try
             {
                 Log.Debug("BCMSDashboardManager[OnStatusChange]");
@@ -205,7 +207,6 @@ namespace CMDataCollector
             {
                 Log.Error("Error in BCMSDashboardManager[OnStatusChange] :" + ex);
             }
-            */
         }
 
         /// <summary>
@@ -214,59 +215,57 @@ namespace CMDataCollector
         static void GetDataFromAlternateServer()
         {
             Log.Debug("BCMSDashboardManager[GetDataFromAlternateServer]");
-            //try
-            //{
-            /*
-            // pull bcms data from other server
-            var pulledCacheData = TRealTimeDataSync.SyncManager.PullDataFromCache();
-            BcmsDashboard serviceObj;
-            List<AgentData> agentDataSet;
-
-            // frame BcmsDashboard model object for each array of data received
-            // and update it to cache object.
-            foreach (var data in pulledCacheData)
+            try
             {
-                agentDataSet = new List<AgentData>();
-                serviceObj = new BcmsDashboard();
-                serviceObj.AbandCalls = data.AbandCalls;
-                serviceObj.AccptedSL = data.AccptedSL;
-                serviceObj.ACD = data.ACD;
-                serviceObj.AcdCallsSummary = data.AcdCallsSummary;
-                serviceObj.ACW = data.ACW;
-                serviceObj.Avail = data.Avail;
-                serviceObj.AvgAbandTime = data.AvgAbandTime;
-                serviceObj.CallsWaiting = data.CallsWaiting;
-                serviceObj.Date = data.Date;
-                serviceObj.Extn = data.Extn;
-                serviceObj.OldestCall = data.OldestCall;
-                serviceObj.Other = data.Other;
-                serviceObj.Skill = data.Skill;
-                serviceObj.SkillName = data.SkillName;
-                serviceObj.SL = data.SL;
-                serviceObj.Staff = data.Staff;
-                serviceObj.Channel = ConfigurationData.GetChannel(data.Skill);
+                // pull bcms data from other server
+                var pulledCacheData = TRealTimeDataSync.SyncManager.PullDataFromCache();
+                BcmsDashboard serviceObj;
+                List<AgentData> agentDataSet;
 
-                if (data.AgentData != null)
+                // frame BcmsDashboard model object for each array of data received
+                // and update it to cache object.
+                foreach (var data in pulledCacheData)
                 {
-                    for (int i = 0; i < data.AgentData.Count(); i++)
+                    agentDataSet = new List<AgentData>();
+                    serviceObj = new BcmsDashboard();
+                    serviceObj.AbandCalls = data.AbandCalls;
+                    serviceObj.AccptedSL = data.AccptedSL;
+                    serviceObj.ACD = data.ACD;
+                    serviceObj.AcdCallsSummary = data.AcdCallsSummary;
+                    serviceObj.ACW = data.ACW;
+                    serviceObj.Avail = data.Avail;
+                    serviceObj.AvgAbandTime = data.AvgAbandTime;
+                    serviceObj.CallsWaiting = data.CallsWaiting;
+                    serviceObj.Date = data.Date;
+                    serviceObj.Extn = data.Extn;
+                    serviceObj.OldestCall = data.OldestCall;
+                    serviceObj.Other = data.Other;
+                    serviceObj.Skill = data.Skill;
+                    serviceObj.SkillName = data.SkillName;
+                    serviceObj.SL = data.SL;
+                    serviceObj.Staff = data.Staff;
+                    serviceObj.Channel = ConfigurationData.GetChannel(data.Skill);
+
+                    if (data.AgentData != null)
                     {
-                        Log.Debug("pulldata : " + i + "AgentCount " + data.AgentData.Count());
-                        agentDataSet.Add(new AgentData
+                        for (int i = 0; i < data.AgentData.Count(); i++)
                         {
-                            LoginId = data.AgentData[i].LoginId,
-                            State = data.AgentData[i].State
-                        });
+                            Log.Debug("pulldata : " + i + "AgentCount " + data.AgentData.Count());
+                            agentDataSet.Add(new AgentData
+                            {
+                                LoginId = data.AgentData[i].LoginId,
+                                State = data.AgentData[i].State
+                            });
+                        }
                     }
+                    serviceObj.AgentData = agentDataSet;
+                    CacheMemory.AddToCacheMemory(serviceObj);
                 }
-                serviceObj.AgentData = agentDataSet;
-                CacheMemory.AddToCacheMemory(serviceObj);
             }
-        }
-        catch (Exception ex)
-        {
-            Log.Error("Error in BCMSDashboardManager[GetDataFromAlternateServer] :" + ex);
-        }
-        */
+            catch (Exception ex)
+            {
+                Log.Error("Error in BCMSDashboardManager[GetDataFromAlternateServer] :" + ex);
+            }
         }
 
         #region NotUsed
