@@ -13,11 +13,11 @@ namespace CMDataCollector
     public interface IRealtimeDataService
     {
         [OperationContract]
-        [WebInvoke(Method = "GET", UriTemplate = "/MonitorBcms", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.Bare)]
+        [WebInvoke(Method = "GET", UriTemplate = "/GetRealtimeDataForAllSkills", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.Bare)]
         List<BcmsDashboard> MonitorBcms();
 
         [OperationContract]
-        [WebInvoke(Method = "GET", UriTemplate = "/MonitorBcmsForSkill/{skillToMonitor}", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.Bare)]
+        [WebInvoke(Method = "GET", UriTemplate = "/GetRealtimeDataForSkill/{skillToMonitor}", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.Bare)]
         BcmsDashboard MonitorBcmsForSkill(string skillToMonitor);
 
         [OperationContract]
