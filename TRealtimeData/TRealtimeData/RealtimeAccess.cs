@@ -27,12 +27,14 @@ namespace TRealtimeData
                 {
                     log.Info("Starting CMDataCollector");
                     myServiceHost = new ServiceHost(typeof(CMDataService));
+                    myServiceHost.Open();
                     BCMSDashboardManager.Start();
                 }
                 else
                 {
                     log.Info("Starting SIPDataCollector");
                     myServiceHost = new ServiceHost(typeof(SIPManager));
+                    myServiceHost.Open();
                     SIPManager.GetInstance().Start();
                 }
             }

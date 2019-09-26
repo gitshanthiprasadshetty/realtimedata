@@ -93,7 +93,6 @@
     </Compile>
     <Compile Include="RealtimeAccess.cs" />
     <Compile Include="RealtimeFactory.cs" />
-    <Compile Include="ServieHost.cs" />
     <Compile Include="TRealtimeService.cs">
       <SubType>Component</SubType>
     </Compile>

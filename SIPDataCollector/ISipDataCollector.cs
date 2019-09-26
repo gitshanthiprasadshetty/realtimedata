@@ -16,7 +16,7 @@ namespace SIPDataCollector
     public interface ISipDataCollector
     {
         [OperationContract]
-        [WebInvoke(Method = "GET", UriTemplate = "/GetBcmsData", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.Bare)]
+        [WebInvoke(Method = "GET", UriTemplate = "/GetRealtimeDataForAllSkills", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.Bare)]
         List<BcmsDataForSIP> GetBcmsData();
 
         [OperationContract]
