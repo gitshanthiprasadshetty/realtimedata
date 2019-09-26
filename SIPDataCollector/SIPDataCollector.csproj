@@ -69,6 +69,7 @@
     <Compile Include="Models\AgentSkillInfo.cs" />
     <Compile Include="Models\BcmsDataForSIP.cs" />
     <Compile Include="Models\RData.cs" />
+    <Compile Include="Models\RealtimeData.cs" />
     <Compile Include="Models\SkillData.cs" />
     <Compile Include="Models\SkillExtensionInfo.cs" />
     <Compile Include="SIPManager.cs" />
