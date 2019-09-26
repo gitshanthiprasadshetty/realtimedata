@@ -10,6 +10,7 @@ SIPDataCollector/bin/
 *.CopyComplete
 *.pdb
 SIPDataCollector/obj/
+SIPDataCollector/bin/*
 *.ide-shm
 TRealtimeData/.vs/
 TRealtimeData/TRealtimeData/bin/
