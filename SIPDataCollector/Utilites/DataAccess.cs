@@ -108,7 +108,7 @@ namespace SIPDataCollector.Utilities
                             ACDTime = Convert.ToInt32(item["TotalACDTime"]),
                             AbandCalls = Convert.ToInt32(item["AbandCalls"]),
                             TotalACDInteractions = Convert.ToInt32(item["TotalInteraction"]),
-                            AvgAbandTime = Convert.ToString(item["AvgAbandTime"]),
+                            AvgAbandTime = Convert.ToInt32(item["AvgAbandTime"]),
                             AHTTime = Convert.ToInt32(item["HoldTime"]),
                             TotalCallsHandled = Convert.ToInt32(item["TotalCallsHandled"])
                         };

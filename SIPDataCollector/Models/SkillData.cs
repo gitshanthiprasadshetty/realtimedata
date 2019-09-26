@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -8,7 +7,7 @@ namespace SIPDataCollector.Models
 {
     internal class SkillData
     {
-        internal string skillID { get; set; }
+        internal int skillId { get; set; }
         internal int ACDTime { get; set; }
         internal int ACWTime { get; set; }
         internal int AHTTime { get; set; }
@@ -17,7 +16,7 @@ namespace SIPDataCollector.Models
         internal int TotalACDInteractions { get; set; }
         internal int TotalCallsHandled { get; set; }
         internal int AvgHandlingTime { get; set; }
-        internal string AvgAbandTime { get; set; }
+        internal int AvgAbandTime { get; set; }
         internal decimal AbandonPercentage { get; set; }
     }
 }

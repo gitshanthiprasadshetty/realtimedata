@@ -214,6 +214,7 @@ namespace CMDataCollector
         /// </summary>
         static void GetDataFromAlternateServer()
         {
+            /*
             Log.Debug("BCMSDashboardManager[GetDataFromAlternateServer]");
             try
             {
@@ -254,7 +255,8 @@ namespace CMDataCollector
                             agentDataSet.Add(new AgentData
                             {
                                 LoginId = data.AgentData[i].LoginId,
-                                State = data.AgentData[i].State
+                                State = data.AgentData[i].State,
+                                StationID = data.AgentData[i].
                             });
                         }
                     }
@@ -266,6 +268,7 @@ namespace CMDataCollector
             {
                 Log.Error("Error in BCMSDashboardManager[GetDataFromAlternateServer] :" + ex);
             }
+            */
         }
 
         #region NotUsed

@@ -18,17 +18,17 @@ namespace SIPDataCollector.Utilites
         /// <summary>
         /// Holds Bcms Dashboard data for SIP
         /// </summary>
-        static readonly ConcurrentDictionary<string, BcmsDataForSIP> CachObj = new ConcurrentDictionary<string, BcmsDataForSIP>();
+        static readonly ConcurrentDictionary<int, RealtimeData> CachObj = new ConcurrentDictionary<int, RealtimeData>();
 
         /// <summary>
         /// 
         /// </summary>
-        static BcmsDataForSIP _bcmsObj;
+        static RealtimeData _bcmsObj;
 
         /// <summary>
         /// 
         /// </summary>
-        static List<BcmsDataForSIP> _listObj;
+        static List<RealtimeData> _listObj;
 
         /// <summary>
         /// Updates main cache data for each skill
@@ -39,16 +39,16 @@ namespace SIPDataCollector.Utilites
             Log.Debug("DataCache.[UpdateCacheData]");
             try
             {
-                _bcmsObj = (BcmsDataForSIP)data;
+                _bcmsObj = (RealtimeData)data;
                 if (data != null)
                 {
-                    if (CachObj.ContainsKey(_bcmsObj.Skill))
+                    if (CachObj.ContainsKey(_bcmsObj.SkillId))
                     {
-                        var value = CachObj.FirstOrDefault(x => x.Key == _bcmsObj.Skill).Value;
-                        CachObj.TryUpdate(value.Skill, _bcmsObj, value);
+                        var value = CachObj.FirstOrDefault(x => x.Key == _bcmsObj.SkillId).Value;
+                        CachObj.TryUpdate(value.SkillId, _bcmsObj, value);
                     }
                     else
-                        CachObj.TryAdd(_bcmsObj.Skill, _bcmsObj);
+                        CachObj.TryAdd(_bcmsObj.SkillId, _bcmsObj);
                 }
             }
             catch (Exception ex)
@@ -65,20 +65,20 @@ namespace SIPDataCollector.Utilites
         {
             try
             {
-                Log.Debug("UpdateHistoricalData : for skill = " + data.skillID);
+                Log.Debug("UpdateHistoricalData : for skill = " + data.skillId);
                 if(data != null)
                 {
-                    if(CachObj.TryGetValue(data.skillID, out BcmsDataForSIP values))
+                    if(CachObj.TryGetValue(data.skillId, out RealtimeData values))
                     {
-                        Log.Debug("Updating with histoircaldata for skill = " + data.skillID);
-                        BcmsDataForSIP oldValues = values;                        
-                        values.AvgHandlingTime = Convert.ToString(data.AvgHandlingTime);
-                        values.SLPercentage = Convert.ToString(data.SLPercentage);
-                        values.AbandCalls = Convert.ToString(data.AbandCalls);
-                        values.TotalACDInteractions = Convert.ToString(data.TotalACDInteractions);
-                        values.AvgAbandTime = data.AvgAbandTime;
+                        Log.Debug("Updating with histoircaldata for skill = " + data.skillId);
+                        RealtimeData oldValues = values;                        
+                        values.AverageHandlingTime = data.AvgHandlingTime;
+                        values.SLPercentage = data.SLPercentage;
+                        values.AbandonedCalls = data.AbandCalls;
+                        values.TotalActiveInteractions = data.TotalACDInteractions;
+                        values.AverageAbandonedTime = data.AvgAbandTime;
                         values.AbandonPercentage = data.AbandonPercentage;
-                        CachObj.TryUpdate(data.skillID, values, oldValues);
+                        CachObj.TryUpdate(data.skillId, values, oldValues);
                     }
                 }
             }
@@ -92,7 +92,7 @@ namespace SIPDataCollector.Utilites
         /// Gets all bcms data for configured skillids
         /// </summary>
         /// <returns>All bcms data for configured skillids</returns>
-        public static List<BcmsDataForSIP> GetBcmsData()
+        public static List<RealtimeData> GetBcmsData()
         {
             Log.Debug("DataCache[GetBcmsData]");
             try
@@ -100,9 +100,9 @@ namespace SIPDataCollector.Utilites
                 if (CachObj.Count > 0)
                 {
                     Log.Debug("Sip Dictionary count : " + CachObj.Count);
-                    _bcmsObj = new BcmsDataForSIP();
-                    _listObj = new List<BcmsDataForSIP>();
-                    foreach (KeyValuePair<string, BcmsDataForSIP> entry in CachObj)
+                    _bcmsObj = new RealtimeData();
+                    _listObj = new List<RealtimeData>();
+                    foreach (KeyValuePair<int, RealtimeData> entry in CachObj)
                     {
                         _bcmsObj = entry.Value;
                         _listObj.Add(_bcmsObj);
@@ -123,7 +123,7 @@ namespace SIPDataCollector.Utilites
         /// </summary>
         /// <param name="skillId">skillid</param>
         /// <returns>Single bcms data for requested skillid</returns>
-        public static BcmsDataForSIP GetBcmsDataForSkill(string skillId)
+        public static RealtimeData GetBcmsDataForSkill(int skillId)
         {
             Log.Debug("DataCache[GetBcmsDataForSkill]");
             try
@@ -131,9 +131,9 @@ namespace SIPDataCollector.Utilites
                 if (CachObj.Count > 0)
                 {
                     Log.Debug("DataCache[GetBcmsDataForSkill] Dictionary count : " + CachObj.Count);
-                    _bcmsObj = new BcmsDataForSIP();
+                    _bcmsObj = new RealtimeData();
                     var result = CachObj.FirstOrDefault(x => x.Key == skillId);
-                    if (!result.Equals(default(KeyValuePair<string, BcmsDataForSIP>)))
+                    if (!result.Equals(default(KeyValuePair<string, RealtimeData>)))
                     {
                         _bcmsObj = CachObj[result.Key];
                     }

@@ -164,7 +164,7 @@ namespace SIPDataCollector
         /// Gets List of bcms data related to all given skills in config
         /// </summary>
         /// <returns>returns all bcms data related for given skills in config.</returns>
-        public List<BcmsDataForSIP> GetBcmsData()
+        public List<RealtimeData> GetBcmsData()
         {
             Log.Debug("SIPManager[GetBcmsData]");
             try
@@ -183,12 +183,12 @@ namespace SIPDataCollector
         /// </summary>
         /// <param name="skillId">skillId</param>
         /// <returns>returns bcms data for passed skillid</returns>
-        public BcmsDataForSIP GetBcmsDataForSkill(string skillId)
+        public RealtimeData GetBcmsDataForSkill(string skillId)
         {
             Log.Debug("SIPManager[GetBcmsDataForSkill]");
             try
             {
-                return DataCache.GetBcmsDataForSkill(skillId);
+                return DataCache.GetBcmsDataForSkill(Convert.ToInt32(skillId));
             }
             catch (Exception ex)
             {
@@ -328,8 +328,8 @@ namespace SIPDataCollector
                 // get the skills from config to be monitored.
                 var skillIdList = ConfigurationData.skillList;
 
-               // List<BcmsDataForSIP> bcmsdata = new List<BcmsDataForSIP>();
-                BcmsDataForSIP data;
+                // List<BcmsDataForSIP> bcmsdata = new List<BcmsDataForSIP>();
+                RealtimeData data;
 
                 // retruns list of data
                 var getActiveInteractions = _tmacProxy.Stat_GetSkillData();
@@ -351,7 +351,7 @@ namespace SIPDataCollector
                         {
                             //var datad =_tmacProxy.GetQueueStatusForSkill(entry.SkillID,"");
                             Log.Debug("Extension-Id : " + entry.SkillID + " is found in _skillExtnInfo dictionary object");
-                            data = new BcmsDataForSIP();
+                            data = new RealtimeData();
 
                             // get the channel 
                             var channel = entry.SkillName.ToLower().StartsWith("v") ? "voice" : "chat";
@@ -365,13 +365,14 @@ namespace SIPDataCollector
 
                             // below four fields data are obtained from GetTmacWallboardSkills method.
                             data.SkillName = entry.SkillName;
+                            
                             //data.Staff = entry.AgentsStaffed.ToString();
                             //data.Avail = entry.AgentAvailable.ToString();
                             try
                             {
-                                data.CallsWaiting = (channel.ToLower() == "email") ? WorkQueueProxy.GetQueueCount(entry.SkillID) : entry.CallsInQueue.ToString();
+                                data.CallsWaiting = (channel.ToLower() == "email") ? Convert.ToInt32(WorkQueueProxy.GetQueueCount(entry.SkillID)) : entry.CallsInQueue;
 
-                                data.OldestCall = (channel.ToLower() != "voice") ? WorkQueueProxy.GetOldestWaitTime(entry.SkillID) : "";
+                                data.OldestCallWaitTime = (channel.ToLower() != "voice") ? Convert.ToInt32(WorkQueueProxy.GetOldestWaitTime(entry.SkillID)) : 0;
 
                             }
                             catch (Exception ex)
@@ -380,7 +381,8 @@ namespace SIPDataCollector
                             }
                           
                             // here model name skill is actually extnid,so get actual skillid from _skillExtnInfo object
-                            data.Skill = _skillExtnInfo[entry.SkillID].SkillId;
+                            data.SkillId = Convert.ToInt32(_skillExtnInfo[entry.SkillID].SkillId);
+                            data.SkillExtensionId = Convert.ToInt32(_skillExtnInfo[entry.SkillID]);
                             // new method will be exposed to get this data for given skillid
 
                             //if (getActiveInteractions != null)
@@ -389,7 +391,7 @@ namespace SIPDataCollector
                             // get the agentdata[Total agents logged-in for a skill] for given skillId
                             try
                             {
-                                data.AgentData = _instance.GetAgentListLoggedInForSkill(data.Skill);
+                                data.AgentData = _instance.GetAgentListLoggedInForSkill(data.SkillId.ToString());
                                 if (data.AgentData != null)
                                 {
                                     //data.ACD = data.AgentData.Count(x => x.State.Contains("On Call")).ToString();
@@ -434,30 +436,29 @@ namespace SIPDataCollector
                                     //data.TotalACDInteractions = Convert.ToString(entry.ActiveInteractions + 1);
                                     // data.TotalACDInteractions = acdInteraction[data.Skill].TotalACDInteractions ?? "0";
                                     Log.Debug("Active Interaction : " + entry.ActiveInteractions + 1);
-                                    data.Staff = Convert.ToString(data.AgentData.Count());
+                                    data.TotalAgentsStaffed = data.AgentData.Count();
                                     //data.Avail = data.AgentData.Count(x => x.State.Contains("Available")).ToString();
-                                    data.ACW = data.AgentData.Count(x => x.State.Contains("ACW")).ToString();
-                                    data.AUX = Convert.ToString(data.AgentData.Count(x => ConfigurationData.auxCodes.Contains(x.State)));
+                                    data.TotalAgentsInACW = data.AgentData.Count(x => x.State.Contains("ACW"));
+                                    data.TotalAgentsInAUX = data.AgentData.Count(x => ConfigurationData.auxCodes.Contains(x.State));
                                 }
 
                             }
                             catch (Exception)
                             {
-                                Log.Error("Error while calling tmac method : GetAgentListLoggedInForSkill() for skill = " + data.Skill);
+                                Log.Error("Error while calling tmac method : GetAgentListLoggedInForSkill() for skill = " + data.SkillId);
                             }
 
-
                             // currently these values are not used in front-end.
-                            data.ACD = Convert.ToString(entry.ActiveInteractions);
-                            data.Avail = Convert.ToString(entry.AgentAvailable);
-                            data.AvgAbandTime = "00:00:00";
-                            data.Date = "";
-                            data.Extn = "";
-                            data.Other = "";
+                            data.TotalActiveInteractions = entry.ActiveInteractions;
+                            data.TotalAvailableAgents = entry.AgentAvailable;
+                            data.AverageAbandonedTime = 0;
+                            //data. = "";
+                            //data.Extn = "";
+                            //data.Other = "";
 
                             try
                             {
-                                data.AccptedSL = ConfigurationData.acceptableSlObj.FirstOrDefault(x => x.Key == data.Skill).Value;
+                                data.AcceptedSL = Convert.ToInt32(ConfigurationData.acceptableSlObj?.FirstOrDefault(x => x.Key == data.SkillId.ToString()).Value);
                             }
                             catch (Exception)
                             {
@@ -564,12 +565,13 @@ namespace SIPDataCollector
                                             AbandCalls = dbData.AbandCalls,
                                             SLPercentage = dbData.SLPercentage,
                                             AvgHandlingTime = ((dbData.ACDTime + dbData.AHTTime) / (dbData.TotalCallsHandled == 0 ? 1 : dbData.TotalCallsHandled)),
-                                            skillID = _skillExtnInfo[skillExtn].SkillId ?? string.Empty,
+                                            skillId = Convert.ToInt32(_skillExtnInfo[skillExtn].SkillId),
                                             TotalACDInteractions = dbData.TotalACDInteractions,
                                             AbandonPercentage = abandPercentage,
                                             AvgAbandTime = dbData.AvgAbandTime
                                         };
-                                        if (!string.IsNullOrEmpty(data.skillID) && (data != null))
+                                        // if (!string.IsNullOrEmpty(data.skillId) && (data != null))
+                                        if (data != null)
                                             DataCache.UpdateHistoricalData(data);
                                     }
                                     catch (Exception ex)
@@ -616,7 +618,7 @@ namespace SIPDataCollector
                     var agentDetails = loggedInAgents.FirstOrDefault(y => y.AgentLoginID == entry);
                     if (agentDetails != null)
                     {
-                        agentData = new AgentData { LoginId = entry, State = agentDetails.CurrentAgentStatus, TotalStaffedAgents = loggedInAgents.Count };
+                        agentData = new AgentData { LoginId = entry, State = agentDetails.CurrentAgentStatus, TotalStaffedAgents = loggedInAgents.Count, StationID = agentDetails.StationID };
                         agentListForSkill.Add(agentData);
                     }
                 }

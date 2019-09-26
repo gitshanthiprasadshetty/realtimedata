@@ -17,11 +17,11 @@ namespace SIPDataCollector
     {
         [OperationContract]
         [WebInvoke(Method = "GET", UriTemplate = "/GetRealtimeDataForAllSkills", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.Bare)]
-        List<BcmsDataForSIP> GetBcmsData();
+        List<RealtimeData> GetBcmsData();
 
         [OperationContract]
         [WebInvoke(Method = "GET", UriTemplate = "/GetBcmsDataForSkill/{skillId}", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.Bare)]
-        BcmsDataForSIP GetBcmsDataForSkill(string skillId);
+        RealtimeData GetBcmsDataForSkill(string skillId);
 
         [OperationContract]
         [WebInvoke(Method = "GET", UriTemplate = "/PullDataFromAlternateServer", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.Bare)]
