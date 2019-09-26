@@ -20,7 +20,7 @@ namespace SIPDataCollector
         List<RealtimeData> GetBcmsData();
 
         [OperationContract]
-        [WebInvoke(Method = "GET", UriTemplate = "/GetBcmsDataForSkill/{skillId}", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.Bare)]
+        [WebInvoke(Method = "GET", UriTemplate = "/GetRealtimeDataForSkill/{skillId}", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.Bare)]
         RealtimeData GetBcmsDataForSkill(string skillId);
 
         [OperationContract]

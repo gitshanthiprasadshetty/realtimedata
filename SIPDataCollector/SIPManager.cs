@@ -302,8 +302,8 @@ namespace SIPDataCollector
                         // add to dictionary object to maintain a skill-Extn mapping.
                         _skillExtnInfo.Add(entry.ItemArray[1].ToString(), new SkillExtensionInfo
                         {
-                            SkillId = entry.ItemArray[0].ToString(),
-                            ExtensionId = entry.ItemArray[1].ToString(),
+                            SkillId = Convert.ToInt32(entry.ItemArray[0]),
+                            ExtensionId = Convert.ToInt32(entry.ItemArray[1]),
                             SkillName = entry.ItemArray[2].ToString()
                         });
                     }
@@ -371,7 +371,7 @@ namespace SIPDataCollector
                             try
                             {
                                 data.CallsWaiting = (channel.ToLower() == "email") ? Convert.ToInt32(WorkQueueProxy.GetQueueCount(entry.SkillID)) : entry.CallsInQueue;
-
+                             
                                 data.OldestCallWaitTime = (channel.ToLower() != "voice") ? Convert.ToInt32(WorkQueueProxy.GetOldestWaitTime(entry.SkillID)) : 0;
 
                             }
@@ -381,8 +381,8 @@ namespace SIPDataCollector
                             }
                           
                             // here model name skill is actually extnid,so get actual skillid from _skillExtnInfo object
-                            data.SkillId = Convert.ToInt32(_skillExtnInfo[entry.SkillID].SkillId);
-                            data.SkillExtensionId = Convert.ToInt32(_skillExtnInfo[entry.SkillID]);
+                            data.SkillId = _skillExtnInfo[entry.SkillID].SkillId;
+                            data.SkillExtensionId = _skillExtnInfo[entry.SkillID].ExtensionId;
                             // new method will be exposed to get this data for given skillid
 
                             //if (getActiveInteractions != null)
@@ -549,7 +549,7 @@ namespace SIPDataCollector
                             if (queue.TryDequeue(out string skillExtn))
                             {
                                 Log.Debug("skillExtn is = " + skillExtn);
-                                string skillId = _skillExtnInfo[skillExtn].SkillId ?? string.Empty;
+                                int skillId = _skillExtnInfo[skillExtn].SkillId;
                                 var dbData = DataAccess.GetHistoricalData(skillExtn, skillId);
                                 if (dbData != null)
                                 {

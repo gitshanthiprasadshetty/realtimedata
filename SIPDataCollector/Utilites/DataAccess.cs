@@ -73,7 +73,7 @@ namespace SIPDataCollector.Utilities
             return 0;
         }
 
-        public static SkillData GetHistoricalData(string skillExtn, string skillId)
+        public static SkillData GetHistoricalData(string skillExtn, int skillId)
         {
             Log.Debug("GetHistoricalData() : " + skillExtn);
             try
@@ -87,7 +87,7 @@ namespace SIPDataCollector.Utilities
                 int accSlLevl;
                 try
                 {
-                    accSlLevl = ConfigurationData.acceptableSlObj.FirstOrDefault(x => x.Key == skillId).Value;
+                    accSlLevl = ConfigurationData.acceptableSlObj.FirstOrDefault(x => x.Key == skillId.ToString()).Value;
                 }
                 catch (Exception ex)
                 {
@@ -164,6 +164,7 @@ namespace SIPDataCollector.Utilities
             try
             {
                 string sql = @"select SkillID,SkillExtension,SkillName from TMAC_Skills Where SkillID in (" + skillsToMonitor + ")";
+                Log.Info("SQL : " + sql);
                 DataTable skillExtnObj = SqlDataAccess.ExecuteDataTable(sql, ConfigurationData.ConntnString);
                 return skillExtnObj;
             }

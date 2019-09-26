@@ -14,12 +14,12 @@ namespace SIPDataCollector.Models
         /// <summary>
         /// Group ExtensionId
         /// </summary>
-        public string ExtensionId { get; set; }
+        public int ExtensionId { get; set; }
         
         /// <summary>
         /// SkillId for ExtensionID
         /// </summary>
-        public string SkillId { get; set; }
+        public int SkillId { get; set; }
 
         /// <summary>
         /// SkillName for SkillId
