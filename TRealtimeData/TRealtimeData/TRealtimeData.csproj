@@ -48,7 +48,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="CMDataCollector">
-      <HintPath>..\..\CMDataCollector\bin\Debug\CMDataCollector.dll</HintPath>
+      <HintPath>..\..\CMDataCollector\lib\CMDataCollector.dll</HintPath>
     </Reference>
     <Reference Include="KMSClient">
       <HintPath>lib\KMSClient.dll</HintPath>
@@ -129,6 +129,12 @@
     <EmbeddedResource Include="TRealtimeService.resx">
       <DependentUpon>TRealtimeService.cs</DependentUpon>
     </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\TRealtimeDataSync\TRealTimeDataSync.csproj">
+      <Project>{5C2DD53D-3A61-4CCD-AE65-285BDC509CD3}</Project>
+      <Name>TRealTimeDataSync</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

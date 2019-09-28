@@ -1,4 +1,5 @@
 ﻿using CMDataCollector;
+using CMDataCollector.Utilities;
 using SIPDataCollector;
 using System;
 using System.Collections.Generic;
@@ -7,6 +8,7 @@ using System.ServiceModel;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using TRealTimeDataSync.HB_TRealtimeData;
 
 namespace TRealtimeData
 {
@@ -33,9 +35,9 @@ namespace TRealtimeData
                 else
                 {
                     log.Info("Starting SIPDataCollector");
-                    myServiceHost = new ServiceHost(typeof(SIPManager));
+                    myServiceHost = new ServiceHost(typeof(SIPDataCollector.SIPManager));
                     myServiceHost.Open();
-                    SIPManager.GetInstance().Start();
+                    SIPDataCollector.SIPManager.GetInstance().Start();
                 }
             }
             catch (Exception e)

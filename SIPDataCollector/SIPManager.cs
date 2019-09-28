@@ -292,8 +292,10 @@ namespace SIPDataCollector
                 // get skillidlist from config to monitor.
                 var skillIdList = ConfigurationData.skillsToMonitor;
 
+                bool key = skillIdList == string.Empty ? false : true;
+
                 // get extnid for given set of skills
-                var result = DataAccess.GetSkillExtnInfo(skillIdList);
+                var result = DataAccess.GetSkillExtnInfo(skillIdList,key);
                 if (result != null)
                 {
                     Log.Debug("Skill to Extension mapping");

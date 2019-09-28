@@ -158,19 +158,21 @@ namespace SIPDataCollector.Utilities
         /// Gets Skill-Extension related information.
         /// </summary>
         /// <returns>returns DataTable</returns>
-        public static DataTable GetSkillExtnInfo(string skillsToMonitor)
+        public static DataTable GetSkillExtnInfo(string skillsToMonitor,bool key)
         {
             Log.Debug("GetSkillExtnInfo()");
             try
             {
-                string sql = @"select SkillID,SkillExtension,SkillName from TMAC_Skills Where SkillID in (" + skillsToMonitor + ")";
+                string sql = "";
+                sql = key ? @"select SkillID,SkillExtension,SkillName from TMAC_Skills Where SkillID in (" + skillsToMonitor + ")" : 
+                    @"select SkillID,SkillExtension,SkillName from TMAC_Skills";
                 Log.Info("SQL : " + sql);
                 DataTable skillExtnObj = SqlDataAccess.ExecuteDataTable(sql, ConfigurationData.ConntnString);
                 return skillExtnObj;
             }
             catch (Exception ex)
             {
-                Log.Error("Exception in ExtnToSkillMap():");
+                Log.Error("Exception in ExtnToSkillMap():" + ex);
                 return null;
             }
         }
@@ -188,6 +190,7 @@ namespace SIPDataCollector.Utilities
                                 WHERE b.AgentID = a.AgentID FOR XML PATH('')),1 ,1, '')  Skills
                                 FROM TMAC_Agent_Skills b
                                 GROUP BY AgentID;";
+                Log.Info("SQL: " + sql);
                 DataTable agentSkillObj = SqlDataAccess.ExecuteDataTable(sql, ConfigurationData.ConntnString);
                 return agentSkillObj;
             }
