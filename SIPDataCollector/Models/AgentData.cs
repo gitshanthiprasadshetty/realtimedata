@@ -10,8 +10,6 @@
     /// </summary>
     public string State { get; set; }
 
-    public int TotalStaffedAgents { get; set; }
-
     public string StationID { get; set; }
 
 }

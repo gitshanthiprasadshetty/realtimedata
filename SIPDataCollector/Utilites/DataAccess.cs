@@ -12,9 +12,9 @@ namespace SIPDataCollector.Utilities
     class DataAccess
     {
         /// <summary>
-        /// Log Defination
+        /// log Defination
         /// </summary>
-        private static Logger.Logger Log = new Logger.Logger(typeof(DataAccess));
+        private static Logger.Logger log = new Logger.Logger(typeof(DataAccess));
 
         /// <summary>
         /// 
@@ -23,21 +23,21 @@ namespace SIPDataCollector.Utilities
         /// <returns></returns>
         public static int ExecuteQuery(string sql)
         {
-            Log.Debug("DataAccess[ExecuteQuery]");
+            log.Debug("ExecuteQuery()");
             try
             {
-                Log.Debug("SQL" + sql);
+                log.Debug("SQL" + sql);
                 using (SqlConnection conn = new SqlConnection(ConfigurationData.ConntnString))
                 {
                     conn.Open();
                     SqlCommand comm = new SqlCommand(sql, conn);
-                    Log.Debug("Return value " + comm.ExecuteReader());
+                    log.Debug("Return value " + comm.ExecuteReader());
                     Convert.ToInt32(comm.ExecuteReader().GetValue(0));
                 }
             }
             catch (Exception ex)
             {
-                Log.Error("Exception in ExecuteQuery():" + sql, ex);
+                log.Error("Exception in ExecuteQuery():" + sql, ex);
             }
             return 0;
         }
@@ -49,7 +49,7 @@ namespace SIPDataCollector.Utilities
         /// <returns>Total abundon calls for given extensionid and date</returns>
         public static int GetAbnData(string Extn, string channel)
         {
-            Log.Debug("DataAccess[GetAbnData]");
+            log.Debug("DataAccess[GetAbnData]");
             try
             {
                 //string sql = @"select Count(1) as COUNT from dbo.TMAC_WorkQueueHistory 
@@ -68,14 +68,14 @@ namespace SIPDataCollector.Utilities
             }
             catch (Exception ex)
             {
-                Log.Error("Exception in GetAbnData():" + ex);
+                log.Error("Exception in GetAbnData():" + ex);
             }
             return 0;
         }
 
         public static SkillData GetHistoricalData(string skillExtn, int skillId)
         {
-            Log.Debug("GetHistoricalData() : " + skillExtn);
+            log.Info($"GetHistoricalData() : skillExtn = {skillExtn} , skillid = {skillId}");
             try
             {
                 //string sql = @"select Count(1) as COUNT from dbo.TMAC_WorkQueueHistory 
@@ -91,11 +91,11 @@ namespace SIPDataCollector.Utilities
                 }
                 catch (Exception ex)
                 {
-                    Log.Error("Error while reading acceptable sl level : ", ex);
+                    log.Error("Error while reading acceptable sl level : ", ex);
                     accSlLevl = ConfigurationData.acceptableSL;
                 }
                 string sql = @"EXEC [GET_HistoricalData] '" + DateTime.Now.Date.ToString("yyyyMMdd") + "'" + ',' + "'" + startTime + "'" + ',' + "'" + endTime + "'" + ',' + "'" + skillExtn + "'" + ',' + "'" + type + "'" + ',' + "'" + accSlLevl + "'";
-                Log.Debug("SQL Query : " + sql);
+                log.Debug("SQL Query : " + sql);
                 DataTable dsusers = SqlDataAccess.ExecuteDataTable(sql, ConfigurationData.ConntnString);
                 if (dsusers != null)
                 {
@@ -118,7 +118,7 @@ namespace SIPDataCollector.Utilities
             }
             catch (Exception ex)
             {
-                Log.Error("Exception in GetHistoricalData():" + ex);
+                log.Error("Exception in GetHistoricalData():" , ex);
             }
             return new SkillData();
         }
@@ -130,7 +130,7 @@ namespace SIPDataCollector.Utilities
         /// <returns>Summary of ACD calls</returns>
         public static int GetACDData(string Extn, string channel)
         {
-            Log.Debug("DataAccess[GetACDData]");
+            log.Debug("DataAccess[GetACDData]");
             try
             {
                 //string sql = @"select Count(1) as COUNT from dbo.TMAC_WorkQueueHistory 
@@ -149,7 +149,7 @@ namespace SIPDataCollector.Utilities
             }
             catch (Exception ex)
             {
-                Log.Error("Exception in GetACDData():" + ex);
+                log.Error("Exception in GetACDData():" + ex);
             }
             return 0;
         }
@@ -160,19 +160,19 @@ namespace SIPDataCollector.Utilities
         /// <returns>returns DataTable</returns>
         public static DataTable GetSkillExtnInfo(string skillsToMonitor,bool key)
         {
-            Log.Debug("GetSkillExtnInfo()");
+            log.Debug("GetSkillExtnInfo()");
             try
             {
                 string sql = "";
-                sql = key ? @"select SkillID,SkillExtension,SkillName from TMAC_Skills Where SkillID in (" + skillsToMonitor + ")" : 
+                sql = key ? @"select SkillID,SkillExtension,SkillName from TMAC_Skills Where SkillID in (" + skillsToMonitor + ")" :
                     @"select SkillID,SkillExtension,SkillName from TMAC_Skills";
-                Log.Info("SQL : " + sql);
+                log.Info("SQL : " + sql);
                 DataTable skillExtnObj = SqlDataAccess.ExecuteDataTable(sql, ConfigurationData.ConntnString);
                 return skillExtnObj;
             }
             catch (Exception ex)
             {
-                Log.Error("Exception in ExtnToSkillMap():" + ex);
+                log.Error("Exception in ExtnToSkillMap():" + ex);
                 return null;
             }
         }
@@ -183,20 +183,20 @@ namespace SIPDataCollector.Utilities
         /// <returns>returns dataTable having agentid and total skills he has.</returns>
         public static DataTable GetAgentSkillInfo()
         {
-            Log.Debug("GetAgentSkillInfo()");
+            log.Debug("GetAgentSkillInfo()");
             try
             {
                 string sql = @"SELECT AgentID , STUFF(( SELECT  ','+ SkillID FROM TMAC_Agent_Skills a
                                 WHERE b.AgentID = a.AgentID FOR XML PATH('')),1 ,1, '')  Skills
                                 FROM TMAC_Agent_Skills b
                                 GROUP BY AgentID;";
-                Log.Info("SQL: " + sql);
+                log.Info("SQL: " + sql);
                 DataTable agentSkillObj = SqlDataAccess.ExecuteDataTable(sql, ConfigurationData.ConntnString);
                 return agentSkillObj;
             }
             catch (Exception ex)
             {
-                Log.Error("Exception in ExtnToSkillMap():");
+                log.Error("Exception in ExtnToSkillMap():" ,ex);
                 return null;
             }
         }
@@ -219,13 +219,14 @@ namespace SIPDataCollector.Utilities
             }
             catch (Exception ex)
             {
+                log.Error("Exception in GetAuxCodes():", ex);
             }
             return null;
         }
 
         public static Dictionary<string, int> GetAcceptableLevels()
         {
-            Log.Debug("GetAcceptableLevels()");
+            log.Debug("GetAcceptableLevels()");
             try
             {
                 string[] auxCodes = new string[] { };
@@ -245,7 +246,7 @@ namespace SIPDataCollector.Utilities
             }
             catch (Exception ex)
             {
-                Log.Error("Error in GetAcceptableLevels : " + ex);
+                log.Error("Error in GetAcceptableLevels : " + ex);
             }
             return null;
         }
@@ -280,7 +281,7 @@ namespace SIPDataCollector.Utilities
         //    }
         //    catch (Exception ex)
         //    {
-        //        Log.Error("Exception in ExtnToSkillMap():");
+        //        log.Error("Exception in ExtnToSkillMap():");
         //        return null;
         //    }
         //}

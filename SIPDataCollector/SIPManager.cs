@@ -18,7 +18,7 @@ namespace SIPDataCollector
         /// <summary>
         /// Logger
         /// </summary>
-        static Logger.Logger Log = new Logger.Logger(typeof(SIPManager));
+        static Logger.Logger log = new Logger.Logger(typeof(SIPManager));
 
         /// <summary>
         /// TMAC Proxy
@@ -89,7 +89,7 @@ namespace SIPDataCollector
 
         public void Start()
         {
-            Log.Debug("Start");
+            log.Info("Start");
             try
             {
                 // First map Skill-Extension data reading from db, before starting the actual work.
@@ -101,64 +101,23 @@ namespace SIPDataCollector
                 {
                     while (true)
                     {
-                        Log.Debug("Get Data for SIP");
                         _instance.FetchBcmsData();
                         Thread.Sleep(ConfigurationData.DashboardRefreshTime);
                     }
                 }));
                 sipThread.Start();
 
+                log.Info("start fetching historical data from historical service.");
+
                 Thread historicalData = new Thread(new ThreadStart(delegate{ GetHistoricalData(); }));
                 historicalData.Start();
             }
             catch (Exception ex)
             {
-                Log.Error("Error in BCMSDashboardManager[StartSIP] :" + ex);
+                log.Error("Error in Start() : ", ex);
             }
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        //public void StartSip()
-        //{
-        //    try
-        //    {
-
-        //        //if (_sipthreadStatus == false)
-        //        //{
-        //            // Thread that runs on timely-fashion for given intervals of time in miliseconds.
-        //            var sipThread = new Thread(new ThreadStart(delegate
-        //            {
-        //                while (true)
-        //                {
-        //                    Log.Debug("Get Data for SIP");
-        //                    _instance.FetchBcmsData();
-        //                    Thread.Sleep(ConfigurationData.DashboardRefreshTime);
-        //                }
-        //            }));
-        //            sipThread.Start();
-
-        //        //    if (sipThread.ThreadState == ThreadState.Aborted || sipThread.ThreadState == ThreadState.Stopped
-        //        //   || sipThread.ThreadState == ThreadState.Unstarted)
-        //        //    {
-        //        //        _sipthreadStatus = false;
-        //        //    }
-        //        //}
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //    }
-        //}
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <returns></returns>
-        //public bool SIPStatus()
-        //{
-        //    return _isStarted;
-        //}
 
         /// <summary>
         /// Gets List of bcms data related to all given skills in config
@@ -166,14 +125,14 @@ namespace SIPDataCollector
         /// <returns>returns all bcms data related for given skills in config.</returns>
         public List<RealtimeData> GetBcmsData()
         {
-            Log.Debug("SIPManager[GetBcmsData]");
+            log.Info("GetBcmsData()");
             try
             {
                 return DataCache.GetBcmsData();
             }
             catch (Exception ex)
             {
-                Log.Error("Error in GetBcmsData() :" + ex);
+                log.Error("Error in GetBcmsData() :", ex);
             }
             return null;
         }
@@ -185,14 +144,14 @@ namespace SIPDataCollector
         /// <returns>returns bcms data for passed skillid</returns>
         public RealtimeData GetBcmsDataForSkill(string skillId)
         {
-            Log.Debug("SIPManager[GetBcmsDataForSkill]");
+            log.Info($"GetBcmsDataForSkill(), skillid = {skillId}");
             try
             {
                 return DataCache.GetBcmsDataForSkill(Convert.ToInt32(skillId));
             }
             catch (Exception ex)
             {
-                Log.Error("Error in GetBcmsDataForSkill() :" + ex);
+                log.Error("Error in GetBcmsDataForSkill() :" , ex);
             }
             return null;
         }
@@ -202,7 +161,7 @@ namespace SIPDataCollector
         /// </summary>
         public void PullDataFromAlternateServer()
         {
-            Log.Debug("SIPManager[PullDataFromAlternateServer]");
+            log.Info($"PullDataFromAlternateServer()");
             try
             {
                 var pulledCacheData = TRealTimeDataSync.SyncManager.PullDataFromCache();
@@ -234,7 +193,7 @@ namespace SIPDataCollector
                     
                     for (int i = 0; i < data.AgentData.Count(); i++)
                     {
-                        Log.Debug("pulldata : " + i + "AgentCount " + data.AgentData.Count());
+                        log.Debug("pulldata : " + i + "AgentCount " + data.AgentData.Count());
                         agentDataSet.Add(new AgentData
                         {
                             LoginId = data.AgentData[i].LoginId,
@@ -247,26 +206,9 @@ namespace SIPDataCollector
             }
             catch (Exception ex)
             {
-                Log.Error("Error in PullDataFromAlternateServer() :" + ex);
+                log.Error("Error in PullDataFromAlternateServer() :" + ex);
             }
         }
-
-
-        ///// <summary>
-        ///// Fetch the bcms data.
-        ///// </summary>
-        //public void GetRealTimeBcmsData()
-        //{
-        //    Log.Debug("SIPManager[GetRealTimeData]");
-        //    try
-        //    {
-        //        _instance.FetchBcmsData();
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        Log.Error("Error in GetRealTimeBcmsData() :" + ex);
-        //    }
-        //}
 
         #endregion
 
@@ -277,7 +219,7 @@ namespace SIPDataCollector
         /// </summary>
         public void MapSkillExtnData()
         {
-            Log.Debug("SIPManager[MapSkillExtnData]");
+            log.Debug("SIPManager[MapSkillExtnData]");
             try
             {
                 // Load all local config values.
@@ -295,25 +237,28 @@ namespace SIPDataCollector
                 bool key = skillIdList == string.Empty ? false : true;
 
                 // get extnid for given set of skills
-                var result = DataAccess.GetSkillExtnInfo(skillIdList,key);
+                var result = DataAccess.GetSkillExtnInfo(skillIdList, key);
                 if (result != null)
                 {
-                    Log.Debug("Skill to Extension mapping");
+                    log.Debug("Skill to Extension mapping");
                     foreach (DataRow entry in result.Rows)
                     {
                         // add to dictionary object to maintain a skill-Extn mapping.
+                        if (_skillExtnInfo.ContainsKey(entry.ItemArray[1].ToString()))
+                            continue;                            
+
                         _skillExtnInfo.Add(entry.ItemArray[1].ToString(), new SkillExtensionInfo
                         {
                             SkillId = Convert.ToInt32(entry.ItemArray[0]),
                             ExtensionId = Convert.ToInt32(entry.ItemArray[1]),
-                            SkillName = entry.ItemArray[2].ToString()
+                            SkillName = Convert.ToString(entry.ItemArray[2])
                         });
                     }
                 }
             }
             catch (Exception ex)
             {
-                Log.Error("Error in MapSkillExtnData() :" + ex);
+                log.Error("Error in MapSkillExtnData() :" , ex);
             }
         }
 
@@ -325,7 +270,7 @@ namespace SIPDataCollector
         {
             try
             {
-                Log.Debug("FetchBcmsData()");
+                log.Debug("FetchBcmsData()");
 
                 // get the skills from config to be monitored.
                 var skillIdList = ConfigurationData.skillList;
@@ -340,19 +285,22 @@ namespace SIPDataCollector
 
                 if (res != null)
                 {
-                    Log.Debug("Total count from GetTmacWallboardSkills : " + res.Count());
+                    log.Debug("Total count from GetTmacWallboardSkills : " + res.Count());
                     foreach (var entry in res)
                     {
                         // if skill to exten mapping is not happend, try again.
                         if (_skillExtnInfo.Count() == 0)
+                        {
+                            log.Warn("Skill to Extn mapping was skipped or failed.");
                             MapSkillExtnData();
+                        }
 
                         // if current EXTENSIONID is present in _skillExtnInfo dictionary object, then take a count else ignore. 
                         // here SkillID obtained from _tmacProxy is actually EXTENSIONID.
                         if (_skillExtnInfo.ContainsKey(entry.SkillID))
                         {
                             //var datad =_tmacProxy.GetQueueStatusForSkill(entry.SkillID,"");
-                            Log.Debug("Extension-Id : " + entry.SkillID + " is found in _skillExtnInfo dictionary object");
+                            log.Debug("Extension-Id : " + entry.SkillID + " is found in _skillExtnInfo dictionary object");
                             data = new RealtimeData();
 
                             // get the channel 
@@ -379,7 +327,7 @@ namespace SIPDataCollector
                             }
                             catch (Exception ex)
                             {
-                                Log.Error("Error while reading workqueue data : " + ex);
+                                log.Error("Error while reading workqueue data : " + ex);
                             }
                           
                             // here model name skill is actually extnid,so get actual skillid from _skillExtnInfo object
@@ -412,13 +360,13 @@ namespace SIPDataCollector
                                                 DateTime date = value.LastUpdatedTime;
                                                 if (date == lastSyncDate)
                                                 {
-                                                    Log.Debug("update | old acd value = " + value.TotalACDInteractions + ", new acd : " + data.ACD + " for skill : " + data.Skill);
+                                                    log.Debug("update | old acd value = " + value.TotalACDInteractions + ", new acd : " + data.ACD + " for skill : " + data.Skill);
                                                     acdInteraction.TryRemove(data.Skill, out RData oldValue);
                                                     acdInteraction.TryAdd(data.Skill, new RData { LastUpdatedTime = lastSyncDate, TotalACDInteractions = oldValue.TotalACDInteractions + data.ACD });
                                                 }
                                                 else
                                                 {
-                                                    Log.Debug("AddOrUpdate | old acd value = " + value.TotalACDInteractions + ", new acd : " + data.ACD + " for skill : " + data.Skill);
+                                                    log.Debug("AddOrUpdate | old acd value = " + value.TotalACDInteractions + ", new acd : " + data.ACD + " for skill : " + data.Skill);
                                                     acdInteraction.AddOrUpdate(data.Skill, new RData { LastUpdatedTime = lastSyncDate, TotalACDInteractions = data.ACD },
                                                         (k, v) => new RData
                                                         {
@@ -437,7 +385,7 @@ namespace SIPDataCollector
                                     //data.AUX = "0";
                                     //data.TotalACDInteractions = Convert.ToString(entry.ActiveInteractions + 1);
                                     // data.TotalACDInteractions = acdInteraction[data.Skill].TotalACDInteractions ?? "0";
-                                    Log.Debug("Active Interaction : " + entry.ActiveInteractions + 1);
+                                    log.Debug("Active Interaction : " + entry.ActiveInteractions + 1);
                                     data.TotalAgentsStaffed = data.AgentData.Count();
                                     //data.Avail = data.AgentData.Count(x => x.State.Contains("Available")).ToString();
                                     data.TotalAgentsInACW = data.AgentData.Count(x => x.State.Contains("ACW"));
@@ -447,7 +395,7 @@ namespace SIPDataCollector
                             }
                             catch (Exception)
                             {
-                                Log.Error("Error while calling tmac method : GetAgentListLoggedInForSkill() for skill = " + data.SkillId);
+                                log.Error("Error while calling tmac method : GetAgentListLoggedInForSkill() for skill = " + data.SkillId);
                             }
 
                             // currently these values are not used in front-end.
@@ -478,7 +426,7 @@ namespace SIPDataCollector
             }
             catch (Exception ex)
             {
-                Log.Error("Error in FetchBcmsData() :" + ex);
+                log.Error("Error in FetchBcmsData() :" , ex);
             }
         }
 
@@ -487,7 +435,7 @@ namespace SIPDataCollector
         /// </summary>
         void AgentSkillInfo()
         {
-            Log.Debug("AgentSkillInfo()");
+            log.Debug("AgentSkillInfo()");
             try
             {
                 DataTable result = null;
@@ -520,7 +468,7 @@ namespace SIPDataCollector
                                     Skills = skillArray.ToList()
                                 });
                             }
-                            Log.Debug("Total Agent-Skill Info Dictionary count : " + _agentSkillInfo.Count());
+                            log.Debug("Total Agent-Skill Info dictionary count : " + _agentSkillInfo.Count());
                         }
                         Thread.Sleep(300000);
                     }
@@ -530,32 +478,32 @@ namespace SIPDataCollector
             catch (Exception ex)
             {
                 _isStarted = false;
-                Log.Error("Error in AgentSkillInfo() :" + ex);
+                log.Error("Error in AgentSkillInfo() :" , ex);
             }
         }
 
 
         public void GetHistoricalData()
         {
-            Log.Debug("GetHistoricalData()");
+            log.Debug("GetHistoricalData()");
             try
             {
                 while (true)
                 {
                     if (!queue.IsEmpty)
                     {
-                        Log.Debug("Queue is not empty");
+                        log.Debug("Queue is not empty");
                         foreach (var item in queue)
                         {
-                            Log.Debug("Queue item is = " + item);
+                            log.Debug("Queue item is = " + item);
                             if (queue.TryDequeue(out string skillExtn))
                             {
-                                Log.Debug("skillExtn is = " + skillExtn);
+                                log.Debug("skillExtn is = " + skillExtn);
                                 int skillId = _skillExtnInfo[skillExtn].SkillId;
                                 var dbData = DataAccess.GetHistoricalData(skillExtn, skillId);
                                 if (dbData != null)
                                 {
-                                    Log.Debug("Received historical data");
+                                    log.Debug("Received historical data");
                                     try
                                     {
                                         decimal abandPercentage = Math.Round(Convert.ToDecimal(100 * Convert.ToDouble(dbData.AbandCalls) / ((dbData.AbandCalls) + (dbData.TotalACDInteractions == 0 ? 1 : dbData.TotalACDInteractions))), 2);
@@ -578,7 +526,7 @@ namespace SIPDataCollector
                                     }
                                     catch (Exception ex)
                                     {
-                                        Log.Error("Error while processing histoircal data : ", ex);
+                                        log.Error("Error while processing histoircal data : ", ex);
                                     }
                                 }
                             }
@@ -589,7 +537,7 @@ namespace SIPDataCollector
             }
             catch (Exception ex)
             {
-                Log.Error("Error in GetHistoricalData", ex);
+                log.Error("Error in GetHistoricalData", ex);
             }
         }
         /// <summary>
@@ -599,7 +547,7 @@ namespace SIPDataCollector
         /// <returns>List of agents who are currently loggedin for given skill</returns>
         List<AgentData> GetAgentListLoggedInForSkill(string skillId)
         {
-            Log.Debug("GetAgentListLoggedInForSkill()");
+            log.Debug("GetAgentListLoggedInForSkill()");
             try
             {
                 List<AgentData> agentListForSkill = new List<AgentData>();
@@ -610,7 +558,7 @@ namespace SIPDataCollector
 
                 // _agentSkillInfo contains all the agentdata from db, get all agents who has requested skillid.
                 var agentList = _agentSkillInfo.Where(x => x.Value.Skills.Contains(skillId)).Select(x => x.Key);
-                // Log.Debug("Total number of agents found for skill : " + skillId + "is "+agentList.Count());
+                // log.Debug("Total number of agents found for skill : " + skillId + "is "+agentList.Count());
 
                 // Loop through and check amoung list of agents having given skill, how many of them are currently
                 // logged-into TMAC. Make a list of these agents and return.
@@ -620,7 +568,7 @@ namespace SIPDataCollector
                     var agentDetails = loggedInAgents.FirstOrDefault(y => y.AgentLoginID == entry);
                     if (agentDetails != null)
                     {
-                        agentData = new AgentData { LoginId = entry, State = agentDetails.CurrentAgentStatus, TotalStaffedAgents = loggedInAgents.Count, StationID = agentDetails.StationID };
+                        agentData = new AgentData { LoginId = entry, State = agentDetails.CurrentAgentStatus, StationID = agentDetails.StationID };
                         agentListForSkill.Add(agentData);
                     }
                 }
@@ -628,7 +576,7 @@ namespace SIPDataCollector
             }
             catch (Exception ex)
             {
-                Log.Error("Error in GetAgentListLoggedInForSkill() :" + ex);
+                log.Error("Error in GetAgentListLoggedInForSkill() :" + ex);
                 return null;
             }
         }
