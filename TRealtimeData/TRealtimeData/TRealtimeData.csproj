@@ -48,7 +48,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="CMDataCollector">
-      <HintPath>..\..\CMDataCollector\lib\CMDataCollector.dll</HintPath>
+      <HintPath>..\..\CMDataCollector\bin\Debug\CMDataCollector.dll</HintPath>
     </Reference>
     <Reference Include="KMSClient">
       <HintPath>lib\KMSClient.dll</HintPath>
@@ -91,7 +91,6 @@
     <Compile Include="ProjectInstaller.Designer.cs">
       <DependentUpon>ProjectInstaller.cs</DependentUpon>
     </Compile>
-    <Compile Include="RealtimeAccess.cs" />
     <Compile Include="RealtimeFactory.cs" />
     <Compile Include="TRealtimeService.cs">
       <SubType>Component</SubType>

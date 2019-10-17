@@ -8,6 +8,7 @@ using System.Data;
 using System.Threading;
 using SIPDataCollector.Utilites;
 using Connector.Proxy;
+using AMACWeb_Proxy;
 
 namespace SIPDataCollector
 {
@@ -23,12 +24,13 @@ namespace SIPDataCollector
         /// <summary>
         /// TMAC Proxy
         /// </summary>
-       // private static readonly ServiceClient tmacServiceClient = new ServiceClient();
+        // private static readonly ServiceClient tmacServiceClient = new ServiceClient();
 
         /// <summary>
         /// TMAC Proxy
         /// </summary>
-        static AMACWeb_Proxy.TmacConnector _tmacProxy = new AMACWeb_Proxy.TmacConnector("DefaultTMACServer");
+        //static AMACWeb_Proxy.TmacConnector _tmacProxy = new AMACWeb_Proxy.TmacConnector("DefaultTMACServer");
+        static TmacProxyRest _tmacProxy = null;
 
         /// <summary>
         /// Holds Skill-Extension Related information for given set of skills in config.
@@ -43,7 +45,7 @@ namespace SIPDataCollector
         /// <summary>
         /// Identity to hold loop value.
         /// </summary>
-        static bool _isStarted = false;
+        public static bool _isStarted = false;
 
         //bool _sipthreadStatus = false;
 
@@ -59,10 +61,19 @@ namespace SIPDataCollector
 
         /// <summary>
         /// Constructor
-        /// </summary>
-        //private SIPManager()
-        //{
-        //}
+        /// </summary>       
+        private SIPManager()
+        {
+            try
+            {
+                AMACWeb_Proxy.ConfigurationData.LoadConfig();
+                _tmacProxy = new TmacProxyRest();
+            }
+            catch (Exception ex)
+            {
+                log.Error("Exception in Main", ex);
+            }
+        }
 
         /// <summary>
         /// singleton instance of class
@@ -96,13 +107,32 @@ namespace SIPDataCollector
                 if (!_isStarted)
                     _instance.MapSkillExtnData();
 
+                // if skill to exten mapping is not happend, try again.
+                try
+                {
+                    if (_skillExtnInfo.Count() == 0)
+                    {
+                        log.Info("skill-extn mapping count is zero, trying again.");
+                        MapSkillExtnData();
+                    }
+
+                    if (_skillExtnInfo.Count() == 0)
+                    {
+                        log.Info("skill-extn mapping count is zero, after couple of tries. please check if skills are configured correctly. Exiting application.");
+                        return;
+                    }
+                }
+                catch (Exception)
+                {
+                }
+
                 //  sipThread = new Thread(StartSip);      
                 var sipThread = new Thread(new ThreadStart(delegate
                 {
                     while (true)
                     {
                         _instance.FetchBcmsData();
-                        Thread.Sleep(ConfigurationData.DashboardRefreshTime);
+                        Thread.Sleep(Utilites.ConfigurationData.DashboardRefreshTime);
                     }
                 }));
                 sipThread.Start();
@@ -210,6 +240,20 @@ namespace SIPDataCollector
             }
         }
 
+        public List<SkillExtensionInfo> GetSkillAndExtensions()
+        {
+            log.Info("GetSkillAndExtensions()");
+            try
+            {
+                return _skillExtnInfo.Values.ToList();
+            }
+            catch (Exception ex)
+            {
+                log.Error("Error in GetSkillAndExtensions: ", ex);
+            }
+            return null;
+        }
+
         #endregion
 
         #region Private 
@@ -223,7 +267,7 @@ namespace SIPDataCollector
             try
             {
                 // Load all local config values.
-                ConfigurationData.LoadConfig();
+                Utilites.ConfigurationData.LoadConfig();
 
                 // Enable the loop
                 _isStarted = true;
@@ -232,12 +276,10 @@ namespace SIPDataCollector
                 AgentSkillInfo();
 
                 // get skillidlist from config to monitor.
-                var skillIdList = ConfigurationData.skillsToMonitor;
-
-                bool key = skillIdList == string.Empty ? false : true;
-
+                var skillIdList = Utilites.ConfigurationData.skillList;
+                string skills = string.Join(",", skillIdList);
                 // get extnid for given set of skills
-                var result = DataAccess.GetSkillExtnInfo(skillIdList, key);
+                var result = DataAccess.GetSkillExtnInfo(skills);
                 if (result != null)
                 {
                     log.Debug("Skill to Extension mapping");
@@ -245,13 +287,14 @@ namespace SIPDataCollector
                     {
                         // add to dictionary object to maintain a skill-Extn mapping.
                         if (_skillExtnInfo.ContainsKey(entry.ItemArray[1].ToString()))
-                            continue;                            
+                            continue;
 
                         _skillExtnInfo.Add(entry.ItemArray[1].ToString(), new SkillExtensionInfo
                         {
                             SkillId = Convert.ToInt32(entry.ItemArray[0]),
                             ExtensionId = Convert.ToInt32(entry.ItemArray[1]),
-                            SkillName = Convert.ToString(entry.ItemArray[2])
+                            SkillName = Convert.ToString(entry.ItemArray[2]),
+                            Channel = Utilites.ConfigurationData.GetChannel(Convert.ToString(entry.ItemArray[0]))
                         });
                     }
                 }
@@ -273,13 +316,13 @@ namespace SIPDataCollector
                 log.Debug("FetchBcmsData()");
 
                 // get the skills from config to be monitored.
-                var skillIdList = ConfigurationData.skillList;
+                // string[] skillIdList = ConfigurationData.skillList;
 
                 // List<BcmsDataForSIP> bcmsdata = new List<BcmsDataForSIP>();
                 RealtimeData data;
 
                 // retruns list of data
-                var getActiveInteractions = _tmacProxy.Stat_GetSkillData();
+                // var getActiveInteractions = _tmacProxy.Stat_GetSkillData();
                 // Gives wallboard data for all("") skills.
                 var res = _tmacProxy.GetTmacWallboardSkills("");
 
@@ -291,47 +334,50 @@ namespace SIPDataCollector
                         // if skill to exten mapping is not happend, try again.
                         if (_skillExtnInfo.Count() == 0)
                         {
-                            log.Warn("Skill to Extn mapping was skipped or failed.");
+                            log.Info("_skillExtnInfo count is 0");
                             MapSkillExtnData();
                         }
 
                         // if current EXTENSIONID is present in _skillExtnInfo dictionary object, then take a count else ignore. 
                         // here SkillID obtained from _tmacProxy is actually EXTENSIONID.
                         if (_skillExtnInfo.ContainsKey(entry.SkillID))
-                        {
+                        {                             
+
                             //var datad =_tmacProxy.GetQueueStatusForSkill(entry.SkillID,"");
                             log.Debug("Extension-Id : " + entry.SkillID + " is found in _skillExtnInfo dictionary object");
                             data = new RealtimeData();
-
+                            // here model name skill is actually extnid,so get actual skillid from _skillExtnInfo object
+                            data.SkillId = _skillExtnInfo[entry.SkillID].SkillId;
                             // get the channel 
-                            var channel = entry.SkillName.ToLower().StartsWith("v") ? "voice" : "chat";
-                            if (entry.SkillName.ToLower().StartsWith("e"))
-                                channel = "email";
-
+                            //var channel = entry.SkillName.ToLower().StartsWith("v") ? "voice" : "chat";
+                            //if (entry.SkillName.ToLower().StartsWith("e"))
+                            //    channel = "email";
+                            // var channel = ConfigurationData.GetChannel(Convert.ToString(data.SkillId));
                             // get total abundent calls and summary of acd calls from DB.
                             //data.AbandCalls = DataAccess.GetAbnData(entry.SkillID, channel).ToString();
                             //data.AcdCallsSummary = DataAccess.GetACDData(entry.SkillID, channel).ToString();
-                            data.Channel = channel;
+                            data.Channel = Utilites.ConfigurationData.GetChannel(Convert.ToString(data.SkillId));
 
                             // below four fields data are obtained from GetTmacWallboardSkills method.
                             data.SkillName = entry.SkillName;
-                            
+
                             //data.Staff = entry.AgentsStaffed.ToString();
                             //data.Avail = entry.AgentAvailable.ToString();
                             try
                             {
-                                data.CallsWaiting = (channel.ToLower() == "email") ? Convert.ToInt32(WorkQueueProxy.GetQueueCount(entry.SkillID)) : entry.CallsInQueue;
-                             
-                                data.OldestCallWaitTime = (channel.ToLower() != "voice") ? Convert.ToInt32(WorkQueueProxy.GetOldestWaitTime(entry.SkillID)) : 0;
+                               // data.InteractionsInQueue = (data.Channel.ToLower() == "email") ? Convert.ToInt32(WorkQueueProxy.GetQueueCount(entry.SkillID)) : entry.CallsInQueue;
+                                data.CallsWaiting = (data.Channel.ToLower() == "email") ? Convert.ToInt32(WorkQueueProxy.GetQueueCount(entry.SkillID)) : entry.CallsInQueue;
+                                //  data.OldestInteractionWaitTime = (data.Channel.ToLower() != "voice") ? Convert.ToInt32(WorkQueueProxy.GetOldestWaitTime(entry.SkillID)) : 0;
+                                // data.OldestInteractionWaitTime = Convert.ToInt32(WorkQueueProxy.GetOldestWaitTime(entry.SkillID));
+                                data.OldestCallWaitTime = WorkQueueProxy.GetOldestWaitTime(entry.SkillID);
 
                             }
                             catch (Exception ex)
                             {
                                 log.Error("Error while reading workqueue data : " + ex);
                             }
-                          
-                            // here model name skill is actually extnid,so get actual skillid from _skillExtnInfo object
-                            data.SkillId = _skillExtnInfo[entry.SkillID].SkillId;
+
+
                             data.SkillExtensionId = _skillExtnInfo[entry.SkillID].ExtensionId;
                             // new method will be exposed to get this data for given skillid
 
@@ -341,6 +387,7 @@ namespace SIPDataCollector
                             // get the agentdata[Total agents logged-in for a skill] for given skillId
                             try
                             {
+                             //   data.AgentStats = _instance.GetAgentListLoggedInForSkill(data.SkillId.ToString());
                                 data.AgentData = _instance.GetAgentListLoggedInForSkill(data.SkillId.ToString());
                                 if (data.AgentData != null)
                                 {
@@ -389,7 +436,7 @@ namespace SIPDataCollector
                                     data.TotalAgentsStaffed = data.AgentData.Count();
                                     //data.Avail = data.AgentData.Count(x => x.State.Contains("Available")).ToString();
                                     data.TotalAgentsInACW = data.AgentData.Count(x => x.State.Contains("ACW"));
-                                    data.TotalAgentsInAUX = data.AgentData.Count(x => ConfigurationData.auxCodes.Contains(x.State));
+                                    data.TotalAgentsInAUX = data.AgentData.Count(x => Utilites.ConfigurationData.auxCodes.Contains(x.State));
                                 }
 
                             }
@@ -399,16 +446,17 @@ namespace SIPDataCollector
                             }
 
                             // currently these values are not used in front-end.
-                            data.TotalActiveInteractions = entry.ActiveInteractions;
+                            //data.ActiveInteractions = entry.ActiveInteractions;
+                            //data.TotalAgentsAvailable = entry.AgentAvailable;
+                            //data.AverageAbandonedTime = 0;
+                            data.ActiveCalls = entry.ActiveInteractions;
                             data.TotalAvailableAgents = entry.AgentAvailable;
-                            data.AverageAbandonedTime = 0;
-                            //data. = "";
-                            //data.Extn = "";
-                            //data.Other = "";
+                            data.AverageAbandonedTime = "00:00:00";
+
 
                             try
                             {
-                                data.AcceptedSL = Convert.ToInt32(ConfigurationData.acceptableSlObj?.FirstOrDefault(x => x.Key == data.SkillId.ToString()).Value);
+                                data.AcceptedSL = Convert.ToInt32(Utilites.ConfigurationData.acceptableSlObj?.FirstOrDefault(x => x.Key == data.SkillId.ToString()).Value);
                             }
                             catch (Exception)
                             {
@@ -422,7 +470,10 @@ namespace SIPDataCollector
                                 queue.Enqueue(entry.SkillID);
                         }
                     }
-                }                
+                }
+                else
+                    log.Info("No response from TMAC");
+
             }
             catch (Exception ex)
             {
@@ -456,6 +507,8 @@ namespace SIPDataCollector
 
                                 var value = entry.ItemArray[1].ToString();
                                 string[] skillArray = value.Split(',');
+                                log.Debug("Entry data [0]: " + entry.ItemArray[0].ToString());
+                                log.Debug("Entry data [1]: " + entry.ItemArray[1].ToString());
 
                                 _agentSkillInfo.AddOrUpdate(entry.ItemArray[0].ToString(), new AgentSkillInfo
                                 {
@@ -532,7 +585,7 @@ namespace SIPDataCollector
                             }
                         }                        
                     }
-                    Thread.Sleep(ConfigurationData.DBRefreshTime);
+                    Thread.Sleep(Utilites.ConfigurationData.DBRefreshTime);
                 }
             }
             catch (Exception ex)

@@ -4,16 +4,11 @@ using System.Linq;
 using System.ServiceModel;
 using System.Text;
 using System.Threading.Tasks;
-using System.Net.Security;
-using System.ServiceModel.Administration;
-using System.ServiceModel.Description;
-using System.ServiceModel.Web;
-using SIPDataCollector.Models;
 
-namespace SIPDataCollector
+namespace TRealtimeData
 {
     [ServiceContract]
-    public interface ISipDataCollector
+    public interface IRealtimeData
     {
         [OperationContract]
         [WebInvoke(Method = "GET", UriTemplate = "/GetRealtimeDataForAllSkills", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.Bare)]

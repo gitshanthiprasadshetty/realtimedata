@@ -1,4 +1,6 @@
 ﻿using ConfigurationProvider;
+using Connector.Proxy;
+using Connector.SMSAPI;
 using SIPDataCollector.Utilities;
 using System;
 using System.Collections.Generic;
@@ -12,7 +14,7 @@ namespace SIPDataCollector.Utilites
         /// <summary>
         /// Logger
         /// </summary>
-        private static Logger.Logger Log = new Logger.Logger(typeof(ConfigurationData));
+        private static Logger.Logger log = new Logger.Logger(typeof(ConfigurationData));
 
         /// <summary>
         /// DB Connection string
@@ -32,7 +34,7 @@ namespace SIPDataCollector.Utilites
         /// <summary>
         /// Array of skills
         /// </summary>
-        public static string[] skillList { get; set; }
+        public static List<string> skillList { get; set; }
         
         /// <summary>
         /// 
@@ -54,30 +56,167 @@ namespace SIPDataCollector.Utilites
         /// </summary>
         public static void LoadConfig()
         {
-            Log.Debug("BcmsSIPManager.ConfigurationData[LoadConfig]");
+            log.Debug("BcmsSIPManager.ConfigurationData[LoadConfig]");
             try
             {
+                Channel();
                 ////ConntnString = ConfigurationSettings.AppSettings["CMDbConn"].ToString();
                 ConntnString = ConnectionStrings.DecryptConnectionString(ConfigurationSettings.AppSettings["CMDbConn"]);
                 skillsToMonitor = ConfigurationSettings.AppSettings["skillsToMonitorForSIP"];
                 DashboardRefreshTime = Convert.ToInt32(ConfigurationSettings.AppSettings["DashboardRefreshTime"]);
                 acceptableSL = Convert.ToInt32(ConfigurationSettings.AppSettings["acceptableSL"]);
                 DBRefreshTime = Convert.ToInt32(ConfigurationSettings.AppSettings["DBRefreshTime"]);
-                if (!string.IsNullOrEmpty(skillsToMonitor) || skillsToMonitor.ToLower() != "na")
-                    skillList = skillsToMonitor.Split(',');
+
+                //if (!string.IsNullOrEmpty(skillsToMonitor) || skillsToMonitor.ToLower() != "na")
+                //    skillList = skillsToMonitor.Split(',');
+
+                skillList = FormatSkills(skillsToMonitor);
+
                 auxCodes = DataAccess.GetAuxCodes();
                 acceptableSlObj = DataAccess.GetAcceptableLevels();
             }
             catch (Exception ex)
             {
-                Log.Error("Error in BcmsSIPManager.ConfigurationData[LoadConfig] : " + ex);
+                log.Error("Error in BcmsSIPManager.ConfigurationData[LoadConfig] : " + ex);
             }
         }
 
+        public static void Channel()
+        {
+            log.Debug("Channel");
+            try
+            {
+                // clear the in-memory data.
+                channelObj.Clear();
+                var section = (SIPDataCollector.Utilites.BcmsSIPConfigSection)ConfigurationManager.GetSection("TRealTimeDataServiceSettings");
+                foreach (BCMSInstanceData data in section.BCMSServiceItems)
+                {
+                    if (!data.SkillId.Contains(";"))
+                    {
+                        log.Debug("Add skills for channel : " + data.ChannelName);
+                        channelObj.Add(data.ChannelName, data.SkillId.Split(',').ToList());
+                    }
+                    else
+                    {
+                        List<string> result = FormatSkills(data.SkillId);
+                        channelObj.Add(data.ChannelName, result);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                log.Error("Error in Channel() : " + ex);
+            }
+        }
+
+        public static string GetChannel(string skillId)
+        {
+            log.Debug("GetChannel()" + skillId);
+            try
+            {
+                var result = "";
+                if (channelObj != null)
+                    result = channelObj.FirstOrDefault(x => x.Value.Contains(skillId)).Key;
+
+                log.Debug("GetChannel return value = " + result);
+                return result;
+            }
+            catch (Exception ex)
+            {
+                log.Error("Error in GetChannel(): for skillId = : " + skillId + Environment.NewLine + ex);
+                return "";
+            }
+        }
+
+        private static List<string> FormatSkills(string skillList)
+        {
+            try
+            {
+
+                if (skillList != null && skillList.Count() >= 0 && !string.IsNullOrEmpty(skillList))
+                {
+                    string[] strArrays = ConfigurationManager.AppSettings["skillsToMonitorForSIP"].Split(new char[] { ';' });
+                    if ((strArrays != null ? true : strArrays.Length != 0))
+                    {
+                        if (strArrays[0] != "")
+                        {
+                            List<int> nums = new List<int>();
+                            for (int i = 0; i < (int)strArrays.Length; i++)
+                            {
+                                nums.AddRange(Enumerable.Range(Convert.ToInt32(strArrays[i].Split(new char[] { '-' })[0]),
+                                    Convert.ToInt32(strArrays[i].Split(new char[] { '-' })[1]) - Convert.ToInt32(strArrays[i].Split(new char[] { '-' })[0]) + 1));
+                            }
+                            List<HuntGroupType> result = SMSAPIProxy.GetSkills();
+
+                            if (result != null)
+                            {
+                                log.Info("Total Skills Obtained from SMSAPI : " + result.Count);
+                                List<int> Skills = result.Select(x => Convert.ToInt32(x.group_NumberField)).ToList();
+                                log.Info("Total Skills from config info : " + nums.Count);
+                                nums = nums?.Where(x => Skills.Contains(x)).ToList();
+                                log.Info("Total Skills to monitor after applying filter : " + nums.Count);
+                                return nums.Select(x => Convert.ToString(x)).ToList();
+                            }
+                            else
+                                log.Info("No data obtained from smsapi");
+
+                        }
+                    }
+                }
+            }
+            catch (Exception exception)
+            {
+                ConfigurationData.log.Error("Error : ", exception);
+            }
+            return null;
+        }
+
+        //static void FetchSIPExtnSkillData(string skillIds)
+        //{
+        //    try
+        //    {
+        //        log.Debug("FetchExtenSkillData()");
+
+        //        string sql = @"select SkillID,SkillExtension,SkillName from TMAC_Skills with (nolock) Where SkillID in (" + skillIds + ")";
+
+        //        log.Info("sql = " + sql);
+
+        //        DataTable result = SqlDataAccess.ExecuteDataTable(sql, ConntnString);
+
+        //        if (result != null)
+        //        {
+        //            log.Debug("Skill to Extension mapping");
+        //            foreach (DataRow entry in result.Rows)
+        //            {
+        //                // add to dictionary object to maintain a skill-Extn mapping.
+        //                try
+        //                {
+        //                    _skillExtnInfo.Add(entry.ItemArray[1].ToString(), new SIPDataCollector.Models.SkillExtensionInfo
+        //                    {
+        //                        SkillId = Convert.ToInt32(entry.ItemArray[0]),
+        //                        ExtensionId = Convert.ToInt32(entry.ItemArray[1]),
+        //                        SkillName = entry.ItemArray[2].ToString()
+        //                    });
+        //                }
+        //                catch (Exception ex)
+        //                {
+        //                    log.Warn("Warning! while adding values to dictionary");
+        //                    log.Error("Message : ", ex);
+        //                }
+        //            }
+        //            log.Debug("completed mapping of skill-extension");
+        //        }
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        log.Error("Error in FetchSIPExtnSkillData: ", ex);
+        //    }
+        //}
+        
         #region notused
         public void GetConnectionString()
         {
-            Log.Debug("GetConnectionString()");
+            log.Debug("GetConnectionString()");
             try
             {
                 string pwdString = string.Empty , userIdString = string.Empty;
@@ -91,7 +230,7 @@ namespace SIPDataCollector.Utilites
                     decryptedPassword = StringEncryptor.Decrypt(pwdString);
                     if (decryptedPassword == null || String.IsNullOrEmpty(decryptedPassword))
                     {
-                        Log.Warn("Failed to decrypt the password");
+                        log.Warn("Failed to decrypt the password");
                         decryptedPassword = pwdString;
                     }
                 }
@@ -101,7 +240,7 @@ namespace SIPDataCollector.Utilites
                     decryptedUserID = StringEncryptor.Decrypt(userIdString);
                     if (decryptedUserID == null || String.IsNullOrEmpty(decryptedUserID))
                     {
-                        Log.Warn("Failed to decrypt the password");
+                        log.Warn("Failed to decrypt the password");
                         decryptedUserID = userIdString;
                     }
                 }
@@ -117,46 +256,6 @@ namespace SIPDataCollector.Utilites
             {
             }
         }
-        /// <summary>
-        /// 
-        /// </summary>
-        //static void Channel()
-        //{
-        //    Log.Debug("Channel");
-        //    try
-        //    {
-        //        channelObj.Clear();
-        //        var section = (BcmsSIPConfigSection)ConfigurationManager.GetSection("BCMSServiceSettings");
-        //        foreach (BCMSInstanceData data in section.BCMSServiceItems)
-        //        {
-        //            channelObj.Add(data.ChannelName, data.SkillId.Split(',').ToList());
-        //        }
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        Log.Error("Error in ConfigurationData[Channel] : " + ex);
-        //    }
-        //}
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="skillId"></param>
-        /// <returns></returns>
-        //public static string GetChannel(string skillId)
-        //{
-        //    Log.Debug("GetChannel");
-        //    try
-        //    {
-        //        var result = channelObj.FirstOrDefault(x => x.Value.Contains(skillId)).Key;
-        //        return result;
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        Log.Error("Error in GetChannel: for skillId = : " + skillId + Environment.NewLine + ex);
-        //        return null;
-        //    }
-        //}
         #endregion
     }
 }

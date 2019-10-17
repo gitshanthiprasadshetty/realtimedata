@@ -110,7 +110,7 @@ namespace SIPDataCollector.Utilities
                             TotalACDInteractions = Convert.ToInt32(item["TotalInteraction"]),
                             AvgAbandTime = Convert.ToInt32(item["AvgAbandTime"]),
                             AHTTime = Convert.ToInt32(item["HoldTime"]),
-                            TotalCallsHandled = Convert.ToInt32(item["TotalCallsHandled"])
+                            TotalCallsHandled = Convert.ToInt32(item["TotalInteraction"])
                         };
                         return skillInfo;
                     }
@@ -158,15 +158,14 @@ namespace SIPDataCollector.Utilities
         /// Gets Skill-Extension related information.
         /// </summary>
         /// <returns>returns DataTable</returns>
-        public static DataTable GetSkillExtnInfo(string skillsToMonitor,bool key)
+        public static DataTable GetSkillExtnInfo(string skillsToMonitor)
         {
             log.Debug("GetSkillExtnInfo()");
             try
             {
                 string sql = "";
-                sql = key ? @"select SkillID,SkillExtension,SkillName from TMAC_Skills Where SkillID in (" + skillsToMonitor + ")" :
-                    @"select SkillID,SkillExtension,SkillName from TMAC_Skills";
-                log.Info("SQL : " + sql);
+                sql = string.IsNullOrEmpty(skillsToMonitor) ? @"select SkillID,SkillExtension,SkillName from TMAC_Skills" :
+                    @"select SkillID,SkillExtension,SkillName from TMAC_Skills Where SkillID in (" + skillsToMonitor + ")";
                 DataTable skillExtnObj = SqlDataAccess.ExecuteDataTable(sql, ConfigurationData.ConntnString);
                 return skillExtnObj;
             }
@@ -190,7 +189,6 @@ namespace SIPDataCollector.Utilities
                                 WHERE b.AgentID = a.AgentID FOR XML PATH('')),1 ,1, '')  Skills
                                 FROM TMAC_Agent_Skills b
                                 GROUP BY AgentID;";
-                log.Info("SQL: " + sql);
                 DataTable agentSkillObj = SqlDataAccess.ExecuteDataTable(sql, ConfigurationData.ConntnString);
                 return agentSkillObj;
             }

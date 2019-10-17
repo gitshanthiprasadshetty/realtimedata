@@ -72,11 +72,12 @@ namespace SIPDataCollector.Utilites
                     {
                         log.Debug("Updating with histoircaldata for skill = " + data.skillId);
                         RealtimeData oldValues = values;                        
-                        values.AverageHandlingTime = data.AvgHandlingTime;
+                        // values.AverageHandlingTime = data.AvgHandlingTime;
+                        values.AverageHandlingTime = Convert.ToString(data.AvgHandlingTime);
                         values.SLPercentage = data.SLPercentage;
                         values.AbandonedCalls = data.AbandCalls;
                         values.TotalActiveInteractions = data.TotalACDInteractions;
-                        values.AverageAbandonedTime = data.AvgAbandTime;
+                        values.AverageAbandonedTime = Convert.ToString(data.AvgAbandTime);
                         values.AbandonPercentage = data.AbandonPercentage;
                         CacheObj.TryUpdate(data.skillId, values, oldValues);
                     }

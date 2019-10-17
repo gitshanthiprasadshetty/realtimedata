@@ -25,9 +25,9 @@ namespace TRealtimeData
             try
             {
                 log.Debug("Starting TRealtime service.");
-                string ret = LoadConfig();
+                string connectionType = GetConnectionType();
                 TRealtimeLogic realTime = new TRealtimeLogic();
-                realTime.GetInvokeAndHostType(ret);
+                realTime.GetInvokeAndHostType(connectionType);
                 log.Debug("TRealtime Service is started");
             }
             catch (Exception ex)
@@ -41,7 +41,7 @@ namespace TRealtimeData
             log.Debug("TRealtime Service Stopped");
         }
 
-        private static string LoadConfig()
+        private static string GetConnectionType()
         {
             try
             {

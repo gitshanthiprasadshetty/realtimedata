@@ -2,7 +2,7 @@
 
 namespace CMDataCollector.Models
 {
-      [DataContract]
+    [DataContract]
     public class AgentData
     {
         /// <summary>

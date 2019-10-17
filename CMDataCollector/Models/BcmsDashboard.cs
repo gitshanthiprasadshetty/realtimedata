@@ -92,11 +92,6 @@ namespace CMDataCollector.Models
         private string abandCalls;
 
         /// <summary>
-        /// Total abandand calls for this skill.
-        /// </summary>
-        private string abandCallsSummary;
-
-        /// <summary>
         /// Avg of all Abandand calls.
         /// </summary>
         private string avgAbandTime;
@@ -215,9 +210,7 @@ namespace CMDataCollector.Models
 
         [DataMember]
         public string AbandCallsSummary
-        {
-            //get { return abandCallsSummary; }
-            //set { abandCallsSummary = value; }
+        {          
             get;
             set;
         }

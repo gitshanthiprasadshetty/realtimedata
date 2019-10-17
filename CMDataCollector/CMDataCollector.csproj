@@ -50,7 +50,7 @@
       <HintPath>..\Connector\bin\Debug\Connector.dll</HintPath>
     </Reference>
     <Reference Include="log4net">
-      <HintPath>..\BcmsSIPManager\bin\Debug\log4net.dll</HintPath>
+      <HintPath>..\TRealtimeClient\libs\log4net.dll</HintPath>
     </Reference>
     <Reference Include="Logger, Version=1.2.2.6, Culture=neutral, processorArchitecture=x86">
       <SpecificVersion>False</SpecificVersion>
@@ -62,9 +62,6 @@
     </Reference>
     <Reference Include="Renci.SshNet">
       <HintPath>lib\Renci.SshNet.dll</HintPath>
-    </Reference>
-    <Reference Include="SIPDataCollector">
-      <HintPath>..\SIPDataCollector\bin\Debug\SIPDataCollector.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Configuration" />
@@ -98,6 +95,7 @@
     <Compile Include="DataParser\HuntGroupTrafficParser.cs" />
     <Compile Include="Models\BcmsSystem.cs" />
     <Compile Include="Models\HuntGroupTraffic.cs" />
+    <Compile Include="Models\SkillExtensionInfo.cs" />
     <Compile Include="Service References\THistoricalData\Reference.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -106,11 +104,10 @@
     <Compile Include="Utilities\ConfigSection.cs" />
     <Compile Include="Utilities\ConfigurationData.cs" />
     <Compile Include="CMConnectionManager.cs" />
-    <Compile Include="BCMSDashboardManager.cs" />
+    <Compile Include="CMDataManager.cs" />
     <Compile Include="IRealtimeDataService.cs" />
     <Compile Include="Models\AgentData.cs" />
     <Compile Include="Models\BcmsDashboard.cs" />
-    <Compile Include="Models\BcmsDataForSIP.cs" />
     <Compile Include="Models\BcmsHistoricalReport.cs" />
     <Compile Include="DataParser\BcmsMonitor.cs" />
     <Compile Include="Models\CMData.cs" />

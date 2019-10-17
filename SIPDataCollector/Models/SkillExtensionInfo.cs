@@ -25,5 +25,6 @@ namespace SIPDataCollector.Models
         /// SkillName for SkillId
         /// </summary>
         public string SkillName { get; set; }
+        public string Channel { get; set; }
     }
 }
