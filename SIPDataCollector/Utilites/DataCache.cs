@@ -57,6 +57,31 @@ namespace SIPDataCollector.Utilites
             }
         }
 
+        public static void UpdateCacheData(List<RealtimeData> itemList)
+        {
+            log.Info("UpdateCacheData()");
+            try
+            {                
+                if (itemList != null)
+                {
+                    foreach (var item in itemList)
+                    {
+                        if (CacheObj.ContainsKey(item.SkillId))
+                        {
+                            var value = CacheObj.FirstOrDefault(x => x.Key == item.SkillId).Value;
+                            CacheObj.TryUpdate(value.SkillId, item, value);
+                        }
+                        else
+                            CacheObj.TryAdd(_bcmsObj.SkillId, item);
+                    }                 
+                }
+            }
+            catch (Exception ex)
+            {
+                log.Error("Error in UpdateCacheData : ", ex);
+            }
+        }
+
         /// <summary>
         /// updates cache with historical data
         /// </summary>
@@ -73,11 +98,11 @@ namespace SIPDataCollector.Utilites
                         log.Debug("Updating with histoircaldata for skill = " + data.skillId);
                         RealtimeData oldValues = values;                        
                         // values.AverageHandlingTime = data.AvgHandlingTime;
-                        values.AverageHandlingTime = Convert.ToString(data.AvgHandlingTime);
+                        values.AverageHandlingTime = data.AvgHandlingTime;
                         values.SLPercentage = data.SLPercentage;
-                        values.AbandonedCalls = data.AbandCalls;
-                        values.TotalActiveInteractions = data.TotalACDInteractions;
-                        values.AverageAbandonedTime = Convert.ToString(data.AvgAbandTime);
+                        values.AbandonedInteractionsSummary = data.AbandCalls;
+                        values.ActiveInteractionsSummary = data.TotalACDInteractions;
+                        values.AverageAbandonedTime = data.AvgAbandTime;
                         values.AbandonPercentage = data.AbandonPercentage;
                         CacheObj.TryUpdate(data.skillId, values, oldValues);
                     }

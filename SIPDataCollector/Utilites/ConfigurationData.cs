@@ -43,6 +43,8 @@ namespace SIPDataCollector.Utilites
 
         internal static List<string> auxCodes;
 
+        internal static List<string> TmacServers;
+
         internal static  Dictionary<string, int> acceptableSlObj = new Dictionary<string, int>();
 
         internal static int acceptableSL;
@@ -66,6 +68,7 @@ namespace SIPDataCollector.Utilites
                 DashboardRefreshTime = Convert.ToInt32(ConfigurationSettings.AppSettings["DashboardRefreshTime"]);
                 acceptableSL = Convert.ToInt32(ConfigurationSettings.AppSettings["acceptableSL"]);
                 DBRefreshTime = Convert.ToInt32(ConfigurationSettings.AppSettings["DBRefreshTime"]);
+                TmacServers = ConfigurationSettings.AppSettings["TmacServers"].Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries).ToList();
 
                 //if (!string.IsNullOrEmpty(skillsToMonitor) || skillsToMonitor.ToLower() != "na")
                 //    skillList = skillsToMonitor.Split(',');
@@ -91,7 +94,7 @@ namespace SIPDataCollector.Utilites
                 var section = (SIPDataCollector.Utilites.BcmsSIPConfigSection)ConfigurationManager.GetSection("TRealTimeDataServiceSettings");
                 foreach (BCMSInstanceData data in section.BCMSServiceItems)
                 {
-                    if (!data.SkillId.Contains(";"))
+                    if (data.SkillId.Contains(","))
                     {
                         log.Debug("Add skills for channel : " + data.ChannelName);
                         channelObj.Add(data.ChannelName, data.SkillId.Split(',').ToList());
@@ -135,7 +138,7 @@ namespace SIPDataCollector.Utilites
 
                 if (skillList != null && skillList.Count() >= 0 && !string.IsNullOrEmpty(skillList))
                 {
-                    string[] strArrays = ConfigurationManager.AppSettings["skillsToMonitorForSIP"].Split(new char[] { ';' });
+                    string[] strArrays = skillList?.Split(new char[] { ';' });
                     if ((strArrays != null ? true : strArrays.Length != 0))
                     {
                         if (strArrays[0] != "")
