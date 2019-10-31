@@ -327,69 +327,88 @@ namespace SIPDataCollector
                     MapSkillExtnData();
                 }
 
-                List<RealtimeData> realtimeDataForAllSkills = new List<RealtimeData>();
-                foreach (var server in Utilites.ConfigurationData.TmacServers)
-                {                    
-                    log.Info($"Get wallboardskills data from TMAC server {server}");
-                    var wallboardSkillsData = GetTmacServerInstance(server).GetTmacWallboardSkills("");
-                    if (wallboardSkillsData != null && wallboardSkillsData.Count > 0)
-                    {
-                        log.Info($"save wallboardskills data from server {server}");
-                        foreach (var wallboardSkillInformation in wallboardSkillsData)
+                Dictionary<int, RealtimeData> realtimeDataForAllSkills = new Dictionary<int, RealtimeData>();
+                try
+                {
+                    foreach (var server in Utilites.ConfigurationData.TmacServers)
+                    {                        
+                        log.Info($"Get wallboardskills data from TMAC server {server}");
+                        var wallboardSkillsData = GetTmacServerInstance(server).GetTmacWallboardSkills("");
+                        if (wallboardSkillsData != null && wallboardSkillsData.Count > 0)
                         {
-                            if (_skillExtnInfo.ContainsKey(wallboardSkillInformation.SkillID))
+                            log.Info($"save wallboardskills data from server {server}");
+                            foreach (var wallboardSkillInformation in wallboardSkillsData)
                             {
-                                RealtimeData realtimeOfSkill;
-                                // skillid field that we get from tmac actually is skillextensionid
-                                int skillExtnId = Convert.ToInt32(wallboardSkillInformation.SkillID);
-
-                                if (realtimeDataForAllSkills.Any(x => x.SkillExtensionId == skillExtnId))
-                                    realtimeOfSkill = realtimeDataForAllSkills?.FirstOrDefault(x => x.SkillExtensionId == skillExtnId);
-                                else
-                                    realtimeOfSkill = new RealtimeData();
-
-                                realtimeOfSkill.SkillId = _skillExtnInfo[wallboardSkillInformation.SkillID].SkillId;
-                                realtimeOfSkill.Channel = Utilites.ConfigurationData.GetChannel(Convert.ToString(realtimeOfSkill.SkillId));
-                                realtimeOfSkill.SkillName = wallboardSkillInformation.SkillName;
-                                realtimeOfSkill.SkillExtensionId = _skillExtnInfo[wallboardSkillInformation.SkillID].ExtensionId;
-                                realtimeOfSkill.ActiveInteractions += wallboardSkillInformation.ActiveInteractions;
-                                realtimeOfSkill.TotalAgentsAvailable += wallboardSkillInformation.AgentAvailable;
-                                realtimeOfSkill.AverageAbandonedTime = 0;
-                                try
+                                if (_skillExtnInfo.ContainsKey(wallboardSkillInformation.SkillID))
                                 {
-                                    realtimeOfSkill.AcceptedSL = Convert.ToInt32(Utilites.ConfigurationData.acceptableSlObj?.FirstOrDefault(x => x.Key == realtimeOfSkill.SkillId.ToString()).Value);
-                                    realtimeOfSkill.InteractionsInQueue = (realtimeOfSkill.Channel.ToLower() == "email") ? Convert.ToInt32(WorkQueueProxy.GetQueueCount(wallboardSkillInformation.SkillID)) : wallboardSkillInformation.CallsInQueue;
-                                    //realtimeOfSkill.CallsWaiting = (realtimeOfSkill.Channel.ToLower() == "email") ? Convert.ToInt32(WorkQueueProxy.GetQueueCount(wallboardSkillInformation.SkillID)) : wallboardSkillInformation.CallsInQueue;
-                                    realtimeOfSkill.OldestInteractionWaitTime = Convert.ToInt32(WorkQueueProxy.GetOldestWaitTime(wallboardSkillInformation.SkillID));
-                                    //realtimeOfSkill.OldestCallWaitTime = WorkQueueProxy.GetOldestWaitTime(wallboardSkillInformation.SkillID);
+                                    RealtimeData realtimeOfSkill;
+                                    // skillid field that we get from tmac actually is skillextensionid
+                                    int skillExtnId = Convert.ToInt32(wallboardSkillInformation.SkillID);
 
-                                    realtimeOfSkill.AgentStats = GetAgentListLoggedInForSkill(server, realtimeOfSkill.SkillId.ToString());
-                                    if (realtimeOfSkill.AgentStats != null)
+                                    if (realtimeDataForAllSkills.Any(x => x.Key == skillExtnId))
                                     {
-                                        // log.Debug("Active Interaction : " + wallboardSkillInformation.ActiveInteractions + 1);
-                                        realtimeOfSkill.TotalAgentsStaffed += realtimeOfSkill.AgentStats.Count();
-                                        realtimeOfSkill.TotalAgentsInACW += realtimeOfSkill.AgentStats.Count(x => x.State.Contains("ACW"));
-                                        realtimeOfSkill.TotalAgentsInAUX += realtimeOfSkill.AgentStats.Count(x => Utilites.ConfigurationData.auxCodes.Contains(x.State));
+                                        realtimeOfSkill = realtimeDataForAllSkills?.FirstOrDefault(x => x.Key == skillExtnId).Value;
                                     }
-                                }
-                                catch (Exception)
-                                {
-                                }
-                                realtimeDataForAllSkills.Add(realtimeOfSkill);
+                                    else
+                                        realtimeOfSkill = new RealtimeData();
 
-                                if (!queue.Contains(wallboardSkillInformation.SkillID))
-                                    queue.Enqueue(wallboardSkillInformation.SkillID);
+                                    realtimeOfSkill.SkillId = _skillExtnInfo[wallboardSkillInformation.SkillID].SkillId;
+                                    realtimeOfSkill.Channel = Utilites.ConfigurationData.GetChannel(Convert.ToString(realtimeOfSkill.SkillId));
+                                    realtimeOfSkill.SkillName = wallboardSkillInformation.SkillName;
+                                    realtimeOfSkill.SkillExtensionId = _skillExtnInfo[wallboardSkillInformation.SkillID].ExtensionId;
+                                    realtimeOfSkill.ActiveInteractions += wallboardSkillInformation.ActiveInteractions;
+                                    realtimeOfSkill.TotalAgentsAvailable += wallboardSkillInformation.AgentAvailable;
+                                    realtimeOfSkill.AverageAbandonedTime = 0;
+                                    try
+                                    {
+                                        realtimeOfSkill.AcceptedSL = Convert.ToInt32(Utilites.ConfigurationData.acceptableSlObj?.FirstOrDefault(x => x.Key == realtimeOfSkill.SkillId.ToString()).Value);
+                                        realtimeOfSkill.InteractionsInQueue = (realtimeOfSkill.Channel.ToLower() == "email") ? Convert.ToInt32(WorkQueueProxy.GetQueueCount(wallboardSkillInformation.SkillID)) : wallboardSkillInformation.CallsInQueue;
+                                        //realtimeOfSkill.CallsWaiting = (realtimeOfSkill.Channel.ToLower() == "email") ? Convert.ToInt32(WorkQueueProxy.GetQueueCount(wallboardSkillInformation.SkillID)) : wallboardSkillInformation.CallsInQueue;
+                                        realtimeOfSkill.OldestInteractionWaitTime = Convert.ToInt32(WorkQueueProxy.GetOldestWaitTime(wallboardSkillInformation.SkillID));
+                                        //realtimeOfSkill.OldestCallWaitTime = WorkQueueProxy.GetOldestWaitTime(wallboardSkillInformation.SkillID);
+
+                                        var agentStats = GetAgentListLoggedInForSkill(server, realtimeOfSkill.SkillId.ToString());
+                                        if(realtimeOfSkill.AgentStats == null)
+                                            realtimeOfSkill.AgentStats = new List<AgentData>();
+
+                                        realtimeOfSkill.AgentStats.AddRange(agentStats);
+
+                                        if (realtimeOfSkill.AgentStats != null)
+                                        {
+                                            // log.Debug("Active Interaction : " + wallboardSkillInformation.ActiveInteractions + 1);
+                                            realtimeOfSkill.TotalAgentsStaffed = realtimeOfSkill.AgentStats.Count();
+                                            realtimeOfSkill.TotalAgentsInACW = realtimeOfSkill.AgentStats.Count(x => x.State.Contains("ACW"));
+                                            realtimeOfSkill.TotalAgentsInAUX = realtimeOfSkill.AgentStats.Count(x => Utilites.ConfigurationData.auxCodes.Contains(x.State));
+                                        }
+                                    }
+                                    catch (Exception)
+                                    {
+                                    }
+
+                                    if (realtimeDataForAllSkills.Any(skill => skill.Key == realtimeOfSkill.SkillExtensionId))
+                                        realtimeDataForAllSkills.Remove(realtimeOfSkill.SkillExtensionId);
+
+                                    realtimeDataForAllSkills.Add(realtimeOfSkill.SkillExtensionId, realtimeOfSkill);
+
+                                    if (!queue.Contains(wallboardSkillInformation.SkillID))
+                                        queue.Enqueue(wallboardSkillInformation.SkillID);
+                                }
                             }
                         }
+                        else
+                            log.Info($"No response from TMAC server instance : {server}");
+
+
+                        //bcmsdata.Add(data);
+                        // update data to cache memory.
+                        List<RealtimeData> valuesToAddToCacheMem = realtimeDataForAllSkills?.Values.ToList();
+                        DataCache.UpdateCacheData(valuesToAddToCacheMem);
                     }
-                    else
-                        log.Info($"No response from TMAC server instance : {server}");
                 }
-
-
-                //bcmsdata.Add(data);
-                // update data to cache memory.
-                DataCache.UpdateCacheData(realtimeDataForAllSkills);          
+                catch (Exception exception)
+                {
+                    log.Error("Error in FetchBcmsData: ", exception);
+                }       
 
                 #region oldcode
                 /*
@@ -501,8 +520,8 @@ namespace SIPDataCollector
 
                                 var value = entry.ItemArray[1].ToString();
                                 string[] skillArray = value.Split(',');
-                                log.Debug("Entry data [0]: " + entry.ItemArray[0].ToString());
-                                log.Debug("Entry data [1]: " + entry.ItemArray[1].ToString());
+                                //log.Debug("Entry data [0]: " + entry.ItemArray[0].ToString());
+                                //log.Debug("Entry data [1]: " + entry.ItemArray[1].ToString());
 
                                 _agentSkillInfo.AddOrUpdate(entry.ItemArray[0].ToString(), new AgentSkillInfo
                                 {
@@ -517,7 +536,7 @@ namespace SIPDataCollector
                             }
                             log.Debug("Total Agent-Skill Info dictionary count : " + _agentSkillInfo.Count());
                         }
-                        Thread.Sleep(300000);
+                        Thread.Sleep(Utilites.ConfigurationData.DashboardRefreshTime);
                     }
                 }));
                 dbThread.Start();

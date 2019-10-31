@@ -64,15 +64,29 @@ namespace SIPDataCollector.Utilites
             {                
                 if (itemList != null)
                 {
+                    log.Info($"total items to update to cache memeory = {itemList.Count}");
                     foreach (var item in itemList)
-                    {
+                    {                       
                         if (CacheObj.ContainsKey(item.SkillId))
                         {
                             var value = CacheObj.FirstOrDefault(x => x.Key == item.SkillId).Value;
-                            CacheObj.TryUpdate(value.SkillId, item, value);
+
+                            if (value != null)
+                            {
+                                // if object is already present, we need to consider below feilds from cache and update to object, 
+                                // else values will be update as zero.
+                                item.AverageHandlingTime = value.AverageHandlingTime;
+                                item.SLPercentage = value.SLPercentage;
+                                item.AbandonedInteractionsSummary = value.AbandonedInteractionsSummary;
+                                item.ActiveInteractionsSummary = value.ActiveInteractionsSummary;
+                                item.AverageAbandonedTime = value.AverageAbandonedTime;
+                                item.AbandonPercentage = value.AbandonPercentage;
+
+                                CacheObj.TryUpdate(value.SkillId, item, value);
+                            }
                         }
                         else
-                            CacheObj.TryAdd(_bcmsObj.SkillId, item);
+                            CacheObj.TryAdd(item.SkillId, item);
                     }                 
                 }
             }
@@ -96,15 +110,17 @@ namespace SIPDataCollector.Utilites
                     if(CacheObj.TryGetValue(data.skillId, out RealtimeData values))
                     {
                         log.Debug("Updating with histoircaldata for skill = " + data.skillId);
-                        RealtimeData oldValues = values;                        
+                        // RealtimeData oldValues = values;                        
                         // values.AverageHandlingTime = data.AvgHandlingTime;
                         values.AverageHandlingTime = data.AvgHandlingTime;
                         values.SLPercentage = data.SLPercentage;
                         values.AbandonedInteractionsSummary = data.AbandCalls;
+                        //log.Debug("ActiveInteractionsSummary before update = " + values.ActiveInteractionsSummary);
                         values.ActiveInteractionsSummary = data.TotalACDInteractions;
+                        //log.Debug("ActiveInteractionsSummary after update = " + values.ActiveInteractionsSummary);
                         values.AverageAbandonedTime = data.AvgAbandTime;
                         values.AbandonPercentage = data.AbandonPercentage;
-                        CacheObj.TryUpdate(data.skillId, values, oldValues);
+                        CacheObj.TryUpdate(data.skillId, values, values);
                     }
                 }
             }
@@ -127,6 +143,7 @@ namespace SIPDataCollector.Utilites
                 {
                     _bcmsObj = new RealtimeData();
                     _listObj = new List<RealtimeData>();
+                    
                     foreach (KeyValuePair<int, RealtimeData> entry in CacheObj)
                     {
                         _bcmsObj = entry.Value;
