@@ -1,10 +1,5 @@
-﻿using System.Runtime.Serialization;
-
-namespace SIPDataCollector.Models
+﻿namespace SIPDataCollector.Models
 {
-    /// <summary>
-    /// Holds agent related data
-    /// </summary>
     public class AgentData
     {
         /// <summary>
@@ -17,7 +12,7 @@ namespace SIPDataCollector.Models
         /// </summary>
         public string State { get; set; }
 
-        public int TotalStaffedAgents { get; set; }
+        public string StationID { get; set; }
 
     }
 }

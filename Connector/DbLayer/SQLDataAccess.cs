@@ -39,8 +39,8 @@ namespace Connector.DbLayer
                 }
                 catch (Exception ex)
                 {
-                    // Log.SQLLog("Exception : " + ex);
-                    Log.Error("Exception in SqlDataAccess - ExecuteDataTable : " + ex);
+                    Log.Info("Exception , sql : " + sql);
+                    Log.Error("Exception in SqlDataAccess - ExecuteDataTable : " , ex);
                 }
                 return null;
             }

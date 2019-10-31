@@ -6,12 +6,25 @@ using System.Threading.Tasks;
 
 namespace CMDataCollector.Models
 {
+    /// <summary>
+    /// Holds skill-extension information[one-one mapping]
+    /// </summary>
     public class SkillExtensionInfo
     {
-        public string ExtensionId { get; set; }
-        
-        public string SkillId { get; set; }
+        /// <summary>
+        /// Group ExtensionId
+        /// </summary>
+        public int ExtensionId { get; set; }
 
+        /// <summary>
+        /// SkillId for ExtensionID
+        /// </summary>
+        public int SkillId { get; set; }
+
+        /// <summary>
+        /// SkillName for SkillId
+        /// </summary>
         public string SkillName { get; set; }
+        public string Channel { get; set; }
     }
 }

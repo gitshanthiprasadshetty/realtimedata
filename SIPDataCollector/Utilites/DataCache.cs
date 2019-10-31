@@ -13,22 +13,22 @@ namespace SIPDataCollector.Utilites
         /// <summary>
         /// Logger
         /// </summary>
-        private static Logger.Logger Log = new Logger.Logger(typeof(DataCache));
+        private static Logger.Logger log = new Logger.Logger(typeof(DataCache));
 
         /// <summary>
         /// Holds Bcms Dashboard data for SIP
         /// </summary>
-        static readonly ConcurrentDictionary<string, BcmsDataForSIP> CachObj = new ConcurrentDictionary<string, BcmsDataForSIP>();
+        static readonly ConcurrentDictionary<int, RealtimeData> CacheObj = new ConcurrentDictionary<int, RealtimeData>();
 
         /// <summary>
         /// 
         /// </summary>
-        static BcmsDataForSIP _bcmsObj;
+        static RealtimeData _bcmsObj;
 
         /// <summary>
         /// 
         /// </summary>
-        static List<BcmsDataForSIP> _listObj;
+        static List<RealtimeData> _listObj;
 
         /// <summary>
         /// Updates main cache data for each skill
@@ -36,24 +36,63 @@ namespace SIPDataCollector.Utilites
         /// <param name="data">bcms data to update</param>
         public static void UpdateCacheData(Object data)
         {
-            Log.Debug("DataCache.[UpdateCacheData]");
+            log.Info("UpdateCacheData()");
             try
             {
-                _bcmsObj = (BcmsDataForSIP)data;
+                _bcmsObj = (RealtimeData)data;
                 if (data != null)
                 {
-                    if (CachObj.ContainsKey(_bcmsObj.Skill))
+                    if (CacheObj.ContainsKey(_bcmsObj.SkillId))
                     {
-                        var value = CachObj.FirstOrDefault(x => x.Key == _bcmsObj.Skill).Value;
-                        CachObj.TryUpdate(value.Skill, _bcmsObj, value);
+                        var value = CacheObj.FirstOrDefault(x => x.Key == _bcmsObj.SkillId).Value;
+                        CacheObj.TryUpdate(value.SkillId, _bcmsObj, value);
                     }
                     else
-                        CachObj.TryAdd(_bcmsObj.Skill, _bcmsObj);
+                        CacheObj.TryAdd(_bcmsObj.SkillId, _bcmsObj);
                 }
             }
             catch (Exception ex)
             {
-                Log.Error("Error in DataCache[UpdateCacheData] : " + ex);
+                log.Error("Error in UpdateCacheData : " , ex);
+            }
+        }
+
+        public static void UpdateCacheData(List<RealtimeData> itemList)
+        {
+            log.Info("UpdateCacheData()");
+            try
+            {                
+                if (itemList != null)
+                {
+                    log.Info($"total items to update to cache memeory = {itemList.Count}");
+                    foreach (var item in itemList)
+                    {                       
+                        if (CacheObj.ContainsKey(item.SkillId))
+                        {
+                            var value = CacheObj.FirstOrDefault(x => x.Key == item.SkillId).Value;
+
+                            if (value != null)
+                            {
+                                // if object is already present, we need to consider below feilds from cache and update to object, 
+                                // else values will be update as zero.
+                                item.AverageHandlingTime = value.AverageHandlingTime;
+                                item.SLPercentage = value.SLPercentage;
+                                item.AbandonedInteractionsSummary = value.AbandonedInteractionsSummary;
+                                item.ActiveInteractionsSummary = value.ActiveInteractionsSummary;
+                                item.AverageAbandonedTime = value.AverageAbandonedTime;
+                                item.AbandonPercentage = value.AbandonPercentage;
+
+                                CacheObj.TryUpdate(value.SkillId, item, value);
+                            }
+                        }
+                        else
+                            CacheObj.TryAdd(item.SkillId, item);
+                    }                 
+                }
+            }
+            catch (Exception ex)
+            {
+                log.Error("Error in UpdateCacheData : ", ex);
             }
         }
 
@@ -65,26 +104,29 @@ namespace SIPDataCollector.Utilites
         {
             try
             {
-                Log.Debug("UpdateHistoricalData : for skill = " + data.skillID);
+                log.Debug("UpdateHistoricalData : for skill = " + data.skillId);
                 if(data != null)
                 {
-                    if(CachObj.TryGetValue(data.skillID, out BcmsDataForSIP values))
+                    if(CacheObj.TryGetValue(data.skillId, out RealtimeData values))
                     {
-                        Log.Debug("Updating with histoircaldata for skill = " + data.skillID);
-                        BcmsDataForSIP oldValues = values;                        
-                        values.AvgHandlingTime = Convert.ToString(data.AvgHandlingTime);
-                        values.SLPercentage = Convert.ToString(data.SLPercentage);
-                        values.AbandCalls = Convert.ToString(data.AbandCalls);
-                        values.TotalACDInteractions = Convert.ToString(data.TotalACDInteractions);
-                        values.AvgAbandTime = data.AvgAbandTime;
+                        log.Debug("Updating with histoircaldata for skill = " + data.skillId);
+                        // RealtimeData oldValues = values;                        
+                        // values.AverageHandlingTime = data.AvgHandlingTime;
+                        values.AverageHandlingTime = data.AvgHandlingTime;
+                        values.SLPercentage = data.SLPercentage;
+                        values.AbandonedInteractionsSummary = data.AbandCalls;
+                        //log.Debug("ActiveInteractionsSummary before update = " + values.ActiveInteractionsSummary);
+                        values.ActiveInteractionsSummary = data.TotalACDInteractions;
+                        //log.Debug("ActiveInteractionsSummary after update = " + values.ActiveInteractionsSummary);
+                        values.AverageAbandonedTime = data.AvgAbandTime;
                         values.AbandonPercentage = data.AbandonPercentage;
-                        CachObj.TryUpdate(data.skillID, values, oldValues);
+                        CacheObj.TryUpdate(data.skillId, values, values);
                     }
                 }
             }
             catch (Exception ex)
             {
-                Log.Error("Error in UpdateHistoricalData : " + ex);
+                log.Error("Error in UpdateHistoricalData : ", ex);
             }
         }
 
@@ -92,28 +134,28 @@ namespace SIPDataCollector.Utilites
         /// Gets all bcms data for configured skillids
         /// </summary>
         /// <returns>All bcms data for configured skillids</returns>
-        public static List<BcmsDataForSIP> GetBcmsData()
+        public static List<RealtimeData> GetBcmsData()
         {
-            Log.Debug("DataCache[GetBcmsData]");
+            log.Debug("GetBcmsData()");
             try
             {
-                if (CachObj.Count > 0)
+                if (CacheObj != null && CacheObj.Count > 0)
                 {
-                    Log.Debug("Sip Dictionary count : " + CachObj.Count);
-                    _bcmsObj = new BcmsDataForSIP();
-                    _listObj = new List<BcmsDataForSIP>();
-                    foreach (KeyValuePair<string, BcmsDataForSIP> entry in CachObj)
+                    _bcmsObj = new RealtimeData();
+                    _listObj = new List<RealtimeData>();
+                    
+                    foreach (KeyValuePair<int, RealtimeData> entry in CacheObj)
                     {
                         _bcmsObj = entry.Value;
                         _listObj.Add(_bcmsObj);
                     }
                 }
-                Log.Debug("DataCache[GetBcmsData] BcmsDashboard Return Count for sip : " + _listObj.Count);
+                log.Debug("GetBcmsData BcmsDashboard Return Count for sip : " + _listObj.Count);
                 return _listObj;
             }
             catch (Exception ex)
             {
-                Log.Error("Error in sip DataCache[GetBcmsData] : " + ex);
+                log.Error("Error in GetBcmsData : ", ex);
                 return null;
             }
         }
@@ -123,26 +165,26 @@ namespace SIPDataCollector.Utilites
         /// </summary>
         /// <param name="skillId">skillid</param>
         /// <returns>Single bcms data for requested skillid</returns>
-        public static BcmsDataForSIP GetBcmsDataForSkill(string skillId)
+        public static RealtimeData GetBcmsDataForSkill(int skillId)
         {
-            Log.Debug("DataCache[GetBcmsDataForSkill]");
+            log.Info($"GetBcmsDataForSkill() , skillId = {skillId}");
             try
             {
-                if (CachObj.Count > 0)
+                if (CacheObj != null && CacheObj.Count > 0)
                 {
-                    Log.Debug("DataCache[GetBcmsDataForSkill] Dictionary count : " + CachObj.Count);
-                    _bcmsObj = new BcmsDataForSIP();
-                    var result = CachObj.FirstOrDefault(x => x.Key == skillId);
-                    if (!result.Equals(default(KeyValuePair<string, BcmsDataForSIP>)))
+                    log.Debug("DataCache[GetBcmsDataForSkill] Dictionary count : " + CacheObj.Count);
+                    _bcmsObj = new RealtimeData();
+                    var result = CacheObj.FirstOrDefault(x => x.Key == skillId);
+                    if (!result.Equals(default(KeyValuePair<string, RealtimeData>)))
                     {
-                        _bcmsObj = CachObj[result.Key];
+                        _bcmsObj = CacheObj[result.Key];
                     }
                 }
                 return _bcmsObj;
             }
             catch (Exception ex)
             {
-                Log.Error("Error in DataCache[GetBcmsDataForSkill] : " + ex);
+                log.Error("Error in GetBcmsDataForSkill : " , ex);
                 return null;
             }
         }

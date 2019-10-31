@@ -1,4 +1,5 @@
-﻿using ConfigurationProvider;
+﻿using CMDataCollector.Models;
+using ConfigurationProvider;
 using Connector.DbLayer;
 using System;
 using System.Collections.Generic;
@@ -105,7 +106,7 @@ namespace CMDataCollector.Utilities
         /// <summary>
         /// Holds Skill-Extension Related information for given set of skills in config.
         /// </summary>
-        static readonly Dictionary<string, SIPDataCollector.Models.SkillExtensionInfo> _skillExtnInfo = new Dictionary<string, SIPDataCollector.Models.SkillExtensionInfo>();
+         static readonly Dictionary<string, SkillExtensionInfo> _skillExtnInfo = new Dictionary<string, SkillExtensionInfo>();
 
         /// <summary>
         /// DB Connection string
@@ -128,8 +129,8 @@ namespace CMDataCollector.Utilities
 
         #endregion
 
-        static string userName = ConfigurationSettings.AppSettings["userName"].ToString();
-        static string password = ConfigurationSettings.AppSettings["password"].ToString();
+        static string userName = ConfigurationManager.AppSettings["userName"].ToString();
+        static string password = ConfigurationManager.AppSettings["password"].ToString();
 
 
         /// <summary>
@@ -142,23 +143,23 @@ namespace CMDataCollector.Utilities
             {
                 Channel();
                 DecryptCredentials();
-                ConntnString = ConnectionStrings.DecryptConnectionString(ConfigurationSettings.AppSettings["CMDbConn"]);
-                ServerAddress = ConfigurationSettings.AppSettings["serverAddress"];
-                skillsToMonitor = ConfigurationSettings.AppSettings["skillsToMonitor"];
+                ConntnString = ConnectionStrings.DecryptConnectionString(ConfigurationManager.AppSettings["CMDbConn"]);
+                ServerAddress = ConfigurationManager.AppSettings["serverAddress"];
+                skillsToMonitor = ConfigurationManager.AppSettings["skillsToMonitor"];
                 skillList = skillsToMonitor.Split(',');
-                DashboardRefreshTime = Convert.ToInt32(ConfigurationSettings.AppSettings["DashboardRefreshTime"]);
-                ReportRefreshTime = Convert.ToInt32(ConfigurationSettings.AppSettings["HistoricalReportRefreshTime"]);
-                ActionOnCMConFailure = ConfigurationSettings.AppSettings["ActionOnCMConFailure"].ToLower();
-                ConnectionType = ConfigurationSettings.AppSettings["Type"];
-                var val = ConfigurationSettings.AppSettings["CommandsToRun"];
+                DashboardRefreshTime = Convert.ToInt32(ConfigurationManager.AppSettings["DashboardRefreshTime"]);
+                ReportRefreshTime = Convert.ToInt32(ConfigurationManager.AppSettings["HistoricalReportRefreshTime"]);
+                ActionOnCMConFailure = ConfigurationManager.AppSettings["ActionOnCMConFailure"].ToLower();
+                ConnectionType = ConfigurationManager.AppSettings["Type"];
+                var val = ConfigurationManager.AppSettings["CommandsToRun"];
                 CommandsToRun = val.Split(',');
-                CommandType = ConfigurationSettings.AppSettings["CommandType"];
-                HuntFrequency = Convert.ToInt32(ConfigurationSettings.AppSettings["HuntFrequency"]);
+                CommandType = ConfigurationManager.AppSettings["CommandType"];
+                HuntFrequency = Convert.ToInt32(ConfigurationManager.AppSettings["HuntFrequency"]);
                 TlsVersion = ConfigurationManager.AppSettings["TlsVersion"];
 
                 try
                 {
-                    Port = Convert.ToInt32(ConfigurationSettings.AppSettings["port"]);
+                    Port = Convert.ToInt32(ConfigurationManager.AppSettings["port"]);
                 }
                 catch (Exception)
                 {
@@ -166,7 +167,7 @@ namespace CMDataCollector.Utilities
                 }
                 try
                 {
-                    string[] HuntRange = ConfigurationSettings.AppSettings["HuntRange"].Split(';');
+                    string[] HuntRange = ConfigurationManager.AppSettings["HuntRange"].Split(';');
                     HuntGroups = new List<int>();
                     for (int i = 0; i < HuntRange.Length; i++)
                     {
@@ -174,9 +175,9 @@ namespace CMDataCollector.Utilities
                             (Convert.ToInt32(HuntRange[i].Split('-')[1]) - Convert.ToInt32(HuntRange[i].Split('-')[0])) + 1));
                     }
 
-                    MaxTriesOnCMConFailure = Convert.ToInt32(ConfigurationSettings.AppSettings["MaxTriesOnConnectionFailure"]);
-                    skillsPerConnection = Convert.ToInt32(ConfigurationSettings.AppSettings["skillsPerConnection"]);
-                    HAEnabled = Convert.ToInt32(ConfigurationSettings.AppSettings["HAEnabled"]);
+                    MaxTriesOnCMConFailure = Convert.ToInt32(ConfigurationManager.AppSettings["MaxTriesOnConnectionFailure"]);
+                    skillsPerConnection = Convert.ToInt32(ConfigurationManager.AppSettings["skillsPerConnection"]);
+                    HAEnabled = Convert.ToInt32(ConfigurationManager.AppSettings["HAEnabled"]);
 
 
                     if (CommandType.ToLower() == "traffic")
@@ -194,7 +195,7 @@ namespace CMDataCollector.Utilities
                             log.Info("No data obtained from smsapi");
                     }
                 }
-                catch (Exception ex)
+                catch (Exception)
                 {
                     skillsPerConnection = GetSkillsPerConnection();
                     HAEnabled = 0;
@@ -374,8 +375,8 @@ namespace CMDataCollector.Utilities
 
                     if (ConnectionType.ToLower() == "cm" && !string.IsNullOrEmpty(skillIds))
                         FetchCMExtnSkillData(skillIds);
-                    else if (ConnectionType.ToLower() == "sip" && !string.IsNullOrEmpty(skillIds))
-                        FetchSIPExtnSkillData(skillIds);
+                    //else if (ConnectionType.ToLower() == "sip" && !string.IsNullOrEmpty(skillIds))
+                    //    FetchSIPExtnSkillData(skillIds);
                 }
             }
             catch (Exception ex)
@@ -399,11 +400,12 @@ namespace CMDataCollector.Utilities
                         huntGroupData = skilldata.FirstOrDefault(x => x.group_NumberField == skill);
                         if (huntGroupData != null)
                         {
-                            _skillExtnInfo.Add(huntGroupData.group_ExtensionField, new SIPDataCollector.Models.SkillExtensionInfo
+                            _skillExtnInfo.Add(huntGroupData.group_ExtensionField, new SkillExtensionInfo
                             {
-                                SkillId = huntGroupData.group_NumberField,
-                                ExtensionId = huntGroupData.group_ExtensionField,
+                                SkillId = Convert.ToInt32(huntGroupData.group_NumberField),
+                                ExtensionId = Convert.ToInt32(huntGroupData.group_ExtensionField),
                                 SkillName = huntGroupData.group_NameField,
+                                Channel = GetChannel(huntGroupData.group_NumberField)
                             });
                         }
                         else
@@ -418,6 +420,7 @@ namespace CMDataCollector.Utilities
             }
         }
 
+        /*
         static void FetchSIPExtnSkillData(string skillIds)
         {
             try
@@ -440,8 +443,8 @@ namespace CMDataCollector.Utilities
                         {
                             _skillExtnInfo.Add(entry.ItemArray[1].ToString(), new SIPDataCollector.Models.SkillExtensionInfo
                             {
-                                SkillId = entry.ItemArray[0].ToString(),
-                                ExtensionId = entry.ItemArray[1].ToString(),
+                                SkillId = Convert.ToInt32(entry.ItemArray[0]),
+                                ExtensionId = Convert.ToInt32(entry.ItemArray[1]),
                                 SkillName = entry.ItemArray[2].ToString()
                             });
                         }
@@ -459,14 +462,14 @@ namespace CMDataCollector.Utilities
                 log.Error("Error in FetchSIPExtnSkillData: ", ex);
             }
         }
-
+        */
         public static string GetExtensionId(string skillId)
         {
             log.Debug("GetExtensionId()" + skillId);
             try
             {
                 if (_skillExtnInfo != null)
-                    return _skillExtnInfo.FirstOrDefault(x => x.Value.SkillId == skillId).Key;
+                    return _skillExtnInfo.FirstOrDefault(x => x.Value.SkillId.ToString() == skillId).Key;
             }
             catch (Exception ex)
             {

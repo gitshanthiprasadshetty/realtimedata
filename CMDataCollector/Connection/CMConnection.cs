@@ -200,6 +200,7 @@ namespace CMDataCollector.Connection
             }
             catch (Exception ex)
             {
+                Log.Error("Error in ExecuteCommand: ", ex);
             }
         }
 

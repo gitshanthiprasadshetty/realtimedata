@@ -1,11 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
+﻿
 using System.Configuration;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace BcmsSIPManager.Utilites
+namespace SIPDataCollector.Utilites
 {
     public class BcmsSIPConfigSection: ConfigurationSection
     {
@@ -16,7 +12,7 @@ namespace BcmsSIPManager.Utilites
         }
     }
 
-    public class BCMSInstanceData : ConfigurationElement
+    public class BCMSInstanceData : ConfigurationSection
     {
         [ConfigurationProperty("ChannelName", DefaultValue = "", IsRequired = true, IsKey = true)]
         public string ChannelName

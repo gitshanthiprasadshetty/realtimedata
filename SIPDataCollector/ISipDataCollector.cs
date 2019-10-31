@@ -16,15 +16,19 @@ namespace SIPDataCollector
     public interface ISipDataCollector
     {
         [OperationContract]
-        [WebInvoke(Method = "GET", UriTemplate = "/GetBcmsData", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.Bare)]
-        List<BcmsDataForSIP> GetBcmsData();
+        [WebInvoke(Method = "GET", UriTemplate = "/GetRealtimeDataForAllSkills", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.Bare)]
+        List<RealtimeData> GetBcmsData();
 
         [OperationContract]
-        [WebInvoke(Method = "GET", UriTemplate = "/GetBcmsDataForSkill/{skillId}", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.Bare)]
-        BcmsDataForSIP GetBcmsDataForSkill(string skillId);
+        [WebInvoke(Method = "GET", UriTemplate = "/GetRealtimeDataForSkill/{skillId}", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.Bare)]
+        RealtimeData GetBcmsDataForSkill(string skillId);
 
         [OperationContract]
         [WebInvoke(Method = "GET", UriTemplate = "/PullDataFromAlternateServer", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.Bare)]
         void PullDataFromAlternateServer();
+
+        [OperationContract]
+        [WebInvoke(Method = "GET", UriTemplate = "/GetSkillAndExtensions", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.Bare)]
+        List<SkillExtensionInfo> GetSkillAndExtensions();
     }
 }

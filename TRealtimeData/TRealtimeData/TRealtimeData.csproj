@@ -91,9 +91,7 @@
     <Compile Include="ProjectInstaller.Designer.cs">
       <DependentUpon>ProjectInstaller.cs</DependentUpon>
     </Compile>
-    <Compile Include="RealtimeAccess.cs" />
     <Compile Include="RealtimeFactory.cs" />
-    <Compile Include="ServieHost.cs" />
     <Compile Include="TRealtimeService.cs">
       <SubType>Component</SubType>
     </Compile>
@@ -130,6 +128,12 @@
     <EmbeddedResource Include="TRealtimeService.resx">
       <DependentUpon>TRealtimeService.cs</DependentUpon>
     </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\TRealtimeDataSync\TRealTimeDataSync.csproj">
+      <Project>{5C2DD53D-3A61-4CCD-AE65-285BDC509CD3}</Project>
+      <Name>TRealTimeDataSync</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

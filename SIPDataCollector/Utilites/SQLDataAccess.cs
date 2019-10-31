@@ -1,4 +1,5 @@
-﻿using BcmsSIPManager.Utilites;
+﻿
+using SIPDataCollector.Utilites;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -7,14 +8,14 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace BcmsSIPManager.Utilities
+namespace SIPDataCollector.Utilities
 {
     public class SqlDataAccess
     {
         /// <summary>
-        /// Log Defination
+        /// log Defination
         /// </summary>
-        private static Logger.Logger Log = new Logger.Logger(typeof(SqlDataAccess));
+        private static Logger.Logger log = new Logger.Logger(typeof(SqlDataAccess));
 
         /// <summary>
         /// Standard sql method to execute datatable.
@@ -23,7 +24,7 @@ namespace BcmsSIPManager.Utilities
         /// <returns>Returns dataTable</returns>
         public static DataTable ExecuteDataTable(string sql)
         {
-            Log.Debug("SqlDataAccess[ExecuteDataTable]");
+            log.Debug("ExecuteDataTable()");
             using (SqlConnection connection = new SqlConnection(ConfigurationData.ConntnString))
             {
                 try
@@ -48,7 +49,7 @@ namespace BcmsSIPManager.Utilities
                 }
                 catch (Exception ex)
                 {
-                    Log.Error("Exception in SqlDataAccess - ExecuteDataTable : " + ex);
+                    log.Error("Exception in ExecuteDataTable : " , ex);
                 }
                 return null;
             }

@@ -116,56 +116,57 @@ namespace CMDataCollector.Utilities
                         return _listObj;
                     }
                 }
-                if (ConfigurationData.ConnectionType.ToLower() == "sip")
-                {
-                    Log.Debug("Return data for sip");
-                    var result = SIPDataCollector.SIPManager.GetInstance().GetBcmsData();
-                    if (result != null)
-                    {
-                        //Mapper.CreateMap<BcmsSIPManager.Models.BcmsDataForSIP, BcmsDashboard>();
-                        //return Mapper.Map<List<BcmsDashboard>>(result);
-                        var output = new List<BcmsDashboard>();
-                        var agentDetails = new List<AgentData>();
-                        foreach (var entry in result)
-                        {
-                            var val = new BcmsDashboard();
-                            val.AbandCalls = entry.AbandCalls;
-                            val.AccptedSL = entry.AccptedSL.ToString();
-                            val.ACD = entry.ACD;
-                            val.AcdCallsSummary = entry.TotalACDInteractions;
-                            val.ACW = entry.ACW;
-                            val.AUX = entry.AUX;
-                            val.Avail = entry.Avail;
-                            val.AvgAbandTime = entry.AvgAbandTime;
-                            val.CallsWaiting = entry.CallsWaiting;
-                            val.Channel = entry.Channel;
-                            val.Date = entry.Date;
-                            val.Extn = entry.Extn;
-                            val.OldestCall = entry.OldestCall;
-                            val.Other = entry.Other;
-                            val.Skill = entry.Skill;
-                            val.SkillName = entry.SkillName;
-                            val.SL = entry.SLPercentage;
-                            val.Staff = entry.Staff;
-                            val.AvgHandlingTime = entry.AvgHandlingTime;
-                            val.AbandonPercentage = entry.AbandonPercentage;
-                            Log.Debug("Avg handling : " + val.AvgAbandTime);
-                            for (int i = 0; i < entry.AgentData.Count; i++)
-                            {
-                                agentDetails.Add(new AgentData
-                                {
-                                    LoginId = entry.AgentData[i].LoginId,
-                                    State = entry.AgentData[i].State
-                                });
-                            }
 
-                            // total agentlist currently loggedin having this skill
-                            val.AgentData = agentDetails;
-                            output.Add(val);
-                        }
-                        return output;
-                    }
-                }
+                //if (ConfigurationData.ConnectionType.ToLower() == "sip")
+                //{
+                //    Log.Debug("Return data for sip");
+                //    var result = SIPDataCollector.SIPManager.GetInstance().GetBcmsData();
+                //    if (result != null)
+                //    {
+                //        //Mapper.CreateMap<BcmsSIPManager.Models.BcmsDataForSIP, BcmsDashboard>();
+                //        //return Mapper.Map<List<BcmsDashboard>>(result);
+                //        var output = new List<BcmsDashboard>();
+                //        var agentDetails = new List<AgentData>();
+                //        foreach (var entry in result)
+                //        {
+                //            var val = new BcmsDashboard();
+                //            val.AbandCalls = entry.AbandCalls;
+                //            val.AccptedSL = entry.AccptedSL.ToString();
+                //            val.ACD = entry.ACD;
+                //            val.AcdCallsSummary = entry.TotalACDInteractions;
+                //            val.ACW = entry.ACW;
+                //            val.AUX = entry.AUX;
+                //            val.Avail = entry.Avail;
+                //            val.AvgAbandTime = entry.AvgAbandTime;
+                //            val.CallsWaiting = entry.CallsWaiting;
+                //            val.Channel = entry.Channel;
+                //            val.Date = entry.Date;
+                //            val.Extn = entry.Extn;
+                //            val.OldestCall = entry.OldestCall;
+                //            val.Other = entry.Other;
+                //            val.Skill = entry.Skill;
+                //            val.SkillName = entry.SkillName;
+                //            val.SL = entry.SLPercentage;
+                //            val.Staff = entry.Staff;
+                //            val.AvgHandlingTime = entry.AvgHandlingTime;
+                //            val.AbandonPercentage = entry.AbandonPercentage;
+                //            Log.Debug("Avg handling : " + val.AvgAbandTime);
+                //            for (int i = 0; i < entry.AgentData.Count; i++)
+                //            {
+                //                agentDetails.Add(new AgentData
+                //                {
+                //                    LoginId = entry.AgentData[i].LoginId,
+                //                    State = entry.AgentData[i].State
+                //                });
+                //            }
+
+                //            // total agentlist currently loggedin having this skill
+                //            val.AgentData = agentDetails;
+                //            output.Add(val);
+                //        }
+                //        return output;
+                //    }
+                //}
             }
             catch (Exception ex)
             {
@@ -185,50 +186,50 @@ namespace CMDataCollector.Utilities
             try
             {
                 // check the connection type before getting data. If SIP read from sip cache else cm cache obj
-                if (ConfigurationData.ConnectionType.ToLower() == "sip")
-                {
-                    var result = SIPDataCollector.SIPManager.GetInstance().GetBcmsDataForSkill(skillId);
-                    if (result != null)
-                    {
-                        var agentDetails = new List<AgentData>();
-                        //Mapper.CreateMap<BcmsSIPManager.Models.BcmsDataForSIP, BcmsDashboard>();
-                        //return Mapper.Map<BcmsDashboard>(result);
-                        var val = new BcmsDashboard();
-                        val.AbandCalls = result.AbandCalls;
-                        val.AccptedSL = result.AccptedSL.ToString();
-                        val.ACD = result.ACD;
-                        val.AcdCallsSummary = result.TotalACDInteractions;
-                        val.ACW = result.ACW;
-                        val.AUX = result.AUX;
-                        val.Avail = result.Avail;
-                        val.AvgAbandTime = result.AvgAbandTime;
-                        val.AbandonPercentage = result.AbandonPercentage;
-                        val.AvgHandlingTime = result.AvgHandlingTime;                        
-                        val.CallsWaiting = result.CallsWaiting;
-                        val.Channel = result.Channel;                        
-                        val.Date = result.Date;
-                        val.Extn = result.Extn;
-                        val.OldestCall = result.OldestCall;
-                        val.Other = result.Other;
-                        val.Skill = result.Skill;
-                        val.SkillName = result.SkillName;
-                        val.SL = result.SLPercentage;
-                        val.Staff = result.Staff;
-                        if (result != null)
-                        {
-                            for (int i = 0; i < result.AgentData.Count; i++)
-                            {
-                                agentDetails.Add(new AgentData
-                                {
-                                    LoginId = result.AgentData[i].LoginId,
-                                    State = result.AgentData[i].State
-                                });
-                            }
-                        }
-                        val.AgentData = agentDetails;
-                        return val;
-                    }
-                }
+                //if (ConfigurationData.ConnectionType.ToLower() == "sip")
+                //{
+                //    var result = SIPDataCollector.SIPManager.GetInstance().GetBcmsDataForSkill(skillId);
+                //    if (result != null)
+                //    {
+                //        var agentDetails = new List<AgentData>();
+                //        //Mapper.CreateMap<BcmsSIPManager.Models.BcmsDataForSIP, BcmsDashboard>();
+                //        //return Mapper.Map<BcmsDashboard>(result);
+                //        var val = new BcmsDashboard();
+                //        val.AbandCalls = result.AbandCalls;
+                //        val.AccptedSL = result.AccptedSL.ToString();
+                //        val.ACD = result.ACD;
+                //        val.AcdCallsSummary = result.TotalACDInteractions;
+                //        val.ACW = result.ACW;
+                //        val.AUX = result.AUX;
+                //        val.Avail = result.Avail;
+                //        val.AvgAbandTime = result.AvgAbandTime;
+                //        val.AbandonPercentage = result.AbandonPercentage;
+                //        val.AvgHandlingTime = result.AvgHandlingTime;                        
+                //        val.CallsWaiting = result.CallsWaiting;
+                //        val.Channel = result.Channel;                        
+                //        val.Date = result.Date;
+                //        val.Extn = result.Extn;
+                //        val.OldestCall = result.OldestCall;
+                //        val.Other = result.Other;
+                //        val.Skill = result.Skill;
+                //        val.SkillName = result.SkillName;
+                //        val.SL = result.SLPercentage;
+                //        val.Staff = result.Staff;
+                //        if (result != null)
+                //        {
+                //            for (int i = 0; i < result.AgentData.Count; i++)
+                //            {
+                //                agentDetails.Add(new AgentData
+                //                {
+                //                    LoginId = result.AgentData[i].LoginId,
+                //                    State = result.AgentData[i].State
+                //                });
+                //            }
+                //        }
+                //        val.AgentData = agentDetails;
+                //        return val;
+                //    }
+                //}
                 if (ConfigurationData.ConnectionType.ToLower() == "cm")
                 {
                     //if (CachObj != null)
