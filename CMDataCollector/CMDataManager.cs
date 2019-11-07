@@ -7,7 +7,7 @@ using System.Security.Cryptography.X509Certificates;
 
 namespace CMDataCollector
 {
-    public class CMDataManager 
+    public class CMDataManager
     {
         /// <summary>
         /// Logger 

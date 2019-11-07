@@ -49,7 +49,7 @@ namespace TRealtimeData
                 if (id.ToLower() == "cm")
                 {
                     log.Info("Starting CMDataCollector");
-                    myServiceHost = new ServiceHost(typeof(CMDataCollector.CMDataManager));
+                    myServiceHost = new ServiceHost(typeof(CMDataCollector.CMDataService));
                     myServiceHost.Open();
                     CMDataCollector.CMDataManager.Start();
                 }

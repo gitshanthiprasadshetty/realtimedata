@@ -11,7 +11,7 @@ namespace TRealtimeData
         /// </summary>
         static void Main()
         {
-            //TConfigLoader.TConfig.UpdateConfigFromTmc();
+            TConfigLoader.TConfig.UpdateConfigFromTmc();
             ServiceBase[] ServicesToRun;
             ServicesToRun = new ServiceBase[]
             {

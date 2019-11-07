@@ -35,8 +35,8 @@ namespace SIPDataCollector
         /// <summary>
         /// Stored TmacConnector instances of all servers
         /// </summary>
-        private static readonly ConcurrentDictionary<string, TmacConnector> TmacConnectors = new ConcurrentDictionary<string, TmacConnector>();
-        private static readonly ConcurrentDictionary<string, List<DataModel.WallboardSkillModel>> wallboardSkills = new ConcurrentDictionary<string, List<DataModel.WallboardSkillModel>>();
+        private static readonly ConcurrentDictionary<string, AMACWeb_Proxy.TmacConnector> TmacConnectors = new ConcurrentDictionary<string, TmacConnector>();
+        //private static readonly ConcurrentDictionary<string, List<DataModel.WallboardSkillModel>> wallboardSkills = new ConcurrentDictionary<string, List<DataModel.WallboardSkillModel>>();
         private static readonly ConcurrentDictionary<string, List<AgentData>> loggedInAgents = new ConcurrentDictionary<string, List<AgentData>>();
 
         /// <summary>
@@ -658,6 +658,7 @@ namespace SIPDataCollector
         {
             try
             {
+                log.Info("Default Tmac  Server is: " + tmacServer);
                 if (!string.IsNullOrWhiteSpace(tmacServer))
                 {
                     if (!TmacConnectors.ContainsKey(tmacServer))
@@ -671,7 +672,8 @@ namespace SIPDataCollector
             }
             catch (Exception ex)
             {
-                throw ex;
+                log.Error("Exception in GetTamcServerInstance: " + ex);
+                return null;
             }
         }
 
