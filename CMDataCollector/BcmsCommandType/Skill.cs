@@ -154,23 +154,23 @@ namespace CMDataCollector.BcmsCommandType
                             if (channel.ToLower() == "email")
                                 extenstion = ConfigurationData.GetExtensionId(b.Skill) ?? "";
 
-                            _connValue.BcmsDashboard = new BcmsDashboard
+                            _connValue.BcmsDashboard = new RealtimeData
                             {
                                 Channel = channel,
-                                Skill = b.Skill,
-                                Date = b.Date,
+                                SkillId = Convert.ToInt32(b.Skill),
+                                // Date = b.Date,
                                 SkillName = b.SkillName,
-                                CallsWaiting = (channel.ToLower() == "email") ? WorkQueueProxy.GetQueueCount(extenstion) : b.CallsWaiting,
-                                AccptedSL = b.AccptedSL,
-                                OldestCall = (channel.ToLower() == "email") ? WorkQueueProxy.GetOldestWaitTime(extenstion) : b.OldestCall,
-                                SL = b.SL,
-                                Staff = b.Staff,
-                                Avail = b.Avail,
-                                ACD = b.ACD,
-                                ACW = b.ACW,
-                                AUX = b.AUX,
-                                Extn = b.Extn,
-                                Other = b.Other
+                                InteractionsInQueue = (channel.ToLower() == "email") ? Convert.ToInt32(WorkQueueProxy.GetQueueCount(extenstion)) : Convert.ToInt32(b.CallsWaiting),
+                                AcceptedSL = Convert.ToInt32(b.AccptedSL),
+                                OldestInteractionWaitTime = (channel.ToLower() == "email") ? Convert.ToInt32(WorkQueueProxy.GetOldestWaitTime(extenstion)) : Convert.ToInt32(b.OldestCall),
+                                SLPercentage = Convert.ToDecimal(b.SL),
+                                TotalAgentsStaffed = Convert.ToInt32(b.Staff),
+                                TotalAgentsAvailable = Convert.ToInt32(b.Avail),
+                                ActiveInteractions = Convert.ToInt32(b.ACD),
+                                TotalAgentsInACW = Convert.ToInt32(b.ACW),
+                                TotalAgentsInAUX = Convert.ToInt32(b.AUX),
+                                // Extn = b.Extn,
+                                // Other = b.Other
                             };
 
 
@@ -187,7 +187,7 @@ namespace CMDataCollector.BcmsCommandType
                                 }
                             }
                             // total agentlist currently loggedin having this skill
-                            _connValue.BcmsDashboard.AgentData = _connValue.AgentDataSet;
+                            _connValue.BcmsDashboard.AgentStats = _connValue.AgentDataSet;
 
                             Log.Debug("CMCommandState[ProcessData] Add/update to cachememory");
                             CacheMemory.UpdateCacheMemory(_connValue.BcmsDashboard);

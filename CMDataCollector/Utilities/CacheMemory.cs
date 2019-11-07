@@ -24,7 +24,7 @@ namespace CMDataCollector.Utilities
         /// Since multiple connection will use same cachememory, concurrent dictionary is used.
         /// Holds BCMS data
         /// </summary>
-        static readonly ConcurrentDictionary<string, BcmsDashboard> skillCachObj = new ConcurrentDictionary<string, BcmsDashboard>();
+        static readonly ConcurrentDictionary<string, RealtimeData> skillCachObj = new ConcurrentDictionary<string, RealtimeData>();
 
         /// <summary>
         /// Holds trunk related data
@@ -46,12 +46,12 @@ namespace CMDataCollector.Utilities
         /// <summary>
         /// 
         /// </summary>
-        static List<BcmsDashboard> _listObj;
+        static List<RealtimeData> _listObj;
 
         /// <summary>
         /// Model declaration for bcmsdashboard
         /// </summary>
-        static BcmsDashboard _bcmsObj;
+        static RealtimeData _bcmsObj;
 
         static BcmsSystem _bcmsSysObj;
 
@@ -86,7 +86,7 @@ namespace CMDataCollector.Utilities
         /// Gets all Bcms data for configured skills.
         /// </summary>
         /// <returns>returns list of bcmsdata for each skill</returns>
-        public static List<BcmsDashboard> GetBcmsData()
+        public static List<RealtimeData> GetBcmsData()
         {
             Log.Debug("CacheMemory[GetBcmsData]");
             try
@@ -104,9 +104,9 @@ namespace CMDataCollector.Utilities
                         if (skillCachObj.Count > 0)
                         {
                             Log.Debug("Dictionary count : " + skillCachObj.Count);
-                            _bcmsObj = new BcmsDashboard();
-                            _listObj = new List<BcmsDashboard>();
-                            foreach (KeyValuePair<string, BcmsDashboard> entry in skillCachObj)
+                            _bcmsObj = new RealtimeData();
+                            _listObj = new List<RealtimeData>();
+                            foreach (KeyValuePair<string, RealtimeData> entry in skillCachObj)
                             {
                                 _bcmsObj = entry.Value;
                                 _listObj.Add(_bcmsObj);
@@ -180,7 +180,7 @@ namespace CMDataCollector.Utilities
         /// </summary>
         /// <param name="skillId">skillid</param>
         /// <returns>returns bcms data only for a requested skillid</returns>
-        public static BcmsDashboard GetBcmsDataForSkill(string skillId)
+        public static RealtimeData GetBcmsDataForSkill(string skillId)
         {
             Log.Debug("CacheMemory[GetBcmsDataForSkill]");
             try
@@ -237,9 +237,9 @@ namespace CMDataCollector.Utilities
                         if (skillCachObj.Count > 0)
                         {
                             Log.Debug("CacheMemory[GetBcmsDataForSkill] Dictionary count : " + skillCachObj.Count);
-                            _bcmsObj = new BcmsDashboard();
+                            _bcmsObj = new RealtimeData();
                             var result = skillCachObj.FirstOrDefault(x => x.Key == skillId);
-                            if (!result.Equals(default(KeyValuePair<string, BcmsDashboard>)))
+                            if (!result.Equals(default(KeyValuePair<string, RealtimeData>)))
                             {
                                 _bcmsObj = skillCachObj[result.Key];
                             }
@@ -403,47 +403,47 @@ namespace CMDataCollector.Utilities
         /// </summary>
         /// <param name="bcmsReturnObj"><see cref="BcmsDashboard"/>dddd</param>
         /// <returns></returns>
-        public static bool UpdateCacheMemory(BcmsDashboard bcmsReturnObj)
+        public static bool UpdateCacheMemory(RealtimeData bcmsReturnObj)
         {
             Log.Debug("CacheMemory[UpdateCacheMemory].BcmsDashboard");
             try
             {
                 if (bcmsReturnObj != null)
                 {                    
-                    if (bcmsReturnObj.Skill != null)
-                    {
-                        Log.Debug("CacheMemory[UpdateCacheMemory] skill: " + bcmsReturnObj.Skill);
-                        skillCachObj.TryAdd(bcmsReturnObj.Skill, bcmsReturnObj);
+                    //if (bcmsReturnObj.SkillId != null)
+                    //{
+                        Log.Debug("CacheMemory[UpdateCacheMemory] skill: " + bcmsReturnObj.SkillId);
+                        skillCachObj.TryAdd(bcmsReturnObj.SkillId.ToString(), bcmsReturnObj);
 
-                        var isKeyExist = skillCachObj.ContainsKey(bcmsReturnObj.Skill);
+                        var isKeyExist = skillCachObj.ContainsKey(bcmsReturnObj.SkillId.ToString());
                         Log.Debug("CacheMemory[UpdateCacheMemory] isKeyExist: " + isKeyExist);
                         if (isKeyExist)
                         {
-                            var value = skillCachObj.FirstOrDefault(x => x.Key == bcmsReturnObj.Skill).Value;
+                            var value = skillCachObj.FirstOrDefault(x => x.Key == bcmsReturnObj.SkillId.ToString()).Value;
                             // var value = CachObj[bcmsReturnObj.Skill];
                             // Log.Debug("CacheMemory[UpdateCacheMemory] update to dictionary " + bcmsReturnObj.Skill + "cache abandon call = " + value.AgentData.Count);
                             try
                             {
                                 //Log.Debug("Before update : " + JsonConvert.SerializeObject(value, Newtonsoft.Json.Formatting.Indented));
 
-                                value.AbandCalls = (value.AbandCalls == null) ? "0" : value.AbandCalls;
-                                value.AvgAbandTime = (value.AbandCalls == null) ? "0" : value.AvgAbandTime;
-                                value.AcdCallsSummary = (value.AbandCalls == null) ? "0" : value.AcdCallsSummary;
-                                value.SL = string.IsNullOrEmpty(value.SL) ? "0" : value.SL;
+                                value.AbandonedInteractionsSummary = value.AbandonedInteractionsSummary;// (value.AbandonedInteractionsSummary == null) ? "0" : value.AbandonedInteractionsSummary;
+                                value.AverageAbandonedTime = value.AverageAbandonedTime;  //(value.AbandCalls == null) ? "0" : value.AverageAbandonedTime;
+                                value.ActiveInteractionsSummary = value.ActiveInteractionsSummary;  // (value.AbandonedInteractionsSummary == null) ? "0" : value.ActiveInteractionsSummary;
+                                value.SLPercentage = value.SLPercentage; // string.IsNullOrEmpty(value.SLPercentage) ? "0" : value.SLPercentage;
 
-                                bcmsReturnObj.AbandCalls = value.AbandCalls;
-                                bcmsReturnObj.AvgAbandTime = value.AvgAbandTime;
-                                bcmsReturnObj.AcdCallsSummary = value.AcdCallsSummary;
-                                bcmsReturnObj.AbandCallsSummary = value.AbandCallsSummary;
-                                bcmsReturnObj.SL = value.SL;
+                                bcmsReturnObj.AbandonedInteractionsSummary = value.AbandonedInteractionsSummary;
+                                bcmsReturnObj.AverageAbandonedTime = value.AverageAbandonedTime;
+                                bcmsReturnObj.ActiveInteractionsSummary = value.ActiveInteractionsSummary;
+                                bcmsReturnObj.AbandonedInteractionsSummary = value.AbandonedInteractionsSummary;
+                               // bcmsReturnObj.SLPercentage = value.SLPercentage;
                             }
                             catch (Exception ex)
                             {
                                 Log.Debug("Error in CacheMemory[UpdateCacheMemory] while appending the historical values : " + ex);
                             }
 
-                            bool updateResult = skillCachObj.TryUpdate(bcmsReturnObj.Skill, bcmsReturnObj, value);
-                            Log.Debug("CacheMemory[UpdateCacheMemory] update to dictionary is  " + updateResult + "for " + bcmsReturnObj.Skill);
+                            bool updateResult = skillCachObj.TryUpdate(bcmsReturnObj.SkillId.ToString(), bcmsReturnObj, value);
+                            Log.Debug("CacheMemory[UpdateCacheMemory] update to dictionary is  " + updateResult + "for " + bcmsReturnObj.SkillId);
 
                             //Log.Debug("After Update : " + JsonConvert.SerializeObject(value, Newtonsoft.Json.Formatting.Indented));
                             //if (value.AbandCalls != null)
@@ -461,10 +461,10 @@ namespace CMDataCollector.Utilities
                             //}
                         }
                         else
-                            Log.Debug("CacheMemory[UpdateCacheMemory] Add to dictionary " + bcmsReturnObj.Skill);
+                            Log.Debug("CacheMemory[UpdateCacheMemory] Add to dictionary " + bcmsReturnObj.SkillId);
                         // _cachObj.AddOrUpdate(bcmsReturnObj.Skill,bcmsReturnObj,
                         return true;
-                    }
+                    //}
                 }
                 return false;
             }
@@ -488,7 +488,7 @@ namespace CMDataCollector.Utilities
                 {
                     Log.Debug("UpdateCacheMemory for skill : " + reportValue.skill);
 
-                    _bcmsObj = new BcmsDashboard();
+                    _bcmsObj = new RealtimeData();
 
                     //foreach (var item in skillCachObj)
                     //{
@@ -499,16 +499,16 @@ namespace CMDataCollector.Utilities
                     //}
 
                     //Log.Debug(JsonConvert.SerializeObject(skillCachObj, Newtonsoft.Json.Formatting.Indented));
-                    BcmsDashboard values;
+                    RealtimeData values;
                     if (skillCachObj.TryGetValue(reportValue.skill, out values))
                     {
                         Log.Debug("update historical data to cache memory");
                         //Log.Debug("Input value : " + JsonConvert.SerializeObject(values1, Newtonsoft.Json.Formatting.Indented));
-                        values.AbandCallsSummary = reportValue.abandoned_Calls;
+                        values.AbandonedInteractionsSummary = Convert.ToInt32(reportValue.abandoned_Calls);
                         //values1.AbandCallsSummaryTest = reportValue.abandoned_Calls;
                         //values1.AbandCallsSummaryTest = "prakash";
-                        values.AvgAbandTime = reportValue.avg_Abandoned_Time;
-                        values.AcdCallsSummary = reportValue.acd_Calls;
+                       // values.AverageAbandonedTime = Convert.ToInt32(reportValue.avg_Abandoned_Time);
+                        values.ActiveInteractionsSummary = Convert.ToInt32(reportValue.acd_Calls);
                     }
                     else
                         Log.Info("No key present in the cache memory");
@@ -673,19 +673,19 @@ namespace CMDataCollector.Utilities
             try
             {
                 // unbox the object data to model data.
-                _bcmsObj = (BcmsDashboard)obj;
+                _bcmsObj = (RealtimeData)obj;
                 if (_bcmsObj != null)
                 {
-                    Log.Debug("AddToCacheMemory() Adding to CacheMemory for skill :" + _bcmsObj.Skill);
+                    Log.Debug("AddToCacheMemory() Adding to CacheMemory for skill :" + _bcmsObj.SkillId);
 
-                    if (skillCachObj.ContainsKey(_bcmsObj.Skill))
+                    if (skillCachObj.ContainsKey(_bcmsObj.SkillId.ToString()))
                     {
-                        var val = skillCachObj[_bcmsObj.Skill];
-                        Log.Debug("AddToCacheMemory() cache old value key :" + val.Skill);
-                        skillCachObj.TryUpdate(_bcmsObj.Skill, _bcmsObj, val);
+                        var val = skillCachObj[Convert.ToString(_bcmsObj.SkillId)];
+                        Log.Debug("AddToCacheMemory() cache old value key :" + val.SkillId);
+                        skillCachObj.TryUpdate(Convert.ToString(_bcmsObj.SkillId), _bcmsObj, val);
                     }
                     else
-                        skillCachObj.TryAdd(_bcmsObj.Skill, _bcmsObj);
+                        skillCachObj.TryAdd(Convert.ToString(_bcmsObj.SkillId), _bcmsObj);
                 }
             }
             catch (Exception ex)
@@ -836,15 +836,15 @@ namespace CMDataCollector.Utilities
             Log.Debug("CacheMemory[UpdateCacheData]");
             try
             {
-                _bcmsObj = (BcmsDashboard)data;
+                _bcmsObj = (RealtimeData)data;
                 if (data != null)
                 {
-                    skillCachObj.TryAdd(_bcmsObj.Skill, _bcmsObj);
-                    var isKeyExist = skillCachObj.ContainsKey(_bcmsObj.Skill);
+                    skillCachObj.TryAdd(_bcmsObj.SkillId.ToString(), _bcmsObj);
+                    var isKeyExist = skillCachObj.ContainsKey(_bcmsObj.SkillId.ToString());
                     if (isKeyExist)
                     {
-                        var value = skillCachObj.FirstOrDefault(x => x.Key == _bcmsObj.Skill).Value;
-                        skillCachObj.TryUpdate(value.Skill, _bcmsObj, value);
+                        var value = skillCachObj.FirstOrDefault(x => x.Key == _bcmsObj.SkillId.ToString()).Value;
+                        skillCachObj.TryUpdate(value.SkillId.ToString(), _bcmsObj, value);
                     }
                 }
             }
