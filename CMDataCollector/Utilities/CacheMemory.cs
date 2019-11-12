@@ -363,6 +363,7 @@ namespace CMDataCollector.Utilities
                 var result = _bcmsReportClientObj.GetSkillHistoricalData(skillId);
                 if (result != null)
                 {
+                    Log.Debug("data from historical service"+ JsonConvert.SerializeObject(result));
                     //Log.Debug("abandonedcalls dumbu : " + Convert.ToString(result.AbandCalls));
                     //Log.Debug("AcdCalls dumbu : " + Convert.ToString(result.AcdCalls));
                     Log.Debug("CacheMemory[GetBcmsHistoricalData] Result from service for skill : "+result.SkillId);
@@ -435,8 +436,8 @@ namespace CMDataCollector.Utilities
                                 bcmsReturnObj.AverageAbandonedTime = value.AverageAbandonedTime;
                                 bcmsReturnObj.ActiveInteractionsSummary = value.ActiveInteractionsSummary;
                                 bcmsReturnObj.AbandonedInteractionsSummary = value.AbandonedInteractionsSummary;
-                               // bcmsReturnObj.SLPercentage = value.SLPercentage;
-                            }
+                                bcmsReturnObj.SLPercentage = value.SLPercentage;
+                        }
                             catch (Exception ex)
                             {
                                 Log.Debug("Error in CacheMemory[UpdateCacheMemory] while appending the historical values : " + ex);
@@ -509,6 +510,17 @@ namespace CMDataCollector.Utilities
                         //values1.AbandCallsSummaryTest = "prakash";
                        // values.AverageAbandonedTime = Convert.ToInt32(reportValue.avg_Abandoned_Time);
                         values.ActiveInteractionsSummary = Convert.ToInt32(reportValue.acd_Calls);
+                        Log.Debug($"AbandonedInteractionsSummary = {values.AbandonedInteractionsSummary}, ActiveInteractionsSummary = {values.ActiveInteractionsSummary}");
+
+                        try
+                        {
+                            values.SLPercentage = Convert.ToDecimal(reportValue.pct_In_Svc_Level);
+                            Log.Debug($"SLPercentage = {values.SLPercentage}");
+                        }
+                        catch (Exception ex)
+                        {
+                            Log.Warn("error while converting sl percentage value to decimal.");
+                        }
                     }
                     else
                         Log.Info("No key present in the cache memory");

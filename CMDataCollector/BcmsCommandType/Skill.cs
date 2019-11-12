@@ -163,7 +163,7 @@ namespace CMDataCollector.BcmsCommandType
                                 InteractionsInQueue = (channel.ToLower() == "email") ? Convert.ToInt32(WorkQueueProxy.GetQueueCount(extenstion)) : Convert.ToInt32(b.CallsWaiting),
                                 AcceptedSL = Convert.ToInt32(b.AccptedSL),
                                 OldestInteractionWaitTime = (channel.ToLower() == "email") ? Convert.ToInt32(WorkQueueProxy.GetOldestWaitTime(extenstion)) : Convert.ToInt32(b.OldestCall),
-                                SLPercentage = Convert.ToDecimal(b.SL),
+                                // SLPercentage = Convert.ToDecimal(b.SL),
                                 TotalAgentsStaffed = Convert.ToInt32(b.Staff),
                                 TotalAgentsAvailable = Convert.ToInt32(b.Avail),
                                 ActiveInteractions = Convert.ToInt32(b.ACD),
