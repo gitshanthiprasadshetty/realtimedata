@@ -18,7 +18,7 @@ namespace CMDataCollector
         /// Gets Bcms data for all skills
         /// </summary>
         /// <returns>returns Bcms data for all skills</returns>
-        public List<BcmsDashboard> MonitorBcms()
+        public List<RealtimeData> MonitorBcms()
         {
             Log.Debug("MonitorBcms()");
             try
@@ -28,7 +28,7 @@ namespace CMDataCollector
             catch (Exception ex)
             {
                 Log.Error("Error in BcmsDashboardService[MonitorBcms] : " + ex);
-                return new List<BcmsDashboard>();
+                return new List<RealtimeData>();
             }
         }
 
@@ -37,7 +37,7 @@ namespace CMDataCollector
         /// </summary>
         /// <param name="skillToMonitor">skillId</param>
         /// <returns>returns Bcms data for given skill</returns>
-        public BcmsDashboard MonitorBcmsForSkill(string skillToMonitor)
+        public RealtimeData MonitorBcmsForSkill(string skillToMonitor)
         {
             Log.Debug("MonitorBcmsForSkill()");
             try
@@ -48,7 +48,7 @@ namespace CMDataCollector
             catch (Exception ex)
             {
                 Log.Error("Error in BcmsDashboardService[MonitorBcmsForSkill] : " + ex);
-                return new BcmsDashboard();
+                return new RealtimeData();
             }
         }
 

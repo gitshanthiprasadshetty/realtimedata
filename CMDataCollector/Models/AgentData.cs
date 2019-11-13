@@ -16,5 +16,6 @@ namespace CMDataCollector.Models
         /// </summary>
         [DataMember]
         public string State { get; set; }
+        public string StationID { get; set; }
     }
 }

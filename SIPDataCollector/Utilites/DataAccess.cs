@@ -164,8 +164,8 @@ namespace SIPDataCollector.Utilities
             try
             {
                 string sql = "";
-                sql = string.IsNullOrEmpty(skillsToMonitor) ? @"select SkillID,SkillExtension,SkillName from TMAC_Skills" :
-                    @"select SkillID,SkillExtension,SkillName from TMAC_Skills Where SkillID in (" + skillsToMonitor + ")";
+                sql = string.IsNullOrEmpty(skillsToMonitor) ? @"select SkillID,SkillExtension,SkillName from TMAC_Skills with (nolock)" :
+                    @"select SkillID,SkillExtension,SkillName from TMAC_Skills with (nolock) Where SkillID in (" + skillsToMonitor + ")";
                 DataTable skillExtnObj = SqlDataAccess.ExecuteDataTable(sql, ConfigurationData.ConntnString);
                 return skillExtnObj;
             }
@@ -187,7 +187,7 @@ namespace SIPDataCollector.Utilities
             {
                 string sql = @"SELECT AgentID , STUFF(( SELECT  ','+ SkillID FROM TMAC_Agent_Skills a
                                 WHERE b.AgentID = a.AgentID FOR XML PATH('')),1 ,1, '')  Skills
-                                FROM TMAC_Agent_Skills b
+                                FROM TMAC_Agent_Skills b with(nolock)
                                 GROUP BY AgentID;";
                 DataTable agentSkillObj = SqlDataAccess.ExecuteDataTable(sql, ConfigurationData.ConntnString);
                 return agentSkillObj;
@@ -204,7 +204,7 @@ namespace SIPDataCollector.Utilities
             try
             {
                 string[] auxCodes = new string[] { };
-                string sql = @"select Name from [dbo].[AGT_AUX_Codes]";
+                string sql = @"select Name from [dbo].[AGT_AUX_Codes] with (nolock)";
                 DataTable dataTable = SqlDataAccess.ExecuteDataTable(sql, ConfigurationData.ConntnString);
                 if(dataTable != null)
                 {
@@ -228,7 +228,7 @@ namespace SIPDataCollector.Utilities
             try
             {
                 string[] auxCodes = new string[] { };
-                string sql = @"select distinct SkillID, AcceptableServiceLevel from TMAC_Skills";
+                string sql = @"select distinct SkillID, AcceptableServiceLevel from TMAC_Skills with (nolock)";
                 DataTable dataTable = SqlDataAccess.ExecuteDataTable(sql, ConfigurationData.ConntnString);
                 if (dataTable != null)
                 {

@@ -34,7 +34,7 @@
       <HintPath>lib\ConfigurationProvider.dll</HintPath>
     </Reference>
     <Reference Include="Connector">
-      <HintPath>..\Connector\obj\Debug\Connector.dll</HintPath>
+      <HintPath>..\Connector\bin\Debug\Connector.dll</HintPath>
     </Reference>
     <Reference Include="DataModel">
       <HintPath>lib\DataModel.dll</HintPath>

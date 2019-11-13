@@ -239,22 +239,25 @@ namespace CMDataCollector.Connection
                             if (channel.ToLower() == "email")
                                 extenstion = ConfigurationData.GetExtensionId(b.Skill) ?? "";
 
-                            _connValue.BcmsDashboard = new BcmsDashboard();
+                            var dateTime = DateTime.ParseExact(b.OldestCall, "H:mm", null, System.Globalization.DateTimeStyles.None);
+                            long seconds = dateTime.Ticks / 10000000;
+
+                            _connValue.BcmsDashboard = new RealtimeData();
                             _connValue.BcmsDashboard.Channel = channel;
-                            _connValue.BcmsDashboard.Skill = b.Skill;
-                            _connValue.BcmsDashboard.Date = b.Date;
+                            _connValue.BcmsDashboard.SkillId = Convert.ToInt32(b.Skill);
+                           // _connValue.BcmsDashboard.Date = b.Date;
                             _connValue.BcmsDashboard.SkillName = b.SkillName;
-                            _connValue.BcmsDashboard.CallsWaiting = (channel.ToLower() == "email") ? Connector.Proxy.WorkQueueProxy.GetQueueCount(extenstion) : b.CallsWaiting;
-                            _connValue.BcmsDashboard.AccptedSL = b.AccptedSL;
-                            _connValue.BcmsDashboard.OldestCall = (channel.ToLower() == "email") ? Connector.Proxy.WorkQueueProxy.GetOldestWaitTime(extenstion) : b.OldestCall;
-                            _connValue.BcmsDashboard.SL = b.SL;
-                            _connValue.BcmsDashboard.Staff = b.Staff;
-                            _connValue.BcmsDashboard.Avail = b.Avail;
-                            _connValue.BcmsDashboard.ACD = b.ACD;
-                            _connValue.BcmsDashboard.ACW = b.ACW;
-                            _connValue.BcmsDashboard.AUX = b.AUX;
-                            _connValue.BcmsDashboard.Extn = b.Extn;
-                            _connValue.BcmsDashboard.Other = b.Other;
+                            _connValue.BcmsDashboard.InteractionsInQueue = Convert.ToInt32(b.CallsWaiting); // (channel.ToLower() == "email") ? Convert.ToInt32(Connector.Proxy.WorkQueueProxy.GetQueueCount(extenstion)) : Convert.ToInt32(b.CallsWaiting);
+                            _connValue.BcmsDashboard.AcceptedSL = Convert.ToInt32(b.AccptedSL);
+                            _connValue.BcmsDashboard.OldestInteractionWaitTime = (int)seconds; //(channel.ToLower() == "email") ? Convert.ToInt32(Connector.Proxy.WorkQueueProxy.GetOldestWaitTime(extenstion)) : Convert.ToInt32(b.OldestCall);
+                           // _connValue.BcmsDashboard.SLPercentage = Convert.ToDecimal(b.SL);
+                            _connValue.BcmsDashboard.TotalAgentsStaffed = Convert.ToInt32(b.Staff);
+                            _connValue.BcmsDashboard.TotalAgentsAvailable = Convert.ToInt32(b.Avail);
+                            _connValue.BcmsDashboard.ActiveInteractions = Convert.ToInt32(b.ACD);
+                            _connValue.BcmsDashboard.TotalAgentsInACW = Convert.ToInt32(b.ACW);
+                            _connValue.BcmsDashboard.TotalAgentsInAUX = Convert.ToInt32(b.AUX);
+                            // _connValue.BcmsDashboard.Extn = b.Extn;
+                            // _connValue.BcmsDashboard.Other = b.Other;
                             if (b.AgentData != null)
                             {
                                 for (int i = 0; i < b.AgentData.Count; i++)
@@ -267,7 +270,7 @@ namespace CMDataCollector.Connection
                                 }
                             }
                             // total agentlist currently loggedin having this skill
-                            _connValue.BcmsDashboard.AgentData = _connValue.AgentDataSet;
+                            _connValue.BcmsDashboard.AgentStats = _connValue.AgentDataSet;
 
                             Log.Debug("CMCommandState[ProcessData] Add/update to cachememory");
                             CacheMemory.UpdateCacheMemory(_connValue.BcmsDashboard);

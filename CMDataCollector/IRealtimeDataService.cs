@@ -14,11 +14,11 @@ namespace CMDataCollector
     {
         [OperationContract]
         [WebInvoke(Method = "GET", UriTemplate = "/GetRealtimeDataForAllSkills", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.Bare)]
-        List<BcmsDashboard> MonitorBcms();
+        List<RealtimeData> MonitorBcms();
 
         [OperationContract]
         [WebInvoke(Method = "GET", UriTemplate = "/GetRealtimeDataForSkill/{skillToMonitor}", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.Bare)]
-        BcmsDashboard MonitorBcmsForSkill(string skillToMonitor);
+        RealtimeData MonitorBcmsForSkill(string skillToMonitor);
 
         [OperationContract]
         [WebInvoke(Method = "GET", UriTemplate = "/MonitorTrunkTraffic", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.Bare)]

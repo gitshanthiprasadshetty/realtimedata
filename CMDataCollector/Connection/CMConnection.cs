@@ -49,7 +49,7 @@ namespace CMDataCollector.Connection
         /// <summary>
         /// Final model object to store values
         /// </summary>
-        public  BcmsDashboard BcmsDashboard;
+        public RealtimeData BcmsDashboard;
 
         /// <summary>
         /// Final model object of trunkTraffic to store values
