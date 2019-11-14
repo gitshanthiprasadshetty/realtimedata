@@ -1,6 +1,8 @@
 ﻿using CMDataCollector.Models;
 using ConfigurationProvider;
 using Connector.DbLayer;
+using Connector.Proxy;
+using Connector.SMSAPI;
 using System;
 using System.Collections.Generic;
 using System.Configuration;
@@ -61,7 +63,7 @@ namespace CMDataCollector.Utilities
         /// <summary>
         /// total skilllist to be monitored is stored in array
         /// </summary>
-        public static string[] skillList { get; set; }
+        public static List<string> skillList { get; set; }
 
         /// <summary>
         /// Dashboard refresh time
@@ -126,12 +128,11 @@ namespace CMDataCollector.Utilities
         public static List<int> Skills { get; set; }
 
         public static string TlsVersion { get; set; }
-
+        public static List<int> totalSkillIds = new List<int>();
         #endregion
 
         static string userName = ConfigurationManager.AppSettings["userName"].ToString();
         static string password = ConfigurationManager.AppSettings["password"].ToString();
-
 
         /// <summary>
         /// Load all config data
@@ -141,12 +142,21 @@ namespace CMDataCollector.Utilities
             log.Debug("LoadConfig()");
             try
             {
+                var key = "";
+                string sectionSkills = "";  //variable contains all the combined skill id values
                 Channel();
+                var skillValue = channelObj.Select(y => y.Value).ToList();
+
+                for (int i = 0; i < skillValue.Count; i++)
+                {
+                    sectionSkills += skillValue[i][0] +";" ;
+                }
                 DecryptCredentials();
                 ConntnString = ConnectionStrings.DecryptConnectionString(ConfigurationManager.AppSettings["CMDbConn"]);
                 ServerAddress = ConfigurationManager.AppSettings["serverAddress"];
-                skillsToMonitor = ConfigurationManager.AppSettings["skillsToMonitor"];
-                skillList = skillsToMonitor.Split(',');
+                //skillsToMonitor = ConfigurationManager.AppSettings["skillsToMonitor"];
+                skillsToMonitor = sectionSkills;
+                //skillList = skillsToMonitor.Split(',');
                 DashboardRefreshTime = Convert.ToInt32(ConfigurationManager.AppSettings["DashboardRefreshTime"]);
                 ReportRefreshTime = Convert.ToInt32(ConfigurationManager.AppSettings["HistoricalReportRefreshTime"]);
                 ActionOnCMConFailure = ConfigurationManager.AppSettings["ActionOnCMConFailure"].ToLower();
@@ -157,6 +167,7 @@ namespace CMDataCollector.Utilities
                 HuntFrequency = Convert.ToInt32(ConfigurationManager.AppSettings["HuntFrequency"]);
                 TlsVersion = ConfigurationManager.AppSettings["TlsVersion"];
 
+                skillList=FormatSkills(skillsToMonitor);
                 try
                 {
                     Port = Convert.ToInt32(ConfigurationManager.AppSettings["port"]);
@@ -309,7 +320,9 @@ namespace CMDataCollector.Utilities
                 {
                     log.Debug("Add skills for channel : " + data.ChannelName);
                     channelObj.Add(data.ChannelName, data.SkillId.Split(',').ToList());
+                    
                 }
+                
             }
             catch (Exception ex)
             {
@@ -353,25 +366,25 @@ namespace CMDataCollector.Utilities
                     //var emailSkillIds = channelObj.FirstOrDefault(x => x.Key.ToLower() == "email").Value.ToList();
                     //StringBuilder builder = new StringBuilder();
                     string skillIds = string.Empty;
-                    for (int i = 0; i < channelObj.Count; i++)
-                    {
-                        var skills = channelObj.ElementAtOrDefault(i).Value;
-                        if (skills != null || skills.Count > 0)
-                        {
-                            skillIds += string.Join(",", skills);
-                            skillIds = skillIds.EndsWith(",") ? skillIds : skillIds + ",";
-                        }
-                    }
+                    //for (int i = 0; i < channelObj.Count; i++)
+                    //{
+                    //    var skills = channelObj.ElementAtOrDefault(i).Value;
+                    //    if (skills != null || skills.Count > 0)
+                    //    {
+                    //        skillIds += string.Join(",", skills);
+                    //        skillIds = skillIds.EndsWith(",") ? skillIds : skillIds + ",";
+                    //    }
+                    //}
 
-                    if (!string.IsNullOrEmpty(skillIds))
-                    {
+                    //if (!string.IsNullOrEmpty(skillIds))
+                    //{
 
-                        if (skillIds.StartsWith(","))
-                            skillIds = skillIds.Remove(0, 1);
+                    //    if (skillIds.StartsWith(","))
+                    //        skillIds = skillIds.Remove(0, 1);
 
-                        if (skillIds.EndsWith(","))
-                            skillIds = skillIds.Substring(0, skillIds.Length - 1);
-                    }
+                    //    if (skillIds.EndsWith(","))
+                    //        skillIds = skillIds.Substring(0, skillIds.Length - 1);
+                    //}
 
                     if (ConnectionType.ToLower() == "cm" && !string.IsNullOrEmpty(skillIds))
                         FetchCMExtnSkillData(skillIds);
@@ -390,14 +403,15 @@ namespace CMDataCollector.Utilities
             log.Debug("FetchCMExtnSkillData()");
             try
             {
-                string[] values = skillIds.Split(',');
+
+                //string[] values = skillIds.Split(',');
                 var skilldata = Connector.Proxy.SMSAPIProxy.GetSkills();
                 Connector.SMSAPI.HuntGroupType huntGroupData = null;
-                if (skilldata != null && values != null)
+                if (skilldata != null && totalSkillIds != null)
                 {
-                    foreach (var skill in values)
+                    foreach (var skill in totalSkillIds)
                     {
-                        huntGroupData = skilldata.FirstOrDefault(x => x.group_NumberField == skill);
+                        huntGroupData = skilldata.FirstOrDefault(x => x.group_NumberField == skill.ToString());
                         if (huntGroupData != null)
                         {
                             _skillExtnInfo.Add(huntGroupData.group_ExtensionField, new SkillExtensionInfo
@@ -474,6 +488,58 @@ namespace CMDataCollector.Utilities
             catch (Exception ex)
             {
                 log.Error("Error in GetExtensionId: " + ex);
+            }
+            return null;
+        }
+
+        private static List<string> FormatSkills(string skillList)
+        {
+            try
+            {
+
+                if (skillList != null && skillList.Count() >= 0 && !string.IsNullOrEmpty(skillList))
+                {
+                    string[] strArrays = skillList?.Split(new char[] { ';' });
+                    if ((strArrays != null ? true : strArrays.Length != 0))
+                    {
+                        if (strArrays[0] != "")
+                        {
+                            List<int> nums = new List<int>();
+                            for (int i = 0; i < (int)strArrays.Length-1; i++)
+                            {
+                                if (!strArrays[i].Contains("-")) //added to check if the skill is added like 100;101-110. this will modify it to 100-100;101-110 Nov 13,2019
+                                {
+                                    strArrays[i] = strArrays[i] + "-" + strArrays[i];
+                                }
+
+                                log.Debug(strArrays[i].Split(new char[] { '-' })[0]);
+                                nums.AddRange(Enumerable.Range(Convert.ToInt32(strArrays[i].Split(new char[] { '-' })[0]),
+                                    Convert.ToInt32(strArrays[i].Split(new char[] { '-' })[1]) - Convert.ToInt32(strArrays[i].Split(new char[] { '-' })[0]) + 1));
+                            }
+                            
+                            List<HuntGroupType> result = SMSAPIProxy.GetSkills();
+
+                            if (result != null)
+                            {
+                                nums =nums.Distinct().ToList(); //removing repeated skills numbers, added on Nov 13,2019
+                                totalSkillIds = nums;
+                                log.Info("Total Skills Obtained from SMSAPI : " + result.Count);
+                                List<int> Skills = result.Select(x => Convert.ToInt32(x.group_NumberField)).ToList();
+                                log.Info("Total Skills from config info : " + nums.Count);
+                                nums = nums?.Where(x => Skills.Contains(x)).ToList();
+                                log.Info("Total Skills to monitor after applying filter : " + nums.Count);
+                                return nums.Select(x => Convert.ToString(x)).ToList();
+                            }
+                            else
+                                log.Info("No data obtained from smsapi");
+
+                        }
+                    }
+                }
+            }
+            catch (Exception exception)
+            {
+                ConfigurationData.log.Error("Error : ", exception);
             }
             return null;
         }
