@@ -61,10 +61,18 @@ namespace SIPDataCollector.Utilites
             log.Debug("BcmsSIPManager.ConfigurationData[LoadConfig]");
             try
             {
+                string sectionSkills = "";  //variable contains all the combined skill id values
                 Channel();
+                var skillValue = channelObj.Select(y => y.Value).ToList();
+
+                for (int i = 0; i < skillValue.Count; i++)
+                {
+                    sectionSkills += skillValue[i][0] + ";";
+                }
                 ////ConntnString = ConfigurationSettings.AppSettings["CMDbConn"].ToString();
                 ConntnString = ConnectionStrings.DecryptConnectionString(ConfigurationSettings.AppSettings["CMDbConn"]);
-                skillsToMonitor = ConfigurationSettings.AppSettings["skillsToMonitorForSIP"];
+                //skillsToMonitor = ConfigurationSettings.AppSettings["skillsToMonitorForSIP"];
+                skillsToMonitor = sectionSkills;
                 DashboardRefreshTime = Convert.ToInt32(ConfigurationSettings.AppSettings["DashboardRefreshTime"]);
                 acceptableSL = Convert.ToInt32(ConfigurationSettings.AppSettings["acceptableSL"]);
                 DBRefreshTime = Convert.ToInt32(ConfigurationSettings.AppSettings["DBRefreshTime"]);
