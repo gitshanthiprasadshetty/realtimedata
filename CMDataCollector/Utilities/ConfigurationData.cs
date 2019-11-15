@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.Configuration;
 using System.Data;
 using System.Linq;
+using System.Timers;
 
 namespace CMDataCollector.Utilities
 {
@@ -108,7 +109,7 @@ namespace CMDataCollector.Utilities
         /// <summary>
         /// Holds Skill-Extension Related information for given set of skills in config.
         /// </summary>
-         static readonly Dictionary<string, SkillExtensionInfo> _skillExtnInfo = new Dictionary<string, SkillExtensionInfo>();
+        static readonly Dictionary<string, SkillExtensionInfo> _skillExtnInfo = new Dictionary<string, SkillExtensionInfo>();
 
         /// <summary>
         /// DB Connection string
@@ -142,15 +143,9 @@ namespace CMDataCollector.Utilities
             log.Debug("LoadConfig()");
             try
             {
-                var key = "";
                 string sectionSkills = "";  //variable contains all the combined skill id values
                 Channel();
-                var skillValue = channelObj.Select(y => y.Value).ToList();
-
-                for (int i = 0; i < skillValue.Count; i++)
-                {
-                    sectionSkills += skillValue[i][0] +";" ;
-                }
+                sectionSkills = SectionSkills();
                 DecryptCredentials();
                 ConntnString = ConnectionStrings.DecryptConnectionString(ConfigurationManager.AppSettings["CMDbConn"]);
                 ServerAddress = ConfigurationManager.AppSettings["serverAddress"];
@@ -166,7 +161,6 @@ namespace CMDataCollector.Utilities
                 CommandType = ConfigurationManager.AppSettings["CommandType"];
                 HuntFrequency = Convert.ToInt32(ConfigurationManager.AppSettings["HuntFrequency"]);
                 TlsVersion = ConfigurationManager.AppSettings["TlsVersion"];
-
                 skillList=FormatSkills(skillsToMonitor);
                 try
                 {
@@ -213,6 +207,11 @@ namespace CMDataCollector.Utilities
                     MaxTriesOnCMConFailure = 0;
                 }
                 FetchExtenSkillData();
+
+                Timer timer = new Timer();
+                timer.Interval = DashboardRefreshTime;
+                timer.Elapsed += RefreshSection;
+                timer.Start();
             }
             catch (Exception ex)
             {
@@ -315,6 +314,7 @@ namespace CMDataCollector.Utilities
             {
                 // clear the in-memory data.
                 channelObj.Clear();
+                ConfigurationManager.RefreshSection("TRealTimeDataServiceSettings");
                 var section = (ConfigSection)ConfigurationManager.GetSection("TRealTimeDataServiceSettings");
                 foreach (BCMSInstanceData data in section.BCMSServiceItems)
                 {
@@ -542,6 +542,35 @@ namespace CMDataCollector.Utilities
                 ConfigurationData.log.Error("Error : ", exception);
             }
             return null;
+        }
+
+        public static string SectionSkills()
+        {
+            var skillValue = channelObj.Select(y => y.Value).ToList();
+            string sectionSkills = "";
+            for (int i = 0; i < skillValue.Count; i++)
+            {
+                sectionSkills += skillValue[i][0] + ";";
+            }
+            return sectionSkills;
+        }
+
+        private static void RefreshSection(object sender, ElapsedEventArgs elapsedEventArgs)
+        {
+            try
+            {
+                log.Info("Refreshing config");
+                Channel();
+                string sectionSkills = SectionSkills();
+                skillsToMonitor = sectionSkills;
+                skillList = FormatSkills(skillsToMonitor);
+                FetchExtenSkillData();
+            }
+            catch (Exception e)
+            {
+                log.Error("Exeception in RefreshSection() " + e);
+            }
+
         }
 
         #region Tobe used later
