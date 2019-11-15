@@ -144,6 +144,7 @@ namespace CMDataCollector.Utilities
             try
             {
                 string sectionSkills = "";  //variable contains all the combined skill id values
+                ConfigurationManager.RefreshSection("appSettings");
                 Channel();
                 sectionSkills = SectionSkills();
                 DecryptCredentials();
@@ -208,10 +209,6 @@ namespace CMDataCollector.Utilities
                 }
                 FetchExtenSkillData();
 
-                Timer timer = new Timer();
-                timer.Interval = DashboardRefreshTime;
-                timer.Elapsed += RefreshSection;
-                timer.Start();
             }
             catch (Exception ex)
             {
@@ -512,7 +509,7 @@ namespace CMDataCollector.Utilities
                                     strArrays[i] = strArrays[i] + "-" + strArrays[i];
                                 }
 
-                                log.Debug(strArrays[i].Split(new char[] { '-' })[0]);
+                                //log.Debug(strArrays[i].Split(new char[] { '-' })[0]);
                                 nums.AddRange(Enumerable.Range(Convert.ToInt32(strArrays[i].Split(new char[] { '-' })[0]),
                                     Convert.ToInt32(strArrays[i].Split(new char[] { '-' })[1]) - Convert.ToInt32(strArrays[i].Split(new char[] { '-' })[0]) + 1));
                             }
@@ -555,16 +552,17 @@ namespace CMDataCollector.Utilities
             return sectionSkills;
         }
 
-        private static void RefreshSection(object sender, ElapsedEventArgs elapsedEventArgs)
+        public static void RefreshSection(object sender, ElapsedEventArgs elapsedEventArgs)
         {
             try
             {
                 log.Info("Refreshing config");
-                Channel();
-                string sectionSkills = SectionSkills();
-                skillsToMonitor = sectionSkills;
-                skillList = FormatSkills(skillsToMonitor);
-                FetchExtenSkillData();
+                //Channel();
+                //string sectionSkills = SectionSkills();
+                //skillsToMonitor = sectionSkills;
+                //skillList = FormatSkills(skillsToMonitor);
+                //FetchExtenSkillData();
+                LoadConfig();
             }
             catch (Exception e)
             {

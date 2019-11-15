@@ -305,6 +305,12 @@ namespace SIPDataCollector
                         });
                     }
                 }
+
+                log.Info("Starting Timer for Config refresh time for SIP");
+                System.Timers.Timer timer = new System.Timers.Timer();
+                timer.Interval = Utilites.ConfigurationData.DashboardRefreshTime;
+                timer.Elapsed += Utilites.ConfigurationData.RefreshSection;
+                timer.Start();
             }
             catch (Exception ex)
             {

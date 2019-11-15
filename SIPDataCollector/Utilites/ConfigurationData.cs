@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Configuration;
 using System.Linq;
+using System.Timers;
 
 namespace SIPDataCollector.Utilites
 {
@@ -49,6 +50,8 @@ namespace SIPDataCollector.Utilites
 
         internal static int acceptableSL;
 
+        public static List<int> totalSkillIds = new List<int>();
+
         /// <summary>
         /// Dashboard refresh time
         /// </summary>
@@ -62,13 +65,9 @@ namespace SIPDataCollector.Utilites
             try
             {
                 string sectionSkills = "";  //variable contains all the combined skill id values
+                ConfigurationManager.RefreshSection("appSettings");
                 Channel();
-                var skillValue = channelObj.Select(y => y.Value).ToList();
-
-                for (int i = 0; i < skillValue.Count; i++)
-                {
-                    sectionSkills += skillValue[i][0] + ";";
-                }
+                sectionSkills = SectionSkills();
                 ////ConntnString = ConfigurationSettings.AppSettings["CMDbConn"].ToString();
                 ConntnString = ConnectionStrings.DecryptConnectionString(ConfigurationSettings.AppSettings["CMDbConn"]);
                 //skillsToMonitor = ConfigurationSettings.AppSettings["skillsToMonitorForSIP"];
@@ -99,6 +98,7 @@ namespace SIPDataCollector.Utilites
             {
                 // clear the in-memory data.
                 channelObj.Clear();
+                ConfigurationManager.RefreshSection("TRealTimeDataServiceSettings");
                 var section = (SIPDataCollector.Utilites.BcmsSIPConfigSection)ConfigurationManager.GetSection("TRealTimeDataServiceSettings");
                 foreach (BCMSInstanceData data in section.BCMSServiceItems)
                 {
@@ -161,6 +161,8 @@ namespace SIPDataCollector.Utilites
 
                             if (result != null)
                             {
+                                nums = nums.Distinct().ToList(); //removing repeated skills numbers, added on Nov 15,2019
+                                totalSkillIds = nums;
                                 log.Info("Total Skills Obtained from SMSAPI : " + result.Count);
                                 List<int> Skills = result.Select(x => Convert.ToInt32(x.group_NumberField)).ToList();
                                 log.Info("Total Skills from config info : " + nums.Count);
@@ -223,7 +225,37 @@ namespace SIPDataCollector.Utilites
         //        log.Error("Error in FetchSIPExtnSkillData: ", ex);
         //    }
         //}
-        
+
+        public static void RefreshSection(object sender, ElapsedEventArgs elapsedEventArgs)
+        {
+            try
+            {
+                log.Info("Refreshing config");
+                //Channel();
+                //string sectionSkills = SectionSkills();
+                //skillsToMonitor = sectionSkills;
+                //skillList = FormatSkills(skillsToMonitor);
+                //FetchExtenSkillData();
+                LoadConfig();
+            }
+            catch (Exception e)
+            {
+                log.Error("Exeception in RefreshSection() " + e);
+            }
+
+        }
+
+        public static string SectionSkills()
+        {
+            var skillValue = channelObj.Select(y => y.Value).ToList();
+            string sectionSkills = "";
+            for (int i = 0; i < skillValue.Count; i++)
+            {
+                sectionSkills += skillValue[i][0] + ";";
+            }
+            return sectionSkills;
+        }
+
         #region notused
         public void GetConnectionString()
         {

@@ -4,6 +4,7 @@ using System;
 using System.Net;
 using System.Net.Security;
 using System.Security.Cryptography.X509Certificates;
+using System.Timers;
 
 namespace CMDataCollector
 {
@@ -65,6 +66,12 @@ namespace CMDataCollector
                 //    Log.Debug("sip selected");
                 //    SIPManager.GetInstance().Start();
                 //}
+
+                Log.Info("Starting Timer for Config refresh time for CM");
+                Timer timer = new Timer();
+                timer.Interval = ConfigurationData.DashboardRefreshTime;
+                timer.Elapsed += ConfigurationData.RefreshSection;
+                timer.Start();
             }
             catch (Exception ex)
             {
