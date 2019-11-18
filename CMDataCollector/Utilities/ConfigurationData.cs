@@ -374,33 +374,7 @@ namespace CMDataCollector.Utilities
             {
                 if (channelObj != null)
                 {
-                    //var emailSkillIds = channelObj.FirstOrDefault(x => x.Key.ToLower() == "email").Value.ToList();
-                    //StringBuilder builder = new StringBuilder();
-                    string skillIds = string.Empty;
-                    //for (int i = 0; i < channelObj.Count; i++)
-                    //{
-                    //    var skills = channelObj.ElementAtOrDefault(i).Value;
-                    //    if (skills != null || skills.Count > 0)
-                    //    {
-                    //        skillIds += string.Join(",", skills);
-                    //        skillIds = skillIds.EndsWith(",") ? skillIds : skillIds + ",";
-                    //    }
-                    //}
-
-                    //if (!string.IsNullOrEmpty(skillIds))
-                    //{
-
-                    //    if (skillIds.StartsWith(","))
-                    //        skillIds = skillIds.Remove(0, 1);
-
-                    //    if (skillIds.EndsWith(","))
-                    //        skillIds = skillIds.Substring(0, skillIds.Length - 1);
-                    //}
-
-                    if (ConnectionType.ToLower() == "cm" && !string.IsNullOrEmpty(skillIds))
-                        FetchCMExtnSkillData(skillIds);
-                    //else if (ConnectionType.ToLower() == "sip" && !string.IsNullOrEmpty(skillIds))
-                    //    FetchSIPExtnSkillData(skillIds);
+                        FetchCMExtnSkillData();
                 }
             }
             catch (Exception ex)
@@ -409,12 +383,11 @@ namespace CMDataCollector.Utilities
             }
         }
 
-        static void FetchCMExtnSkillData(string skillIds)
+        static void FetchCMExtnSkillData()
         {
             log.Debug("FetchCMExtnSkillData()");
             try
             {
-
                 //string[] values = skillIds.Split(',');
                 var skilldata = Connector.Proxy.SMSAPIProxy.GetSkills();
                 Connector.SMSAPI.HuntGroupType huntGroupData = null;
