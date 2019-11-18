@@ -128,6 +128,7 @@ namespace CMDataCollector.Utilities
 
         public static List<int> Skills { get; set; }
 
+        public static int ReloadConfigTime { get; set; }
         public static string TlsVersion { get; set; }
         public static List<int> totalSkillIds = new List<int>();
         #endregion
@@ -150,8 +151,6 @@ namespace CMDataCollector.Utilities
                 DecryptCredentials();
                 ConntnString = ConnectionStrings.DecryptConnectionString(ConfigurationManager.AppSettings["CMDbConn"]);
                 ServerAddress = ConfigurationManager.AppSettings["serverAddress"];
-                //skillsToMonitor = ConfigurationManager.AppSettings["skillsToMonitor"];
-                //skillList = skillsToMonitor.Split(',');
                 DashboardRefreshTime = Convert.ToInt32(ConfigurationManager.AppSettings["DashboardRefreshTime"]);
                 ReportRefreshTime = Convert.ToInt32(ConfigurationManager.AppSettings["HistoricalReportRefreshTime"]);
                 ActionOnCMConFailure = ConfigurationManager.AppSettings["ActionOnCMConFailure"].ToLower();
@@ -162,6 +161,7 @@ namespace CMDataCollector.Utilities
                 HuntFrequency = Convert.ToInt32(ConfigurationManager.AppSettings["HuntFrequency"]);
                 TlsVersion = ConfigurationManager.AppSettings["TlsVersion"];
                 skillList=FormatSkills(skillsToMonitor);
+                ReloadConfigTime = Convert.ToInt32(ConfigurationManager.AppSettings["ReloadConfigTime"]);
                 try
                 {
                     Port = Convert.ToInt32(ConfigurationManager.AppSettings["port"]);
@@ -395,6 +395,7 @@ namespace CMDataCollector.Utilities
                 //string[] values = skillIds.Split(',');
                 var skilldata = Connector.Proxy.SMSAPIProxy.GetSkills();
                 Connector.SMSAPI.HuntGroupType huntGroupData = null;
+                _skillExtnInfo.Clear();
                 if (skilldata != null && totalSkillIds != null)
                 {
                     foreach (var skill in totalSkillIds)
@@ -484,7 +485,7 @@ namespace CMDataCollector.Utilities
         {
             try
             {
-
+                log.Info("Skills List: " + skillList);
                 if (skillList != null && skillList.Count() >= 0 && !string.IsNullOrEmpty(skillList))
                 {
                     string[] strArrays = skillList?.Split(new char[] { ';' });
@@ -534,14 +535,19 @@ namespace CMDataCollector.Utilities
 
         public static string SectionSkills()
         {
-            var skillValue = channelObj.SelectMany(x => x.Value).ToList();
-            string sectionSkills = string.Empty;
-            //for (int i = 0; i < skillValue.Count; i++)
-            //{
-            //    sectionSkills += skillValue[i] + ",";
-            //}
-            sectionSkills = String.Join(",", skillValue);
-            return sectionSkills;
+            try
+            {
+                var skillValue = channelObj.SelectMany(x => x.Value).Distinct().ToList();
+                string sectionSkills = string.Empty;
+                sectionSkills = String.Join(",", skillValue);
+                return sectionSkills;
+            }
+            catch (Exception e)
+            {
+                log.Error("Exception in SectionSkills(): " + e);
+                return "";
+            }
+
         }
 
         public static void RefreshSection(object sender, ElapsedEventArgs elapsedEventArgs)
@@ -549,11 +555,6 @@ namespace CMDataCollector.Utilities
             try
             {
                 log.Info("Refreshing config");
-                //Channel();
-                //string sectionSkills = SectionSkills();
-                //skillsToMonitor = sectionSkills;
-                //skillList = FormatSkills(skillsToMonitor);
-                //FetchExtenSkillData();
                 LoadConfig();
             }
             catch (Exception e)

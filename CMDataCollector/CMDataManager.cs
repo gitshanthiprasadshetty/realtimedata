@@ -69,7 +69,7 @@ namespace CMDataCollector
 
                 Log.Info("Starting Timer for Config refresh time for CM");
                 Timer timer = new Timer();
-                timer.Interval = ConfigurationData.DashboardRefreshTime;
+                timer.Interval = ConfigurationData.ReloadConfigTime*60000;
                 timer.Elapsed += ConfigurationData.RefreshSection;
                 timer.Start();
             }

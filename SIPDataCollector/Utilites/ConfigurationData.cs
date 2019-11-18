@@ -51,7 +51,7 @@ namespace SIPDataCollector.Utilites
         internal static int acceptableSL;
 
         public static List<int> totalSkillIds = new List<int>();
-
+        public static int ReloadConfigTime { get; set; }
         /// <summary>
         /// Dashboard refresh time
         /// </summary>
@@ -76,7 +76,7 @@ namespace SIPDataCollector.Utilites
                 acceptableSL = Convert.ToInt32(ConfigurationSettings.AppSettings["acceptableSL"]);
                 DBRefreshTime = Convert.ToInt32(ConfigurationSettings.AppSettings["DBRefreshTime"]);
                 TmacServers = ConfigurationSettings.AppSettings["TmacServers"].Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries).ToList();
-
+                ReloadConfigTime = Convert.ToInt32(ConfigurationManager.AppSettings["ReloadConfigTime"]);
                 //if (!string.IsNullOrEmpty(skillsToMonitor) || skillsToMonitor.ToLower() != "na")
                 //    skillList = skillsToMonitor.Split(',');
 
@@ -152,7 +152,7 @@ namespace SIPDataCollector.Utilites
         {
             try
             {
-
+                log.Info("Skills List: " + skillList);
                 if (skillList != null && skillList.Count() >= 0 && !string.IsNullOrEmpty(skillList))
                 {
                     string[] strArrays = skillList?.Split(new char[] { ';' });
@@ -160,28 +160,35 @@ namespace SIPDataCollector.Utilites
                     {
                         if (strArrays[0] != "")
                         {
-                            List<int> nums = new List<int>();
-                            for (int i = 0; i < (int)strArrays.Length; i++)
-                            {
-                                nums.AddRange(Enumerable.Range(Convert.ToInt32(strArrays[i].Split(new char[] { '-' })[0]),
-                                    Convert.ToInt32(strArrays[i].Split(new char[] { '-' })[1]) - Convert.ToInt32(strArrays[i].Split(new char[] { '-' })[0]) + 1));
-                            }
+
                             List<HuntGroupType> result = SMSAPIProxy.GetSkills();
 
                             if (result != null)
                             {
-                                nums = nums.Distinct().ToList(); //removing repeated skills numbers, added on Nov 15,2019
-                                totalSkillIds = nums;
+                                var totalIdsToMonitor = channelObj.SelectMany(x => x.Value).ToList();
+                                totalSkillIds = totalIdsToMonitor.Select((x => Convert.ToInt32((x)))).ToList();
                                 log.Info("Total Skills Obtained from SMSAPI : " + result.Count);
                                 List<int> Skills = result.Select(x => Convert.ToInt32(x.group_NumberField)).ToList();
-                                log.Info("Total Skills from config info : " + nums.Count);
-                                nums = nums?.Where(x => Skills.Contains(x)).ToList();
-                                log.Info("Total Skills to monitor after applying filter : " + nums.Count);
-                                return nums.Select(x => Convert.ToString(x)).ToList();
+                                log.Info("Total Skills from config info : " + totalSkillIds.Count);
+                                totalSkillIds = totalSkillIds?.Where(x => Skills.Contains(x)).ToList();
+                                log.Info("Total Skills to monitor after applying filter : " + totalSkillIds.Count);
+                                return totalSkillIds.Select(x => Convert.ToString(x)).ToList();
                             }
                             else
                                 log.Info("No data obtained from smsapi");
 
+                            //List<int> nums = new List<int>();
+                            //for (int i = 0; i < (int)strArrays.Length-1; i++)
+                            //{
+                            //    if (!strArrays[i].Contains("-")) //added to check if the skill is added like 100;101-110. this will modify it to 100-100;101-110 Nov 13,2019
+                            //    {
+                            //        strArrays[i] = strArrays[i] + "-" + strArrays[i];
+                            //    }
+
+                            //    //log.Debug(strArrays[i].Split(new char[] { '-' })[0]);
+                            //    nums.AddRange(Enumerable.Range(Convert.ToInt32(strArrays[i].Split(new char[] { '-' })[0]),
+                            //        Convert.ToInt32(strArrays[i].Split(new char[] { '-' })[1]) - Convert.ToInt32(strArrays[i].Split(new char[] { '-' })[0]) + 1));
+                            //}
                         }
                     }
                 }
@@ -256,13 +263,18 @@ namespace SIPDataCollector.Utilites
 
         public static string SectionSkills()
         {
-            var skillValue = channelObj.Select(y => y.Value).ToList();
-            string sectionSkills = "";
-            for (int i = 0; i < skillValue.Count; i++)
+            try
             {
-                sectionSkills += skillValue[i][0] + ";";
+                var skillValue = channelObj.SelectMany(x => x.Value).Distinct().ToList();
+                string sectionSkills = string.Empty;
+                sectionSkills = String.Join(",", skillValue);
+                return sectionSkills;
             }
-            return sectionSkills;
+            catch (Exception e)
+            {
+                log.Error("Exception in SectionSkills(): " + e);
+                return "";
+            }
         }
 
         #region notused

@@ -149,8 +149,9 @@ namespace SIPDataCollector.Utilites
                         _bcmsObj = entry.Value;
                         _listObj.Add(_bcmsObj);
                     }
+                    log.Debug("GetBcmsData BcmsDashboard Return Count for sip : " + _listObj.Count);
                 }
-                log.Debug("GetBcmsData BcmsDashboard Return Count for sip : " + _listObj.Count);
+                log.Debug("GetBcmsData BcmsDashboard No data to return");
                 return _listObj;
             }
             catch (Exception ex)
