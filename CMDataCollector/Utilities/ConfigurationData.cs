@@ -313,13 +313,27 @@ namespace CMDataCollector.Utilities
                 channelObj.Clear();
                 ConfigurationManager.RefreshSection("TRealTimeDataServiceSettings");
                 var section = (ConfigSection)ConfigurationManager.GetSection("TRealTimeDataServiceSettings");
+                List<int> nums = new List<int>();
                 foreach (BCMSInstanceData data in section.BCMSServiceItems)
                 {
                     log.Debug("Add skills for channel : " + data.ChannelName);
-                    channelObj.Add(data.ChannelName, data.SkillId.Split(',').ToList());
-                    
+                    string[] strArrays = data.SkillId?.Split(new char[] { ';' });
+                    nums.Clear();
+                    if (strArrays[0] != "")
+                    {
+                        for (int i = 0; i < (int)strArrays.Length; i++)
+                        {                          
+                            if (!strArrays[i].Contains("-")) //added to check if the skill is added like 100;101-110. this will modify it to 100-100;101-110 Nov 13,2019
+                            {
+                                strArrays[i] = strArrays[i] + "-" + strArrays[i];
+                            }
+                            nums.AddRange(Enumerable.Range(Convert.ToInt32(strArrays[i].Split(new char[] { '-' })[0]),
+                                Convert.ToInt32(strArrays[i].Split(new char[] { '-' })[1]) - Convert.ToInt32(strArrays[i].Split(new char[] { '-' })[0]) + 1));
+                        }
+                        List<string> l2 = nums.ConvertAll<string>(delegate (int i) { return i.ToString(); });
+                        channelObj.Add(data.ChannelName, l2.Distinct().ToList());
+                    }
                 }
-                
             }
             catch (Exception ex)
             {
