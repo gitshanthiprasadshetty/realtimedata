@@ -143,15 +143,14 @@ namespace CMDataCollector.Utilities
             log.Debug("LoadConfig()");
             try
             {
-                string sectionSkills = "";  //variable contains all the combined skill id values
+                //variable contains all the combined skill id values
                 ConfigurationManager.RefreshSection("appSettings");
                 Channel();
-                sectionSkills = SectionSkills();
+                skillsToMonitor = SectionSkills();
                 DecryptCredentials();
                 ConntnString = ConnectionStrings.DecryptConnectionString(ConfigurationManager.AppSettings["CMDbConn"]);
                 ServerAddress = ConfigurationManager.AppSettings["serverAddress"];
                 //skillsToMonitor = ConfigurationManager.AppSettings["skillsToMonitor"];
-                skillsToMonitor = sectionSkills;
                 //skillList = skillsToMonitor.Split(',');
                 DashboardRefreshTime = Convert.ToInt32(ConfigurationManager.AppSettings["DashboardRefreshTime"]);
                 ReportRefreshTime = Convert.ToInt32(ConfigurationManager.AppSettings["HistoricalReportRefreshTime"]);
@@ -173,13 +172,18 @@ namespace CMDataCollector.Utilities
                 }
                 try
                 {
-                    string[] HuntRange = ConfigurationManager.AppSettings["HuntRange"].Split(';');
+                    string hunts = ConfigurationManager.AppSettings["HuntRange"];
+                    string[] HuntRange = hunts?.Split(';');
                     HuntGroups = new List<int>();
-                    for (int i = 0; i < HuntRange.Length; i++)
+                    if (!string.IsNullOrEmpty(hunts))
                     {
-                        HuntGroups.AddRange(Enumerable.Range(Convert.ToInt32(HuntRange[i].Split('-')[0]),
-                            (Convert.ToInt32(HuntRange[i].Split('-')[1]) - Convert.ToInt32(HuntRange[i].Split('-')[0])) + 1));
+                        for (int i = 0; i < HuntRange.Length; i++)
+                        {
+                            HuntGroups.AddRange(Enumerable.Range(Convert.ToInt32(HuntRange[i].Split('-')[0]),
+                                (Convert.ToInt32(HuntRange[i].Split('-')[1]) - Convert.ToInt32(HuntRange[i].Split('-')[0])) + 1));
+                        }
                     }
+                 
 
                     MaxTriesOnCMConFailure = Convert.ToInt32(ConfigurationManager.AppSettings["MaxTriesOnConnectionFailure"]);
                     skillsPerConnection = Convert.ToInt32(ConfigurationManager.AppSettings["skillsPerConnection"]);
@@ -374,7 +378,7 @@ namespace CMDataCollector.Utilities
             {
                 if (channelObj != null)
                 {
-                        FetchCMExtnSkillData();
+                   FetchCMExtnSkillData();
                 }
             }
             catch (Exception ex)
@@ -488,35 +492,35 @@ namespace CMDataCollector.Utilities
                     {
                         if (strArrays[0] != "")
                         {
-                            List<int> nums = new List<int>();
-                            for (int i = 0; i < (int)strArrays.Length-1; i++)
-                            {
-                                if (!strArrays[i].Contains("-")) //added to check if the skill is added like 100;101-110. this will modify it to 100-100;101-110 Nov 13,2019
-                                {
-                                    strArrays[i] = strArrays[i] + "-" + strArrays[i];
-                                }
 
-                                //log.Debug(strArrays[i].Split(new char[] { '-' })[0]);
-                                nums.AddRange(Enumerable.Range(Convert.ToInt32(strArrays[i].Split(new char[] { '-' })[0]),
-                                    Convert.ToInt32(strArrays[i].Split(new char[] { '-' })[1]) - Convert.ToInt32(strArrays[i].Split(new char[] { '-' })[0]) + 1));
-                            }
-                            
                             List<HuntGroupType> result = SMSAPIProxy.GetSkills();
 
                             if (result != null)
                             {
-                                nums =nums.Distinct().ToList(); //removing repeated skills numbers, added on Nov 13,2019
-                                totalSkillIds = nums;
+                                var totalIdsToMonitor = channelObj.SelectMany(x => x.Value).ToList();
+                                totalSkillIds = totalIdsToMonitor.Select((x => Convert.ToInt32((x)))).ToList();
                                 log.Info("Total Skills Obtained from SMSAPI : " + result.Count);
                                 List<int> Skills = result.Select(x => Convert.ToInt32(x.group_NumberField)).ToList();
-                                log.Info("Total Skills from config info : " + nums.Count);
-                                nums = nums?.Where(x => Skills.Contains(x)).ToList();
-                                log.Info("Total Skills to monitor after applying filter : " + nums.Count);
-                                return nums.Select(x => Convert.ToString(x)).ToList();
+                                log.Info("Total Skills from config info : " + totalSkillIds.Count);
+                                totalSkillIds = totalSkillIds?.Where(x => Skills.Contains(x)).ToList();
+                                log.Info("Total Skills to monitor after applying filter : " + totalSkillIds.Count);
+                                return totalSkillIds.Select(x => Convert.ToString(x)).ToList();
                             }
                             else
                                 log.Info("No data obtained from smsapi");
 
+                            //List<int> nums = new List<int>();
+                            //for (int i = 0; i < (int)strArrays.Length-1; i++)
+                            //{
+                            //    if (!strArrays[i].Contains("-")) //added to check if the skill is added like 100;101-110. this will modify it to 100-100;101-110 Nov 13,2019
+                            //    {
+                            //        strArrays[i] = strArrays[i] + "-" + strArrays[i];
+                            //    }
+
+                            //    //log.Debug(strArrays[i].Split(new char[] { '-' })[0]);
+                            //    nums.AddRange(Enumerable.Range(Convert.ToInt32(strArrays[i].Split(new char[] { '-' })[0]),
+                            //        Convert.ToInt32(strArrays[i].Split(new char[] { '-' })[1]) - Convert.ToInt32(strArrays[i].Split(new char[] { '-' })[0]) + 1));
+                            //}
                         }
                     }
                 }
@@ -530,12 +534,13 @@ namespace CMDataCollector.Utilities
 
         public static string SectionSkills()
         {
-            var skillValue = channelObj.Select(y => y.Value).ToList();
-            string sectionSkills = "";
-            for (int i = 0; i < skillValue.Count; i++)
-            {
-                sectionSkills += skillValue[i][0] + ";";
-            }
+            var skillValue = channelObj.SelectMany(x => x.Value).ToList();
+            string sectionSkills = string.Empty;
+            //for (int i = 0; i < skillValue.Count; i++)
+            //{
+            //    sectionSkills += skillValue[i] + ",";
+            //}
+            sectionSkills = String.Join(",", skillValue);
             return sectionSkills;
         }
 
