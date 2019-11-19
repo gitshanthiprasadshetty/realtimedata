@@ -8,9 +8,9 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyTitle("CMDataCollector")]
 [assembly: AssemblyDescription("Data Collector Layer")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("Tetherfi Technology")]
+[assembly: AssemblyCompany("Tetherfi")]
 [assembly: AssemblyProduct("CMDataCollector")]
-[assembly: AssemblyCopyright("Copyright ©  2014")]
+[assembly: AssemblyCopyright("Copyright ©  2019")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
@@ -32,5 +32,5 @@ using System.Runtime.InteropServices;
 // You can specify all the values or you can default the Build and Revision Numbers 
 // by using the '*' as shown below:
 // [assembly: AssemblyVersion("1.0.*")]
-[assembly: AssemblyVersion("1.1.11.06")]
-[assembly: AssemblyFileVersion("1.1.11.06")]
+[assembly: AssemblyVersion("1.1.11.19")]
+[assembly: AssemblyFileVersion("1.1.11.19")]
