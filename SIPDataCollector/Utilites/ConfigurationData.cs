@@ -247,12 +247,9 @@ namespace SIPDataCollector.Utilites
             try
             {
                 log.Info("Refreshing config");
-                //Channel();
-                //string sectionSkills = SectionSkills();
-                //skillsToMonitor = sectionSkills;
-                //skillList = FormatSkills(skillsToMonitor);
-                //FetchExtenSkillData();
+
                 LoadConfig();
+                SIPManager.GetInstance().GetSkillExtensionInfo();
             }
             catch (Exception e)
             {

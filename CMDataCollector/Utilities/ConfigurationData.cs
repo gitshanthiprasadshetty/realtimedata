@@ -561,7 +561,11 @@ namespace CMDataCollector.Utilities
             {
                 log.Error("Exeception in RefreshSection() " + e);
             }
+        }
 
+        public static string GetSkillName(string skillId)
+        {
+            return _skillExtnInfo?.FirstOrDefault(x => x.Value.SkillId == Convert.ToInt32(skillId)).Value.SkillName;
         }
 
         #region Tobe used later

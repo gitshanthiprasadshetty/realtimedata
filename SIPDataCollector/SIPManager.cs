@@ -283,28 +283,29 @@ namespace SIPDataCollector
                 AgentSkillInfo();
 
                 // get skillidlist from config to monitor.
-                var skillIdList = Utilites.ConfigurationData.skillList;
-                string skills = string.Join(",", skillIdList);
-                // get extnid for given set of skills
-                var result = DataAccess.GetSkillExtnInfo(skills);
-                if (result != null)
-                {
-                    log.Debug("Skill to Extension mapping");
-                    foreach (DataRow entry in result.Rows)
-                    {
-                        // add to dictionary object to maintain a skill-Extn mapping.
-                        if (_skillExtnInfo.ContainsKey(entry.ItemArray[1].ToString()))
-                            continue;
+                //var skillIdList = Utilites.ConfigurationData.skillList;
+                //string skills = string.Join(",", skillIdList);
+                //// get extnid for given set of skills
+                //var result = DataAccess.GetSkillExtnInfo(skills);
+                //if (result != null)
+                //{
+                //    log.Debug("Skill to Extension mapping");
+                //    foreach (DataRow entry in result.Rows)
+                //    {
+                //        // add to dictionary object to maintain a skill-Extn mapping.
+                //        if (_skillExtnInfo.ContainsKey(entry.ItemArray[1].ToString()))
+                //            continue;
 
-                        _skillExtnInfo.Add(entry.ItemArray[1].ToString(), new SkillExtensionInfo
-                        {
-                            SkillId = Convert.ToInt32(entry.ItemArray[0]),
-                            ExtensionId = Convert.ToInt32(entry.ItemArray[1]),
-                            SkillName = Convert.ToString(entry.ItemArray[2]),
-                            Channel = Utilites.ConfigurationData.GetChannel(Convert.ToString(entry.ItemArray[0]))
-                        });
-                    }
-                }
+                //        _skillExtnInfo.Add(entry.ItemArray[1].ToString(), new SkillExtensionInfo
+                //        {
+                //            SkillId = Convert.ToInt32(entry.ItemArray[0]),
+                //            ExtensionId = Convert.ToInt32(entry.ItemArray[1]),
+                //            SkillName = Convert.ToString(entry.ItemArray[2]),
+                //            Channel = Utilites.ConfigurationData.GetChannel(Convert.ToString(entry.ItemArray[0]))
+                //        });
+                //    }
+                //}
+                GetSkillExtensionInfo();
 
                 log.Info("Starting Timer for Config refresh time for SIP");
                 System.Timers.Timer timer = new System.Timers.Timer();
@@ -683,6 +684,33 @@ namespace SIPDataCollector
             }
         }
 
+        public void GetSkillExtensionInfo()
+        {
+            // get skillidlist from config to monitor.
+            var skillIdList = Utilites.ConfigurationData.skillList;
+            string skills = string.Join(",", skillIdList);
+            // get extnid for given set of skills
+            var result = DataAccess.GetSkillExtnInfo(skills);
+            _skillExtnInfo.Clear();
+            if (result != null)
+            {
+                log.Debug("Skill to Extension mapping");
+                foreach (DataRow entry in result.Rows)
+                {
+                    // add to dictionary object to maintain a skill-Extn mapping.
+                    if (_skillExtnInfo.ContainsKey(entry.ItemArray[1].ToString()))
+                        continue;
+
+                    _skillExtnInfo.Add(entry.ItemArray[1].ToString(), new SkillExtensionInfo
+                    {
+                        SkillId = Convert.ToInt32(entry.ItemArray[0]),
+                        ExtensionId = Convert.ToInt32(entry.ItemArray[1]),
+                        SkillName = Convert.ToString(entry.ItemArray[2]),
+                        Channel = Utilites.ConfigurationData.GetChannel(Convert.ToString(entry.ItemArray[0]))
+                    });
+                }
+            }
+        }
         #endregion
     }
 }
