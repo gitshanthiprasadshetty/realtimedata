@@ -73,7 +73,7 @@ namespace SIPDataCollector.Utilities
             return 0;
         }
 
-        public static SkillData GetHistoricalData(string skillExtn, int skillId)
+        public static SkillData GetHistoricalData(List<string> skillExtn, string skillId)
         {
             log.Info($"GetHistoricalData() : skillExtn = {skillExtn} , skillid = {skillId}");
             try
@@ -94,7 +94,8 @@ namespace SIPDataCollector.Utilities
                     log.Error("Error while reading acceptable sl level : ", ex);
                     accSlLevl = ConfigurationData.acceptableSL;
                 }
-                string sql = @"EXEC [GET_HistoricalData] '" + DateTime.Now.Date.ToString("yyyyMMdd") + "'" + ',' + "'" + startTime + "'" + ',' + "'" + endTime + "'" + ',' + "'" + skillExtn + "'" + ',' + "'" + type + "'" + ',' + "'" + accSlLevl + "'";
+                string skillExtension = string.Join(",", skillExtn);
+                string sql = @"EXEC [GET_HistoricalData] '" + DateTime.Now.Date.ToString("yyyyMMdd") + "'" + ',' + "'" + startTime + "'" + ',' + "'" + endTime + "'" + ',' + "'" + skillExtension + "'" + ',' + "'" + type + "'" + ',' + "'" + accSlLevl + "'";
                 log.Debug("SQL Query : " + sql);
                 DataTable dsusers = SqlDataAccess.ExecuteDataTable(sql, ConfigurationData.ConntnString);
                 if (dsusers != null)
@@ -110,7 +111,24 @@ namespace SIPDataCollector.Utilities
                             TotalACDInteractions = Convert.ToInt32(item["TotalInteraction"]),
                             AvgAbandTime = Convert.ToInt32(item["AvgAbandTime"]),
                             AHTTime = Convert.ToInt32(item["HoldTime"]),
-                            TotalCallsHandled = Convert.ToInt32(item["TotalInteraction"])
+                            TotalCallsHandled = Convert.ToInt32(item["TotalInteraction"]),
+                            Date=item["Date"].ToString(),
+                            skillId= Convert.ToInt32(item["SkillId"]),
+                            AvgSpeedAnswer = Convert.ToInt32(item["AvgSpeedAnswer"]),
+                            AvgTalkTime= Convert.ToInt32(item["AvgTalkTime"]),
+                            TotalAuxTime = Convert.ToInt32(item["TotalAuxTime"]),
+                            FlowIn = Convert.ToInt32(item["FlowIn"]),
+                            FlowOut = Convert.ToInt32(item["FlowOut"]),
+                            AvgStaffedTime = Convert.ToInt32(item["AvgStaffedTime"]),
+                            TotalStaffedTime = Convert.ToInt32(item["TotalStaffedTime"]),
+                            CallsHandledWithinThreshold = Convert.ToInt32(item["CallsHandledWithinSLAThreshold"]),
+                            CallsAbandAfterThreshold = Convert.ToInt32(item["CallsAbandonedAfterSLAThreshold"]),
+                            PassedCalls = Convert.ToInt32(item["PassedCalls"]),
+                            TransferCalls = Convert.ToInt32(item["TransferCalls"]),
+                            TotalAbandTime = Convert.ToInt32(item["TotalAbandTime"]),
+                            SpeedOfAnswer = Convert.ToInt32(item["SpeedOfAnswer"]),
+                            TotalTalkTime = Convert.ToInt32(item["TotalTalkTime"]),
+                            TotalStaffedAgents = Convert.ToInt32(item["TotalStaffedAgents"])
                         };
                         return skillInfo;
                     }

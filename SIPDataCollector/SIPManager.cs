@@ -561,6 +561,8 @@ namespace SIPDataCollector
             log.Debug("GetHistoricalData()");
             try
             {
+                List<string> skillExtension = new List<string>();
+                string skillIds = "";
                 while (true)
                 {
                     if (!queue.IsEmpty)
@@ -569,11 +571,21 @@ namespace SIPDataCollector
                         foreach (var item in queue)
                         {
                             log.Debug("Queue item is = " + item);
-                            if (queue.TryDequeue(out string skillExtn))
+                            if (!queue.IsEmpty)
                             {
-                                log.Debug("skillExtn is = " + skillExtn);
-                                int skillId = _skillExtnInfo[skillExtn].SkillId;
-                                var dbData = DataAccess.GetHistoricalData(skillExtn, skillId);
+                                skillExtension.Clear();
+                                skillIds = "";
+                                while (queue.TryDequeue(out string skillExtns))
+                                {
+                                    skillExtension.Add(skillExtns);
+                                    skillIds += _skillExtnInfo[skillExtns].SkillId + ",";
+                                }
+                            }
+                            //if (queue.TryDequeue(out string skillExtn))
+                            //{                              
+                                //log.Debug("skillExtn is = " + skillExtn);
+                                //int skillId = _skillExtnInfo[skillExtn].SkillId;
+                                var dbData = DataAccess.GetHistoricalData(skillExtension, skillIds);
                                 if (dbData != null)
                                 {
                                     log.Debug("Received historical data");
@@ -588,10 +600,29 @@ namespace SIPDataCollector
                                             AbandCalls = dbData.AbandCalls,
                                             SLPercentage = dbData.SLPercentage,
                                             AvgHandlingTime = ((dbData.ACDTime + dbData.AHTTime) / (dbData.TotalCallsHandled == 0 ? 1 : dbData.TotalCallsHandled)),
-                                            skillId = Convert.ToInt32(_skillExtnInfo[skillExtn].SkillId),
+                                            //skillId = Convert.ToInt32(_skillExtnInfo[skillExtn].SkillId),
                                             TotalACDInteractions = dbData.TotalACDInteractions,
                                             AbandonPercentage = abandPercentage,
-                                            AvgAbandTime = dbData.AvgAbandTime
+                                            AvgAbandTime = dbData.AvgAbandTime,
+                                            AHTTime = dbData.AHTTime,
+                                            TotalCallsHandled = dbData.TotalCallsHandled,
+                                            Date = dbData.Date,
+                                            skillId = dbData.skillId,
+                                            AvgSpeedAnswer = dbData.AvgSpeedAnswer,
+                                            AvgTalkTime = dbData.AvgTalkTime,
+                                            TotalAuxTime = dbData.TotalAuxTime,
+                                            FlowIn = dbData.FlowIn,
+                                            FlowOut = dbData.FlowOut,
+                                            AvgStaffedTime = dbData.AvgStaffedTime,
+                                            TotalStaffedTime = dbData.TotalStaffedTime,
+                                            CallsHandledWithinThreshold = dbData.CallsHandledWithinThreshold,
+                                            CallsAbandAfterThreshold = dbData.CallsAbandAfterThreshold,
+                                            PassedCalls = dbData.PassedCalls,
+                                            TransferCalls = dbData.TransferCalls,
+                                            TotalAbandTime = dbData.TotalAbandTime,
+                                            SpeedOfAnswer = dbData.SpeedOfAnswer,
+                                            TotalTalkTime = dbData.TotalTalkTime,
+                                            TotalStaffedAgents = dbData.TotalStaffedAgents
                                         };
                                         // if (!string.IsNullOrEmpty(data.skillId) && (data != null))
                                         if (data != null)
@@ -602,7 +633,7 @@ namespace SIPDataCollector
                                         log.Error("Error while processing histoircal data : ", ex);
                                     }
                                 }
-                            }
+                            //}
                         }
                     }
                     Thread.Sleep(Utilites.ConfigurationData.DBRefreshTime);
