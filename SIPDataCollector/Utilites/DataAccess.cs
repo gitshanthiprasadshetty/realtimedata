@@ -124,7 +124,7 @@ namespace SIPDataCollector.Utilities
                             CallsHandledWithinThreshold = Convert.ToInt32(item["CallsHandledWithinSLAThreshold"]),
                             CallsAbandAfterThreshold = Convert.ToInt32(item["CallsAbandonedAfterSLAThreshold"]),
                             PassedCalls = Convert.ToInt32(item["PassedCalls"]),
-                            TransferCalls = Convert.ToInt32(item["TransferCalls"]),
+                            TransferCalls = Convert.ToInt32(item["TransferCall"]),
                             TotalAbandTime = Convert.ToInt32(item["TotalAbandTime"]),
                             SpeedOfAnswer = Convert.ToInt32(item["SpeedOfAnswer"]),
                             TotalTalkTime = Convert.ToInt32(item["TotalTalkTime"]),
