@@ -9,6 +9,8 @@ using System.Threading;
 using SIPDataCollector.Utilites;
 using Connector.Proxy;
 using AMACWeb_Proxy;
+using Connector.DbLayer;
+using System.Data.SqlClient;
 
 namespace SIPDataCollector
 {
@@ -62,6 +64,10 @@ namespace SIPDataCollector
 
         ConcurrentQueue<string> queue = new ConcurrentQueue<string>();
 
+        static readonly Dictionary<string,RealtimeData> summaryInfo = new Dictionary<string, RealtimeData>();
+
+        static List<string> skillExtension = new List<string>();
+        static string skillIds = "";
         #endregion
 
         #region Singleton
@@ -146,7 +152,10 @@ namespace SIPDataCollector
 
                 log.Info("start fetching historical data from historical service.");
 
-                Thread historicalData = new Thread(new ThreadStart(delegate { GetHistoricalData(); }));
+                //Thread historicalData = new Thread(new ThreadStart(delegate { GetHistoricalData(); }));
+                //historicalData.Start();
+
+                Thread historicalData = new Thread(new ThreadStart(delegate { GetSummaryData(); }));
                 historicalData.Start();
             }
             catch (Exception ex)
@@ -561,8 +570,7 @@ namespace SIPDataCollector
             log.Debug("GetHistoricalData()");
             try
             {
-                List<string> skillExtension = new List<string>();
-                string skillIds = "";
+                
                 while (true)
                 {
                     if (!queue.IsEmpty)
@@ -597,7 +605,7 @@ namespace SIPDataCollector
                                         {
                                             ACDTime = dbData.ACDTime,
                                             ACWTime = dbData.ACWTime,
-                                            AbandCalls = dbData.AbandCalls,
+                                            AbandCalls = Convert.ToInt32(summaryInfo.Where(x => x.Value.AbandonedInteractionsSummary.ToString().Contains(dbData.skillId.ToString()))),
                                             SLPercentage = dbData.SLPercentage,
                                             AvgHandlingTime = ((dbData.ACDTime + dbData.AHTTime) / (dbData.TotalCallsHandled == 0 ? 1 : dbData.TotalCallsHandled)),
                                             //skillId = Convert.ToInt32(_skillExtnInfo[skillExtn].SkillId),
@@ -740,6 +748,45 @@ namespace SIPDataCollector
                         Channel = Utilites.ConfigurationData.GetChannel(Convert.ToString(entry.ItemArray[0]))
                     });
                 }
+            }
+        }
+
+        public void GetSummaryData()
+        {
+            try
+            {
+                log.Info("GetSummaryData()");
+                string skills = string.Join(",", _skillExtnInfo.Keys.ToArray());
+                DateTime dt = new DateTime();
+                string date = DateTime.Now.ToString("yyyymmdd");
+                string startTime = DateTime.Now.ToString("HHmmss");
+                string endTime = dt.Date.AddDays(1).AddTicks(-1).ToString("HHmmss");
+                SqlConnection conn = new SqlConnection(Utilites.ConfigurationData.ConntnString);
+                SqlCommand cmd = new SqlCommand("SELECT AbandCalls,PassedCalls,Skill FROM [dbo].[WorkQueueData](@Date,@StartTime,@EndTime,@Id,@acceptableSL)", conn); 
+                cmd.Parameters.AddWithValue("@Date", date);
+                cmd.Parameters.AddWithValue("@StartTime", startTime);
+                cmd.Parameters.AddWithValue("@EndTime", endTime);
+                cmd.Parameters.AddWithValue("@Id", skills);
+                cmd.Parameters.AddWithValue("@acceptableSL", 1);
+                SqlDataAdapter da = new SqlDataAdapter(cmd);
+                DataTable dTable = new DataTable();
+                da.Fill(dTable);
+                if (dTable != null)
+                {
+                    for(int i = 0; i < dTable.Rows.Count; i++)
+                    {
+                        summaryInfo.Add(i.ToString(), new RealtimeData
+                        {
+                            ActiveInteractions = Convert.ToInt32(dTable.Rows[i][0]),
+                            AbandonedInteractionsSummary = Convert.ToInt32(dTable.Rows[i][1]),
+                            SkillId= Convert.ToInt32(dTable.Rows[i][2])
+                        });
+                    }                 
+                }
+            }
+            catch (Exception e)
+            {
+                log.Error("Exception in GetSummaryData(): " + e);
             }
         }
         #endregion

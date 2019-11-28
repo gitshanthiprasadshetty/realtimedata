@@ -80,7 +80,7 @@ namespace SIPDataCollector.Utilities
             {
                 //string sql = @"select Count(1) as COUNT from dbo.TMAC_WorkQueueHistory 
                 //               where channel='voice' and Reason='ABN' and skill='" + Extn + "' and CreateDate= '" + DateTime.Now.Date.ToString("yyyyMMdd") + "'";
-                SkillData skillInfo;
+                SkillData skillInfo= new SkillData();
                 string startTime = "000000";
                 string endTime = DateTime.Now.TimeOfDay.ToString("hhmmss");
                 string type = "skill";
@@ -130,8 +130,9 @@ namespace SIPDataCollector.Utilities
                             TotalTalkTime = Convert.ToInt32(item["TotalTalkTime"]),
                             TotalStaffedAgents = Convert.ToInt32(item["TotalStaffedAgents"])
                         };
-                        return skillInfo;
+                       
                     }
+                    return skillInfo;
                 }
             }
             catch (Exception ex)
