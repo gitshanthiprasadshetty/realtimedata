@@ -245,8 +245,8 @@ namespace CMDataCollector.Connection
                             _connValue.BcmsDashboard = new RealtimeData();
                             _connValue.BcmsDashboard.Channel = channel;
                             _connValue.BcmsDashboard.SkillId = Convert.ToInt32(b.Skill);
-                           // _connValue.BcmsDashboard.Date = b.Date;
-                            _connValue.BcmsDashboard.SkillName = b.SkillName;
+                            // _connValue.BcmsDashboard.Date = b.Date;
+                            _connValue.BcmsDashboard.SkillName = ConfigurationData.GetSkillName(b.Skill);//b.SkillName;
                             _connValue.BcmsDashboard.InteractionsInQueue = Convert.ToInt32(b.CallsWaiting); // (channel.ToLower() == "email") ? Convert.ToInt32(Connector.Proxy.WorkQueueProxy.GetQueueCount(extenstion)) : Convert.ToInt32(b.CallsWaiting);
                             _connValue.BcmsDashboard.AcceptedSL = Convert.ToInt32(b.AccptedSL);
                             _connValue.BcmsDashboard.OldestInteractionWaitTime = (int)seconds; //(channel.ToLower() == "email") ? Convert.ToInt32(Connector.Proxy.WorkQueueProxy.GetOldestWaitTime(extenstion)) : Convert.ToInt32(b.OldestCall);
