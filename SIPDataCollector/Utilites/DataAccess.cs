@@ -16,62 +16,8 @@ namespace SIPDataCollector.Utilities
         /// </summary>
         private static Logger.Logger log = new Logger.Logger(typeof(DataAccess));
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="sql">SQL query to run</param>
-        /// <returns></returns>
-        public static int ExecuteQuery(string sql)
-        {
-            log.Debug("ExecuteQuery()");
-            try
-            {
-                log.Debug("SQL" + sql);
-                using (SqlConnection conn = new SqlConnection(ConfigurationData.ConntnString))
-                {
-                    conn.Open();
-                    SqlCommand comm = new SqlCommand(sql, conn);
-                    log.Debug("Return value " + comm.ExecuteReader());
-                    Convert.ToInt32(comm.ExecuteReader().GetValue(0));
-                }
-            }
-            catch (Exception ex)
-            {
-                log.Error("Exception in ExecuteQuery():" + sql, ex);
-            }
-            return 0;
-        }
-
-        /// <summary>
-        /// Gets Total abundon calls for given date.
-        /// </summary>
-        /// <param name="Extn">Group Extension Id</param>
-        /// <returns>Total abundon calls for given extensionid and date</returns>
-        public static int GetAbnData(string Extn, string channel)
-        {
-            log.Debug("DataAccess[GetAbnData]");
-            try
-            {
-                //string sql = @"select Count(1) as COUNT from dbo.TMAC_WorkQueueHistory 
-                //               where channel='voice' and Reason='ABN' and skill='" + Extn + "' and CreateDate= '" + DateTime.Now.Date.ToString("yyyyMMdd") + "'";
-
-                string sql = @"EXEC [GET_TotalAbandonedInteractions] '" + Extn + "'" + ',' + "'" + channel + "'" + ',' + "'" + DateTime.Now.Date.ToString("yyyyMMdd") + "'";
-                DataTable dsusers = SqlDataAccess.ExecuteDataTable(sql, ConfigurationData.ConntnString);
-                if (dsusers != null)
-                {
-                    if (dsusers.Rows.Count > 0)
-                    {
-                        return Convert.ToInt32(dsusers.Rows[0][0]);
-                    }
-                    else return 0;
-                }
-            }
-            catch (Exception ex)
-            {
-                log.Error("Exception in GetAbnData():" + ex);
-            }
-            return 0;
-        }
+  
+        /*
 
         public static SkillData GetHistoricalData(string skillExtn, int skillId)
         {
@@ -123,36 +69,7 @@ namespace SIPDataCollector.Utilities
             return new SkillData();
         }
 
-        /// <summary>
-        /// Gets total summary of acd calls for given extensionid
-        /// </summary>
-        /// <param name="Extn">Group Extension Id</param>
-        /// <returns>Summary of ACD calls</returns>
-        public static int GetACDData(string Extn, string channel)
-        {
-            log.Debug("DataAccess[GetACDData]");
-            try
-            {
-                //string sql = @"select Count(1) as COUNT from dbo.TMAC_WorkQueueHistory 
-                //               where Channel='voice' AND SubChannel='in' AND Reason NOT IN ('ABN','abandon') 
-                //               and skill='" + Extn + "' and CreateDate= '" + DateTime.Now.Date.ToString("yyyyMMdd") + "'";
-                string sql = @"EXEC [GET_TotalAcdInteractions] '" + Extn + "'" + ',' + "'" + channel + "'" + ',' + "'" + DateTime.Now.Date.ToString("yyyyMMdd") + "'";
-                DataTable dsusers = SqlDataAccess.ExecuteDataTable(sql, ConfigurationData.ConntnString);
-                if (dsusers != null)
-                {
-                    if (dsusers.Rows.Count > 0)
-                    {
-                        return Convert.ToInt32(dsusers.Rows[0][0]);
-                    }
-                    else return 0;           
-                }
-            }
-            catch (Exception ex)
-            {
-                log.Error("Exception in GetACDData():" + ex);
-            }
-            return 0;
-        }
+        */
 
         /// <summary>
         /// Gets Skill-Extension related information.
@@ -248,41 +165,5 @@ namespace SIPDataCollector.Utilities
             }
             return null;
         }
-
-        #region for bcms summary data
-
-        public void SummaryData(BcmsDataForSIP summarydata)
-        {
-            try
-            {
-
-            }
-            catch (Exception ex)
-            {
-            }
-        }
-
-        #endregion
-
-        #region Not-Used
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <returns></returns>
-        //public static ExtnSkillMap ExtnToSkillMap()
-        //{
-        //    try
-        //    {
-        //        string sql = @"select Count(1) as COUNT from dbo.TMAC_WorkQueueHistory 
-        //                       where Channel='voice' AND SubChannel='in' AND Reason NOT IN ('ABN','abandon') and skill='" + Extn + "' and CreateDate= '" + DateTime.Now.Date.ToString("yyyyMMdd") + "'";
-        //        DataTable dsusers = SqlDataAccess.ExecuteDataTable(sql);
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        log.Error("Exception in ExtnToSkillMap():");
-        //        return null;
-        //    }
-        //}
-        #endregion
     }
 }

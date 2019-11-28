@@ -9,6 +9,7 @@ using System.Threading;
 using SIPDataCollector.Utilites;
 using Connector.Proxy;
 using AMACWeb_Proxy;
+using ConfigurationData = SIPDataCollector.Utilites.ConfigurationData;
 
 namespace SIPDataCollector
 {
@@ -110,6 +111,9 @@ namespace SIPDataCollector
             log.Info("Start");
             try
             {
+                // Load configuration first. 
+                ConfigurationData.LoadConfig();
+
                 // First map Skill-Extension data reading from db, before starting the actual work.
                 if (!_isStarted)
                     _instance.MapSkillExtnData();
@@ -146,8 +150,8 @@ namespace SIPDataCollector
 
                 log.Info("start fetching historical data from historical service.");
 
-                Thread historicalData = new Thread(new ThreadStart(delegate { GetHistoricalData(); }));
-                historicalData.Start();
+                //Thread historicalData = new Thread(new ThreadStart(delegate { GetHistoricalData(); }));
+                //historicalData.Start();
             }
             catch (Exception ex)
             {
@@ -261,6 +265,22 @@ namespace SIPDataCollector
             return null;
         }
 
+        public void VdnInformation(int skillId, string status, DateTime queuedDateTime, DateTime ansOrAbandTime)
+        {
+            log.Info($"VdnInformation() : skillId = {skillId}, status = {status}");
+            try
+            {
+                // check status : values will be abandoned or acd
+                // if acd then do time-diff to queuedtime and get the ASA, then bind this information to cacheobj for that skillId.
+                // if acd then add the count to cacheobj
+                // if abandoned then no need to calculate the queuedtime, but needs to consider abandoned count and increment the cacheobj count.
+                // 
+            }
+            catch (Exception ex)
+            {
+                log.Error("Error in VdnInformation: ", ex);
+            }
+        }
         #endregion
 
         #region Private 
@@ -273,9 +293,6 @@ namespace SIPDataCollector
             log.Debug("SIPManager[MapSkillExtnData]");
             try
             {
-                // Load all local config values.
-                Utilites.ConfigurationData.LoadConfig();
-
                 // Enable the loop
                 _isStarted = true;
 
@@ -286,23 +303,28 @@ namespace SIPDataCollector
                 var skillIdList = Utilites.ConfigurationData.skillList;
                 string skills = string.Join(",", skillIdList);
                 // get extnid for given set of skills
-                var result = DataAccess.GetSkillExtnInfo(skills);
+                // var result = DataAccess.GetSkillExtnInfo(skills);
+                var result = SMSAPIProxy.GetSkills();
                 if (result != null)
                 {
                     log.Debug("Skill to Extension mapping");
-                    foreach (DataRow entry in result.Rows)
+                    foreach (var entry in result)
                     {
-                        // add to dictionary object to maintain a skill-Extn mapping.
-                        if (_skillExtnInfo.ContainsKey(entry.ItemArray[1].ToString()))
-                            continue;
-
-                        _skillExtnInfo.Add(entry.ItemArray[1].ToString(), new SkillExtensionInfo
+                        if (skillIdList.Contains(entry.group_NumberField))
                         {
-                            SkillId = Convert.ToInt32(entry.ItemArray[0]),
-                            ExtensionId = Convert.ToInt32(entry.ItemArray[1]),
-                            SkillName = Convert.ToString(entry.ItemArray[2]),
-                            Channel = Utilites.ConfigurationData.GetChannel(Convert.ToString(entry.ItemArray[0]))
-                        });
+                            log.Info("skill-id to monitor = " + entry.group_NumberField);
+                            // add to dictionary object to maintain a skill-Extn mapping.
+                            if (_skillExtnInfo.ContainsKey(entry.group_ExtensionField))
+                                continue;
+
+                            _skillExtnInfo.Add(entry.group_ExtensionField, new SkillExtensionInfo
+                            {
+                                SkillId = Convert.ToInt32(entry.group_NumberField),
+                                ExtensionId = Convert.ToInt32(entry.group_ExtensionField),
+                                SkillName = Convert.ToString(entry.group_NameField),
+                                Channel = ConfigurationData.GetChannel(Convert.ToString(entry.group_NumberField))
+                            });
+                        }
                     }
                 }
 
@@ -327,12 +349,6 @@ namespace SIPDataCollector
             log.Info("FetchBcmsData()");
             try
             {
-                if (_skillExtnInfo.Count() == 0)
-                {
-                    log.Info("skill-extension count is 0, trying again.");
-                    MapSkillExtnData();
-                }
-
                 Dictionary<int, RealtimeData> realtimeDataForAllSkills = new Dictionary<int, RealtimeData>();
                 try
                 {
@@ -404,9 +420,6 @@ namespace SIPDataCollector
                         else
                             log.Info($"No response from TMAC server instance : {server}");
 
-
-                        //bcmsdata.Add(data);
-                        // update data to cache memory.
                         List<RealtimeData> valuesToAddToCacheMem = realtimeDataForAllSkills?.Values.ToList();
                         DataCache.UpdateCacheData(valuesToAddToCacheMem);
                     }
@@ -542,7 +555,7 @@ namespace SIPDataCollector
                             }
                             log.Debug("Total Agent-Skill Info dictionary count : " + _agentSkillInfo.Count());
                         }
-                        Thread.Sleep(Utilites.ConfigurationData.DashboardRefreshTime);
+                        Thread.Sleep(Utilites.ConfigurationData.DBRefreshTime);
                     }
                 }));
                 dbThread.Start();
@@ -554,7 +567,7 @@ namespace SIPDataCollector
             }
         }
 
-
+        /*
         public void GetHistoricalData()
         {
             log.Debug("GetHistoricalData()");
@@ -612,6 +625,8 @@ namespace SIPDataCollector
                 log.Error("Error in GetHistoricalData", ex);
             }
         }
+        */
+
         /// <summary>
         /// Filters out only Loggedin agents from agent-skill dictionary object for requested skillid.
         /// </summary>

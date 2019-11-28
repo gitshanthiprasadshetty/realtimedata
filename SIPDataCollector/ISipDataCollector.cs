@@ -30,5 +30,9 @@ namespace SIPDataCollector
         [OperationContract]
         [WebInvoke(Method = "GET", UriTemplate = "/GetSkillAndExtensions", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.Bare)]
         List<SkillExtensionInfo> GetSkillAndExtensions();
+
+        [OperationContract]
+        [WebInvoke(Method = "POST", UriTemplate = "/VdnInformation/{skillId}/{status}/{queuedDateTime}/{ansOrAbandTime}", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.Bare)]
+        void VdnInformation(int skillId, string status, DateTime queuedDateTime, DateTime ansOrAbandTime);
     }
 }

@@ -5,8 +5,10 @@ using SIPDataCollector.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Configuration;
+using System.IO;
 using System.Linq;
 using System.Timers;
+using Newtonsoft.Json;
 
 namespace SIPDataCollector.Utilites
 {
@@ -61,21 +63,17 @@ namespace SIPDataCollector.Utilites
         /// </summary>
         public static void LoadConfig()
         {
-            log.Debug("BcmsSIPManager.ConfigurationData[LoadConfig]");
+            log.Debug("LoadConfig()");
             try
             {
-                string sectionSkills = "";  //variable contains all the combined skill id values
                 ConfigurationManager.RefreshSection("appSettings");
                 Channel();
-                sectionSkills = SectionSkills();
-                ////ConntnString = ConfigurationSettings.AppSettings["CMDbConn"].ToString();
+                skillsToMonitor = SectionSkills();
                 ConntnString = ConnectionStrings.DecryptConnectionString(ConfigurationSettings.AppSettings["CMDbConn"]);
-                //skillsToMonitor = ConfigurationSettings.AppSettings["skillsToMonitorForSIP"];
-                skillsToMonitor = sectionSkills;
                 DashboardRefreshTime = Convert.ToInt32(ConfigurationSettings.AppSettings["DashboardRefreshTime"]);
                 acceptableSL = Convert.ToInt32(ConfigurationSettings.AppSettings["acceptableSL"]);
                 DBRefreshTime = Convert.ToInt32(ConfigurationSettings.AppSettings["DBRefreshTime"]);
-                TmacServers = ConfigurationSettings.AppSettings["TmacServers"].Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries).ToList();
+                TmacServers = ConfigurationSettings.AppSettings["TmacServers"]?.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries)?.ToList();
                 ReloadConfigTime = Convert.ToInt32(ConfigurationManager.AppSettings["ReloadConfigTime"]);
                 //if (!string.IsNullOrEmpty(skillsToMonitor) || skillsToMonitor.ToLower() != "na")
                 //    skillList = skillsToMonitor.Split(',');
@@ -84,10 +82,47 @@ namespace SIPDataCollector.Utilites
 
                 auxCodes = DataAccess.GetAuxCodes();
                 acceptableSlObj = DataAccess.GetAcceptableLevels();
+
+                // load json data to file.
+                LoadDataFromFileToMemory();
+                LoadDataFromDatabase();
             }
             catch (Exception ex)
             {
                 log.Error("Error in BcmsSIPManager.ConfigurationData[LoadConfig] : " + ex);
+            }
+        }
+
+        static void LoadDataFromFileToMemory()
+        {
+            log.Info("LoadDataFromFileToMemory()");
+            try
+            {
+                using (StreamReader r = new StreamReader("file.json"))
+                {
+                    string json = r.ReadToEnd();
+                    List<RealtimeData> itemToLoadToCacheMemory = JsonConvert.DeserializeObject<List<RealtimeData>>(json);
+                }
+            }
+            catch (Exception ex)
+            {
+                log.Error("Error in LoadDataFromFileToMemory: " + ex);
+            }
+        }
+
+
+        static void LoadDataFromDatabase()
+        {
+            log.Info("LoadDataFromDatabase()");
+            try
+            {
+               // on app load get data from database by executing function.
+
+               // after loading from database, push that data to cacheobj
+            }
+            catch (Exception ex)
+            {
+                log.Error("Error in LoadDataFromDatabase: " + ex);
             }
         }
 
@@ -121,7 +156,6 @@ namespace SIPDataCollector.Utilites
                         channelObj.Add(data.ChannelName, l2.Distinct().ToList());
                     }
                 }
-            
             }
             catch (Exception ex)
             {
@@ -176,19 +210,6 @@ namespace SIPDataCollector.Utilites
                             }
                             else
                                 log.Info("No data obtained from smsapi");
-
-                            //List<int> nums = new List<int>();
-                            //for (int i = 0; i < (int)strArrays.Length-1; i++)
-                            //{
-                            //    if (!strArrays[i].Contains("-")) //added to check if the skill is added like 100;101-110. this will modify it to 100-100;101-110 Nov 13,2019
-                            //    {
-                            //        strArrays[i] = strArrays[i] + "-" + strArrays[i];
-                            //    }
-
-                            //    //log.Debug(strArrays[i].Split(new char[] { '-' })[0]);
-                            //    nums.AddRange(Enumerable.Range(Convert.ToInt32(strArrays[i].Split(new char[] { '-' })[0]),
-                            //        Convert.ToInt32(strArrays[i].Split(new char[] { '-' })[1]) - Convert.ToInt32(strArrays[i].Split(new char[] { '-' })[0]) + 1));
-                            //}
                         }
                     }
                 }
@@ -200,58 +221,11 @@ namespace SIPDataCollector.Utilites
             return null;
         }
 
-        //static void FetchSIPExtnSkillData(string skillIds)
-        //{
-        //    try
-        //    {
-        //        log.Debug("FetchExtenSkillData()");
-
-        //        string sql = @"select SkillID,SkillExtension,SkillName from TMAC_Skills with (nolock) Where SkillID in (" + skillIds + ")";
-
-        //        log.Info("sql = " + sql);
-
-        //        DataTable result = SqlDataAccess.ExecuteDataTable(sql, ConntnString);
-
-        //        if (result != null)
-        //        {
-        //            log.Debug("Skill to Extension mapping");
-        //            foreach (DataRow entry in result.Rows)
-        //            {
-        //                // add to dictionary object to maintain a skill-Extn mapping.
-        //                try
-        //                {
-        //                    _skillExtnInfo.Add(entry.ItemArray[1].ToString(), new SIPDataCollector.Models.SkillExtensionInfo
-        //                    {
-        //                        SkillId = Convert.ToInt32(entry.ItemArray[0]),
-        //                        ExtensionId = Convert.ToInt32(entry.ItemArray[1]),
-        //                        SkillName = entry.ItemArray[2].ToString()
-        //                    });
-        //                }
-        //                catch (Exception ex)
-        //                {
-        //                    log.Warn("Warning! while adding values to dictionary");
-        //                    log.Error("Message : ", ex);
-        //                }
-        //            }
-        //            log.Debug("completed mapping of skill-extension");
-        //        }
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        log.Error("Error in FetchSIPExtnSkillData: ", ex);
-        //    }
-        //}
-
         public static void RefreshSection(object sender, ElapsedEventArgs elapsedEventArgs)
         {
             try
             {
                 log.Info("Refreshing config");
-                //Channel();
-                //string sectionSkills = SectionSkills();
-                //skillsToMonitor = sectionSkills;
-                //skillList = FormatSkills(skillsToMonitor);
-                //FetchExtenSkillData();
                 LoadConfig();
             }
             catch (Exception e)
