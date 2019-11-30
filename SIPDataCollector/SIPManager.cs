@@ -10,6 +10,7 @@ using SIPDataCollector.Utilites;
 using Connector.Proxy;
 using AMACWeb_Proxy;
 using ConfigurationData = SIPDataCollector.Utilites.ConfigurationData;
+using System.Data.SqlClient;
 
 namespace SIPDataCollector
 {
@@ -118,6 +119,7 @@ namespace SIPDataCollector
                 if (!_isStarted)
                     _instance.MapSkillExtnData();
 
+                ConfigurationData.LoadDataFromDatabase();
                 // if skill to exten mapping is not happend, try again.
                 try
                 {
@@ -265,20 +267,79 @@ namespace SIPDataCollector
             return null;
         }
 
-        public void VdnInformation(int skillId, string status, DateTime queuedDateTime, DateTime ansOrAbandTime)
+        /// <summary>
+        /// Below method is exposed to VDN MOnitor service to send the ACD call information
+        /// </summary>
+        /// <param name="callid"></param>
+        /// <param name="queue"></param>
+        /// <param name="queuetime"></param>
+        /// <param name="abandontime"></param>
+        public void VdnInformation(string callid, string queue, string queuetime, string abandontime)
         {
-            log.Info($"VdnInformation() : skillId = {skillId}, status = {status}");
+            log.Info($"VdnInformation() : CallId = {callid}, skillExtension = {queue} , QueueTime = {queuetime} , AbandonTime={abandontime}");
             try
             {
-                // check status : values will be abandoned or acd
-                // if acd then do time-diff to queuedtime and get the ASA, then bind this information to cacheobj for that skillId.
-                // if acd then add the count to cacheobj
-                // if abandoned then no need to calculate the queuedtime, but needs to consider abandoned count and increment the cacheobj count.
-                // 
+                string skillId = ""; int AcceptedSLConvert = 0;
+                DateTime queueDateTime = DateTime.ParseExact(queuetime, "yyyyMMdd HHmmss", null);
+                DateTime ansOrAbandDateTime = DateTime.ParseExact(abandontime, "yyyyMMdd HHmmss", null);
+                TimeSpan timeDiff = ansOrAbandDateTime - queueDateTime;
+                log.Info($"TimeDifference is {timeDiff.TotalSeconds.ToString()} seconds");
+                _skillExtnInfo.TryGetValue(queue, out SkillExtensionInfo value);
+                if (value != null)
+                {
+                    skillId=value.SkillId.ToString();
+                    AcceptedSLConvert = Convert.ToInt32(Utilites.ConfigurationData.acceptableSlObj?.FirstOrDefault(x => x.Key == skillId).Value);
+                    log.Info($"Accepted SL is {AcceptedSLConvert}");
+                    DataCache.UpdateActiveInteraction(Convert.ToInt32(skillId));
+                    if (timeDiff.TotalSeconds < AcceptedSLConvert)
+                    {
+                        log.Info($"Update ASA data to cacheobj for skillId={skillId}");
+                        DataCache.UpdateASAData(Convert.ToInt32(skillId));
+                    }
+                    return;
+                }
+                log.Info("Skill extension not found in SkillExtnInfo");
+            // check status : values will be abandoned or acd
+            // if acd then do time-diff to queuedtime and get the ASA, then bind this information to cacheobj for that skillId.
+            // if abandoned then no need to calculate the queuedtime, but needs to consider abandoned count and increment the cacheobj count.
             }
             catch (Exception ex)
             {
-                log.Error("Error in VdnInformation: ", ex);
+                log.Error($"Error in VdnInformation: {ex}");
+            }
+        }
+
+        /// <summary>
+        /// Below method is exposed to VDN MOnitor service to send the Abandon call information
+        /// </summary>
+        /// <param name="callid"></param>
+        /// <param name="queue"></param>
+        /// <param name="queuetime"></param>
+        /// <param name="abandontime"></param>
+        public void VdnInformationForAbandon(string callid, string queue, string queuetime, string abandontime)
+        {
+            log.Info($"VdnInformationForAbandon() : CallId = {callid}, skillExtension = {queue} , QueueTime = {queuetime} , AbandonTime={abandontime}");
+            try
+            {
+                string skillId = "";
+                _skillExtnInfo.TryGetValue(queue, out SkillExtensionInfo value);
+                if (value != null)
+                {
+                    skillId = value.SkillId.ToString();
+
+                    log.Info($"Update Abandoned count to cacheobj for skillId={skillId}");
+                    DataCache.UpdateAbandonedCount(Convert.ToInt32(skillId));
+                    return;
+                }
+                log.Info("Skill extension not found in SkillExtnInfo");
+
+                // check status : values will be abandoned or acd
+                // if acd then do time-diff to queuedtime and get the ASA, then bind this information to cacheobj for that skillId.
+                // if abandoned then no need to calculate the queuedtime, but needs to consider abandoned count and increment the cacheobj count.
+            }
+            catch (Exception ex)
+            {
+                log.Error($"Error in VdnInformation: {ex}");
             }
         }
         #endregion
@@ -379,6 +440,7 @@ namespace SIPDataCollector
                                     realtimeOfSkill.SkillName = wallboardSkillInformation.SkillName;
                                     realtimeOfSkill.SkillExtensionId = _skillExtnInfo[wallboardSkillInformation.SkillID].ExtensionId;
                                     realtimeOfSkill.ActiveInteractions += wallboardSkillInformation.ActiveInteractions;
+                                    //DataCache.UpdateActiveInteraction(wallboardSkillInformation.ActiveInteractions, realtimeOfSkill.SkillId);
                                     realtimeOfSkill.TotalAgentsAvailable += wallboardSkillInformation.AgentAvailable;
                                     realtimeOfSkill.AverageAbandonedTime = 0;
                                     try
@@ -555,7 +617,7 @@ namespace SIPDataCollector
                             }
                             log.Debug("Total Agent-Skill Info dictionary count : " + _agentSkillInfo.Count());
                         }
-                        Thread.Sleep(Utilites.ConfigurationData.DBRefreshTime);
+                        Thread.Sleep(Utilites.ConfigurationData.DBRefreshTime* 60000);
                     }
                 }));
                 dbThread.Start();
@@ -698,6 +760,60 @@ namespace SIPDataCollector
             }
         }
 
+        /// <summary>
+        /// The below method gets the abandcalls, acdcalls and skillid from the function WorkQueueData and updates to cacheobj
+        /// </summary>
+        public void GetSummaryData()
+        {
+            try
+            {
+                log.Info("GetSummaryData()");
+                DataTable dTable = new DataTable();
+                string skills = string.Join(",", _skillExtnInfo.Keys.ToArray());
+                DateTime dt = new DateTime();
+                string date = DateTime.Now.ToString("yyyyMMdd");
+                string startTime = DateTime.Today.ToString("HHmmss");
+                string endTime = dt.Date.AddDays(1).AddTicks(-1).ToString("HHmmss");
+                string connString = ConfigurationData.ConntnString;
+
+                SqlConnection conn = new SqlConnection(connString);
+                SqlCommand cmd = new SqlCommand("SELECT AbandCalls,PassedCalls,Skill FROM [dbo].[WorkQueueData](@Date,@StartTime,@EndTime,@Id,@acceptableSL)", conn);
+                cmd.Parameters.AddWithValue("@Date", date);
+                cmd.Parameters.AddWithValue("@StartTime", startTime);
+                cmd.Parameters.AddWithValue("@EndTime", endTime);
+                cmd.Parameters.AddWithValue("@Id", skills);
+                cmd.Parameters.AddWithValue("@acceptableSL", 1);
+                SqlDataAdapter da = new SqlDataAdapter(cmd);
+                da.Fill(dTable);
+
+                //dTable =Connector.DbLayer.SqlDataAccess.GetWorkQueueData(date,startTime,endTime, connString,skills);                
+                DataCache.UpdateSummaryData(dTable);
+            }
+            catch (Exception e)
+            {
+                log.Error("Exception in GetSummaryData(): " + e);
+            }
+        }
+
+        public int GetSkillExtensionInfo(object skillExtension)
+        {
+            try
+            {
+                log.Info($"GetSkillExtensionInfo: {skillExtension.ToString()}");
+                _skillExtnInfo.TryGetValue(skillExtension.ToString(), out SkillExtensionInfo value);
+                if (value != null)
+                {
+                    return value.SkillId;
+                }
+                return 0;
+            }
+            catch (Exception ex)
+            {
+                log.Error($"Exception in GetSkillExtensionInfo(): {ex}");
+                return 0;
+            }
+
+        }
         #endregion
     }
 }

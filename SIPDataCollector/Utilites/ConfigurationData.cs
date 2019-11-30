@@ -38,6 +38,7 @@ namespace SIPDataCollector.Utilites
         /// Array of skills
         /// </summary>
         public static List<string> skillList { get; set; }
+        public static string jsonPath { get; set; }
         
         /// <summary>
         /// 
@@ -75,17 +76,23 @@ namespace SIPDataCollector.Utilites
                 DBRefreshTime = Convert.ToInt32(ConfigurationSettings.AppSettings["DBRefreshTime"]);
                 TmacServers = ConfigurationSettings.AppSettings["TmacServers"]?.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries)?.ToList();
                 ReloadConfigTime = Convert.ToInt32(ConfigurationManager.AppSettings["ReloadConfigTime"]);
+                jsonPath = ConfigurationManager.AppSettings["JsonFilePath"];
                 //if (!string.IsNullOrEmpty(skillsToMonitor) || skillsToMonitor.ToLower() != "na")
                 //    skillList = skillsToMonitor.Split(',');
 
                 skillList = FormatSkills(skillsToMonitor);
 
+                for(int i = 0; i < skillList.Count(); i++)
+                {
+                    log.Info($"Monitoring {skillList[i]}");
+                }
+                
                 auxCodes = DataAccess.GetAuxCodes();
                 acceptableSlObj = DataAccess.GetAcceptableLevels();
 
                 // load json data to file.
                 LoadDataFromFileToMemory();
-                LoadDataFromDatabase();
+
             }
             catch (Exception ex)
             {
@@ -98,7 +105,7 @@ namespace SIPDataCollector.Utilites
             log.Info("LoadDataFromFileToMemory()");
             try
             {
-                using (StreamReader r = new StreamReader("file.json"))
+                using (StreamReader r = new StreamReader(jsonPath))
                 {
                     string json = r.ReadToEnd();
                     List<RealtimeData> itemToLoadToCacheMemory = JsonConvert.DeserializeObject<List<RealtimeData>>(json);
@@ -111,12 +118,13 @@ namespace SIPDataCollector.Utilites
         }
 
 
-        static void LoadDataFromDatabase()
+        public static void LoadDataFromDatabase()
         {
             log.Info("LoadDataFromDatabase()");
             try
             {
-               // on app load get data from database by executing function.
+                // on app load get data from database by executing function.
+                SIPManager.GetInstance().GetSummaryData();
 
                // after loading from database, push that data to cacheobj
             }
@@ -186,7 +194,8 @@ namespace SIPDataCollector.Utilites
         {
             try
             {
-                log.Info("Skills List: " + skillList);
+                log.Info("FormatSkills()");
+                //log.Info("Skills List: " + skillList);
                 if (skillList != null && skillList.Count() >= 0 && !string.IsNullOrEmpty(skillList))
                 {
                     string[] strArrays = skillList?.Split(new char[] { ';' });
@@ -221,6 +230,11 @@ namespace SIPDataCollector.Utilites
             return null;
         }
 
+        /// <summary>
+        /// Below method is used to reload the config section for each interval specified in the config
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="elapsedEventArgs"></param>
         public static void RefreshSection(object sender, ElapsedEventArgs elapsedEventArgs)
         {
             try
@@ -235,6 +249,10 @@ namespace SIPDataCollector.Utilites
 
         }
 
+        /// <summary>
+        /// Below method gets the skills from the channelobj and appends ',' to make it as a string
+        /// </summary>
+        /// <returns></returns>
         public static string SectionSkills()
         {
             try
@@ -250,6 +268,8 @@ namespace SIPDataCollector.Utilites
                 return "";
             }
         }
+
+
 
         #region notused
         public void GetConnectionString()

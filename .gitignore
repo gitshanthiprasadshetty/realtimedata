@@ -21,3 +21,4 @@ SIPDataCollector/bin/*
 Connector/obj/*
 Connector/bin/*
 CMDataCollector/bin/*
+SIPDataCollector/packages.config

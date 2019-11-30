@@ -22,6 +22,7 @@ public class RealtimeData
     public List<AgentData> AgentStats { get; set; }
     public int AcceptedSL { get; set; }
     public string Channel { get; set; }
+    public int AvgSpeedAnswer { get; set; }
 }
 
 //public class RealtimeData

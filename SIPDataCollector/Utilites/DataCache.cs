@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -190,6 +191,109 @@ namespace SIPDataCollector.Utilites
             }
         }
 
+        /// <summary>
+        /// Below methods updated summarydata to the cacheobj for that skillID which is retrived from SkillExtensionObj for skillExtension
+        /// </summary>
+        /// <param name="dataTable"></param>
+        public static void UpdateSummaryData(DataTable dataTable)
+        {
+            try
+            {
+                log.Info("UpdateSummaryData()");
+                int skillId = 0;
+                if (dataTable != null)
+                {
+                    for (int i = 0; i < dataTable.Rows.Count; i++)
+                    {
+                        skillId = SIPManager.GetInstance().GetSkillExtensionInfo(dataTable.Rows[i][2]);
+                        log.Info($"UpdateSummaryData(): {skillId}");
+                        CacheObj.TryAdd(skillId, new RealtimeData
+                        {
+                            AbandonedInteractionsSummary = Convert.ToInt32(dataTable.Rows[i][0]),
+                            ActiveInteractionsSummary = Convert.ToInt32(dataTable.Rows[i][1]),
+                            SkillId = skillId
+                        });
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                log.Error($"Exception in UpdateSummaryData(): {ex}");
+            }
+        }
+
+        /// <summary>
+        /// The below method updates acd interactions to the cacheobj recevied from the VDN monitor for that ksillID
+        /// </summary>
+        /// <param name="skillId"></param>
+        public static void UpdateActiveInteraction(int skillId)
+        {
+            try
+            {
+                log.Info($"UpdateActiveInteraction():  SkillID= {skillId}");
+                CacheObj.TryGetValue(skillId, out RealtimeData oldValue);
+                if (oldValue != null)
+                {
+                    oldValue.ActiveInteractionsSummary ++ ;
+                    CacheObj.TryUpdate(skillId, oldValue, oldValue);
+                    log.Info("UpdateActiveInteraction: Done updating to CacheObj");
+                    return;
+                }
+                log.Info("No data found in CacheObj to update");
+            }
+            catch (Exception e)
+            {
+                log.Error($"Exception in UpdateActiveInteraction(): {e}");
+            }
+        }
+
+        /// <summary>
+        /// Below method updates the asa data to the cacheobj for that skillID
+        /// </summary>
+        /// <param name="skillId"></param>
+        public static void UpdateASAData(int skillId)
+        {
+            try
+            {
+                log.Info($"UpdateASAData(): SkillID= { skillId}");
+                CacheObj.TryGetValue(skillId, out RealtimeData oldValue);
+                if (oldValue != null)
+                {
+                    oldValue.AvgSpeedAnswer++;
+                    CacheObj.TryUpdate(skillId, oldValue, oldValue);
+                    log.Info("UpdateASAData: Done updating to CacheObj");
+                }
+                log.Info("No data found in CacheObj to update");
+            }
+            catch (Exception e)
+            {
+                log.Error($"Exception in UpdateASAData(): {e}");
+            }
+        }
+
+        /// <summary>
+        /// Below method updates the abandon data to the cacheobj for that skillID
+        /// </summary>
+        /// <param name="skillId"></param>
+        public static void UpdateAbandonedCount(int skillId)
+        {
+            try
+            {
+                log.Info($"UpdateAbandonedCount(): SkillID= { skillId}");
+                CacheObj.TryGetValue(skillId, out RealtimeData oldValue);
+                if (oldValue != null)
+                {
+                    oldValue.AbandonedInteractionsSummary++;
+                    CacheObj.TryUpdate(skillId, oldValue, oldValue);
+                    log.Info("UpdateAbandonedCount: Done updating to CacheObj");
+                }
+                log.Info("No data found in CacheObj to update");
+            }
+            catch (Exception e)
+            {
+                log.Error($"Exception in UpdateAbandonedCount(): {e}");
+            }
+        }
         #region Bcms Summary
 
 

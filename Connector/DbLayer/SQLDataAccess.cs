@@ -65,5 +65,29 @@ namespace Connector.DbLayer
             {
             }
         }
+
+        public static DataTable GetWorkQueueData(string date,string startTime,string endTime,string connectionString,string skills)
+        {
+            DataTable dataTable = new DataTable();
+            try
+            {
+                Log.Info($"GetWorkQueueData()- Date: {date}, StartTime: {startTime}, EndTime: {endTime}, Skills: {skills}");
+                SqlConnection conn = new SqlConnection(connectionString);
+                SqlCommand cmd = new SqlCommand("SELECT AbandCalls,PassedCalls,Skill FROM [dbo].[WorkQueueData](@Date,@StartTime,@EndTime,@Id,@acceptableSL)", conn);
+                cmd.Parameters.AddWithValue("@Date", date);
+                cmd.Parameters.AddWithValue("@StartTime", startTime);
+                cmd.Parameters.AddWithValue("@EndTime", endTime);
+                cmd.Parameters.AddWithValue("@Id", skills);
+                cmd.Parameters.AddWithValue("@acceptableSL", 1);
+                SqlDataAdapter da = new SqlDataAdapter(cmd);
+                da.Fill(dataTable);
+                return dataTable;
+            }
+            catch (Exception e)
+            {
+                Log.Error($"Exception in GetWorkQueueData(): {e}");
+                return dataTable;
+            }
+        }
     }
 }
