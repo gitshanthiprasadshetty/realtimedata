@@ -6,6 +6,7 @@ using System.Linq;
 using SIPDataCollector.Utilites;
 using Connector.DbLayer;
 using SIPDataCollector.Models;
+using System.Reflection;
 
 namespace SIPDataCollector.Utilities
 {
@@ -16,7 +17,7 @@ namespace SIPDataCollector.Utilities
         /// </summary>
         private static Logger.Logger log = new Logger.Logger(typeof(DataAccess));
 
-  
+
         /*
 
         public static SkillData GetHistoricalData(List<string> skillExtn, string skillId)
@@ -130,7 +131,7 @@ namespace SIPDataCollector.Utilities
             }
             catch (Exception ex)
             {
-                log.Error("Exception in ExtnToSkillMap():" ,ex);
+                log.Error("Exception in ExtnToSkillMap():", ex);
                 return null;
             }
         }
@@ -139,15 +140,16 @@ namespace SIPDataCollector.Utilities
         {
             try
             {
+                log.Info("GetAuxCodes()");
                 string[] auxCodes = new string[] { };
                 string sql = @"select Name from [dbo].[AGT_AUX_Codes] with (nolock)";
                 DataTable dataTable = SqlDataAccess.ExecuteDataTable(sql, ConfigurationData.ConntnString);
-                if(dataTable != null)
+                if (dataTable != null)
                 {
-                        auxCodes = dataTable
-                        .AsEnumerable()
-                        .Select(row => row.Field<string>("Name"))
-                        .ToArray();
+                    auxCodes = dataTable
+                    .AsEnumerable()
+                    .Select(row => row.Field<string>("Name"))
+                    .ToArray();
                 }
                 return auxCodes.ToList();
             }

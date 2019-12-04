@@ -39,7 +39,7 @@ namespace SIPDataCollector.Utilites
         /// </summary>
         public static List<string> skillList { get; set; }
         public static string jsonPath { get; set; }
-        
+
         /// <summary>
         /// 
         /// </summary>
@@ -49,12 +49,13 @@ namespace SIPDataCollector.Utilites
 
         internal static List<string> TmacServers;
 
-        internal static  Dictionary<string, int> acceptableSlObj = new Dictionary<string, int>();
+        internal static Dictionary<string, int> acceptableSlObj = new Dictionary<string, int>();
 
         internal static int acceptableSL;
 
         public static List<int> totalSkillIds = new List<int>();
         public static int ReloadConfigTime { get; set; }
+        public static string GetAgentSkillInfoConfig { get; set; }
         /// <summary>
         /// Dashboard refresh time
         /// </summary>
@@ -77,22 +78,17 @@ namespace SIPDataCollector.Utilites
                 TmacServers = ConfigurationSettings.AppSettings["TmacServers"]?.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries)?.ToList();
                 ReloadConfigTime = Convert.ToInt32(ConfigurationManager.AppSettings["ReloadConfigTime"]);
                 jsonPath = ConfigurationManager.AppSettings["JsonFilePath"];
-                //if (!string.IsNullOrEmpty(skillsToMonitor) || skillsToMonitor.ToLower() != "na")
-                //    skillList = skillsToMonitor.Split(',');
+                GetAgentSkillInfoConfig = ConfigurationManager.AppSettings["GetAgentSkillInfo"];
 
                 skillList = FormatSkills(skillsToMonitor);
+                string s = string.Join(",", skillList); //converting list of skillList to string
+                log.Info($"Monitoring {s}");
 
-                for(int i = 0; i < skillList.Count(); i++)
-                {
-                    log.Info($"Monitoring {skillList[i]}");
-                }
-                
                 auxCodes = DataAccess.GetAuxCodes();
                 acceptableSlObj = DataAccess.GetAcceptableLevels();
 
                 // load json data to file.
                 LoadDataFromFileToMemory();
-
             }
             catch (Exception ex)
             {
@@ -105,10 +101,17 @@ namespace SIPDataCollector.Utilites
             log.Info("LoadDataFromFileToMemory()");
             try
             {
-                using (StreamReader r = new StreamReader(jsonPath))
+                if (Directory.Exists(jsonPath))
                 {
-                    string json = r.ReadToEnd();
-                    List<RealtimeData> itemToLoadToCacheMemory = JsonConvert.DeserializeObject<List<RealtimeData>>(json);
+                    using (StreamReader r = new StreamReader(jsonPath))
+                    {
+                        string json = r.ReadToEnd();
+                        List<RealtimeData> itemToLoadToCacheMemory = JsonConvert.DeserializeObject<List<RealtimeData>>(json);
+                    }
+                }
+                else
+                {
+                    log.Info("Configured JsonPath does not exist. Please provide the proper path");
                 }
             }
             catch (Exception ex)
@@ -126,7 +129,7 @@ namespace SIPDataCollector.Utilites
                 // on app load get data from database by executing function.
                 SIPManager.GetInstance().GetSummaryData();
 
-               // after loading from database, push that data to cacheobj
+                // after loading from database, push that data to cacheobj
             }
             catch (Exception ex)
             {
@@ -173,7 +176,7 @@ namespace SIPDataCollector.Utilites
 
         public static string GetChannel(string skillId)
         {
-            log.Debug("GetChannel()" + skillId);
+            log.Debug("GetChannel() " + skillId);
             try
             {
                 var result = "";
@@ -194,7 +197,7 @@ namespace SIPDataCollector.Utilites
         {
             try
             {
-                log.Info("FormatSkills()");
+                log.Info($"FormatSkills() {skillList}");
                 //log.Info("Skills List: " + skillList);
                 if (skillList != null && skillList.Count() >= 0 && !string.IsNullOrEmpty(skillList))
                 {
@@ -203,7 +206,6 @@ namespace SIPDataCollector.Utilites
                     {
                         if (strArrays[0] != "")
                         {
-
                             List<HuntGroupType> result = SMSAPIProxy.GetSkills();
 
                             if (result != null)
@@ -257,6 +259,7 @@ namespace SIPDataCollector.Utilites
         {
             try
             {
+                log.Info("SectionSkills()");
                 var skillValue = channelObj.SelectMany(x => x.Value).Distinct().ToList();
                 string sectionSkills = string.Empty;
                 sectionSkills = String.Join(",", skillValue);
@@ -277,7 +280,7 @@ namespace SIPDataCollector.Utilites
             log.Debug("GetConnectionString()");
             try
             {
-                string pwdString = string.Empty , userIdString = string.Empty;
+                string pwdString = string.Empty, userIdString = string.Empty;
                 string decryptedPassword = string.Empty; string decryptedUserID = string.Empty;
                 string[] stringarray = ConntnString.Split(';');
                 int pwdndex = Array.IndexOf(stringarray, "Password");

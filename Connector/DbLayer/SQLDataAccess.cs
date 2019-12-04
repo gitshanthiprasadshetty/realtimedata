@@ -14,6 +14,7 @@ namespace Connector.DbLayer
 
         public static DataTable ExecuteDataTable(string sql, string conn)
         {
+            Log.Info("ExecuteDataTable()");
             using (SqlConnection connection = new SqlConnection(conn))
             {
                 try

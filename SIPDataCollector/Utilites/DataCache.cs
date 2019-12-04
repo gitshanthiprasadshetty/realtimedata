@@ -203,6 +203,7 @@ namespace SIPDataCollector.Utilites
                 int skillId = 0;
                 if (dataTable != null)
                 {
+                    log.Info($"DataTable from DB count is {dataTable.Rows.Count}, hence trying to update cacheObj for Abandoned, Active and skillId");
                     for (int i = 0; i < dataTable.Rows.Count; i++)
                     {
                         skillId = SIPManager.GetInstance().GetSkillExtensionInfo(dataTable.Rows[i][2]);
@@ -215,6 +216,7 @@ namespace SIPDataCollector.Utilites
                         });
                     }
                 }
+                log.Info($"Total CacheObj count {CacheObj.Count()}");
             }
             catch (Exception ex)
             {
@@ -234,9 +236,10 @@ namespace SIPDataCollector.Utilites
                 CacheObj.TryGetValue(skillId, out RealtimeData oldValue);
                 if (oldValue != null)
                 {
+                    log.Info($"Incrementing ActiveInteractions in the cache obj: {oldValue.ActiveInteractionsSummary}");
                     oldValue.ActiveInteractionsSummary ++ ;
                     CacheObj.TryUpdate(skillId, oldValue, oldValue);
-                    log.Info("UpdateActiveInteraction: Done updating to CacheObj");
+                    log.Info($"UpdateActiveInteraction: Done updating to CacheObj, count {CacheObj.Count()}");
                     return;
                 }
                 log.Info("No data found in CacheObj to update");
@@ -259,9 +262,11 @@ namespace SIPDataCollector.Utilites
                 CacheObj.TryGetValue(skillId, out RealtimeData oldValue);
                 if (oldValue != null)
                 {
+                    log.Info($"Incrementing AvgSpeedAnswer in the cache obj {oldValue.AvgSpeedAnswer}");
                     oldValue.AvgSpeedAnswer++;
                     CacheObj.TryUpdate(skillId, oldValue, oldValue);
-                    log.Info("UpdateASAData: Done updating to CacheObj");
+                    log.Info($"UpdateASAData: Done updating to CacheObj, count {CacheObj.Count()}");
+                    return;
                 }
                 log.Info("No data found in CacheObj to update");
             }
@@ -283,9 +288,11 @@ namespace SIPDataCollector.Utilites
                 CacheObj.TryGetValue(skillId, out RealtimeData oldValue);
                 if (oldValue != null)
                 {
+                    log.Info($"Incrementing AbandonedInteractionsSummary in the cache obj {oldValue.AbandonedInteractionsSummary}");
                     oldValue.AbandonedInteractionsSummary++;
                     CacheObj.TryUpdate(skillId, oldValue, oldValue);
-                    log.Info("UpdateAbandonedCount: Done updating to CacheObj");
+                    log.Info($"UpdateAbandonedCount: Done updating to CacheObj, count {CacheObj.Count()}");
+                    return;
                 }
                 log.Info("No data found in CacheObj to update");
             }
