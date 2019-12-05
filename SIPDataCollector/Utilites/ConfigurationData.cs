@@ -85,6 +85,7 @@ namespace SIPDataCollector.Utilites
                 log.Info($"Monitoring {s}");
 
                 auxCodes = DataAccess.GetAuxCodes();
+                auxCodes.Add("Default");
                 acceptableSlObj = DataAccess.GetAcceptableLevels();
 
                 // load json data to file.
