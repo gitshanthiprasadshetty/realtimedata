@@ -281,8 +281,8 @@ namespace SIPDataCollector
             try
             {
                 string skillId = ""; int AcceptedSLConvert = 0;
-                DateTime queueDateTime = DateTime.ParseExact(queuetime, "yyyyMMdd HHmmss", null);
-                DateTime ansOrAbandDateTime = DateTime.ParseExact(abandontime, "yyyyMMdd HHmmss", null);
+                DateTime queueDateTime = DateTime.ParseExact(queuetime, "yyyyMMddHHmmss", null);
+                DateTime ansOrAbandDateTime = DateTime.ParseExact(abandontime, "yyyyMMddHHmmss", null);
                 TimeSpan timeDiff = ansOrAbandDateTime - queueDateTime;
                 log.Info($"TimeDifference is {timeDiff.TotalSeconds.ToString()} seconds");
                 _skillExtnInfo.TryGetValue(queue, out SkillExtensionInfo value);
@@ -465,11 +465,12 @@ namespace SIPDataCollector
                                             // log.Debug("Active Interaction : " + wallboardSkillInformation.ActiveInteractions + 1);
                                             realtimeOfSkill.TotalAgentsStaffed = realtimeOfSkill.AgentStats.Count();
                                             realtimeOfSkill.TotalAgentsInACW = realtimeOfSkill.AgentStats.Count(x => x.State.Contains("ACW"));
-                                            realtimeOfSkill.TotalAgentsInAUX = realtimeOfSkill.AgentStats.Count(x => Utilites.ConfigurationData.auxCodes.Contains(x.State));
+                                            realtimeOfSkill.TotalAgentsInAUX = realtimeOfSkill.AgentStats.Count(x=>x.State.Any());
                                         }
                                     }
                                     catch (Exception)
                                     {
+
                                     }
 
                                     if (realtimeDataForAllSkills.Any(skill => skill.Key == realtimeOfSkill.SkillExtensionId))

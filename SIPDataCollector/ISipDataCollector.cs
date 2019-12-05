@@ -32,11 +32,11 @@ namespace SIPDataCollector
         List<SkillExtensionInfo> GetSkillAndExtensions();
 
         [OperationContract]
-        [WebInvoke(Method = "POST", UriTemplate = "/VdnInformation/{callid}/{queue}/{queuetime}/{abandontime}", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.Bare)]
+        [WebInvoke(Method = "GET", UriTemplate = "/VdnInformation/{callid}/{queue}/{queuetime}/{abandontime}", RequestFormat = WebMessageFormat.Json, ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.Bare)]
         void VdnInformation(string callid, string queue, string queuetime, string abandontime);
 
         [OperationContract]
-        [WebInvoke(Method = "POST", UriTemplate = "/VdnInformationForAbandon/{callid}/{queue}/{queuetime}/{abandontime}", ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.Bare)]
+        [WebInvoke(Method = "GET", UriTemplate = "/VdnInformationForAbandon/{callid}/{queue}/{queuetime}/{abandontime}", RequestFormat =WebMessageFormat.Json, ResponseFormat = WebMessageFormat.Json, BodyStyle = WebMessageBodyStyle.Bare)]
         void VdnInformationForAbandon(string callid, string queue, string queuetime, string abandontime);
     }
 }
