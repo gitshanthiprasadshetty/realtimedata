@@ -83,6 +83,7 @@ namespace SIPDataCollector.Utilites
                 skillList = FormatSkills(skillsToMonitor);
 
                 auxCodes = DataAccess.GetAuxCodes();
+                auxCodes.Add("Default");
                 acceptableSlObj = DataAccess.GetAcceptableLevels();
             }
             catch (Exception ex)
