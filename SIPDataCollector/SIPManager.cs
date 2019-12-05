@@ -465,7 +465,7 @@ namespace SIPDataCollector
                                             // log.Debug("Active Interaction : " + wallboardSkillInformation.ActiveInteractions + 1);
                                             realtimeOfSkill.TotalAgentsStaffed = realtimeOfSkill.AgentStats.Count();
                                             realtimeOfSkill.TotalAgentsInACW = realtimeOfSkill.AgentStats.Count(x => x.State.Contains("ACW"));
-                                            realtimeOfSkill.TotalAgentsInAUX = realtimeOfSkill.AgentStats.Count(x=>x.State.Any());
+                                            realtimeOfSkill.TotalAgentsInAUX = realtimeOfSkill.AgentStats.Count(x=> Utilites.ConfigurationData.auxCodes.Contains(x.State));
                                         }
                                     }
                                     catch (Exception)
