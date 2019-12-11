@@ -26,6 +26,7 @@ public class RealtimeData
     public int InteractionsActiveTime { get; set; }
     public int InteractionsHoldTime { get; set; }
     public int InteractionsQueueTime { get; set; }
+    public int TotalInteractionsQueueTime { get; set; }
     public int InteractionsAcwTime { get; set; }
     public int CallsAnsweredWithinSLA { get; set; }
 }

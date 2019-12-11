@@ -462,13 +462,14 @@ namespace SIPDataCollector
                                         realtimeOfSkill.OldestInteractionWaitTime = Convert.ToInt32(WorkQueueProxy.GetOldestWaitTime(wallboardSkillInformation.SkillID));
                                         //realtimeOfSkill.OldestCallWaitTime = WorkQueueProxy.GetOldestWaitTime(wallboardSkillInformation.SkillID);
 
+                                        realtimeOfSkill = DataCache.UpdateFetchBcmsData(realtimeOfSkill);
                                         var agentStats = GetAgentListLoggedInForSkill(server, realtimeOfSkill.SkillExtensionId.ToString());
-                                        if (agentStats == null)                                       
+                                        if (agentStats == null)
                                             log.Info("AgentStats is null");
-                                        
+
                                         if (realtimeOfSkill.AgentStats == null)
                                             realtimeOfSkill.AgentStats = new List<AgentData>();
-                                       
+
                                         realtimeOfSkill.AgentStats.AddRange(agentStats);
 
                                         if (realtimeOfSkill.AgentStats != null)
@@ -655,7 +656,7 @@ namespace SIPDataCollector
                             {
                                 agentSkillInfo = GetTmacServerInstance(item).GetAgentSessionsList("", "", "", "", item);
                             }
-                            
+
                             if (agentSkillInfo != null)
                             {
                                 foreach (var data in agentSkillInfo)
@@ -669,7 +670,7 @@ namespace SIPDataCollector
                                     {
                                         AgentId = data.AgentLoginID.ToString(),
                                         SkillExtension = data.AgentVoiceSkillsAsString.Split(',').ToList()
-                                    });                               
+                                    });
                                 }
                             }
                             //DataCache.UpdateCacheObj(agentSkillInfo);
