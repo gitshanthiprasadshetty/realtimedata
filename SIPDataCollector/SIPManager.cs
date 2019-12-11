@@ -109,7 +109,7 @@ namespace SIPDataCollector
 
         public void Start()
         {
-            log.Info("Start");
+            log.Info("Start of SIPManager");
             try
             {
                 // Load configuration first. 
@@ -131,7 +131,7 @@ namespace SIPDataCollector
 
                     if (_skillExtnInfo.Count() == 0)
                     {
-                        log.Info("skill-extn mapping count is zero, after couple of tries. please check if skills are configured correctly. Exiting application.");
+                        log.Info("skill-extn mapping count is zero, after couple of tries. Please check if skills are configured correctly. Exiting application.");
                         return;
                     }
                 }
@@ -140,7 +140,6 @@ namespace SIPDataCollector
                     log.Error($"Exception in _skillExtnInfo obj: {exp}");
                 }
 
-                //  sipThread = new Thread(StartSip);      
                 var sipThread = new Thread(new ThreadStart(delegate
                 {
                     while (true)
@@ -151,10 +150,20 @@ namespace SIPDataCollector
                 }));
                 sipThread.Start();
 
-                log.Info("start fetching historical data from historical service.");
-
-                //Thread historicalData = new Thread(new ThreadStart(delegate { GetHistoricalData(); }));
-                //historicalData.Start();
+                if (!ConfigurationData.isVDN)
+                {
+                    log.Info("start fetching historical data from SQL function workQueueData");
+                    Thread historicalData = new Thread(new ThreadStart(delegate
+                    {
+                        while (true)
+                        {
+                            Thread.Sleep(ConfigurationData.DBRefreshTime);
+                            ConfigurationData.LoadDataFromDatabaseForInterval();
+                        }
+                    }
+                    ));
+                    historicalData.Start();
+                }
             }
             catch (Exception ex)
             {
@@ -363,7 +372,6 @@ namespace SIPDataCollector
 
                 // get skillidlist from config to monitor.
                 var skillIdList = Utilites.ConfigurationData.skillList;
-                string skills = string.Join(",", skillIdList);
                 // get extnid for given set of skills
                 // var result = DataAccess.GetSkillExtnInfo(skills);
                 var result = SMSAPIProxy.GetSkills();
@@ -454,23 +462,27 @@ namespace SIPDataCollector
                                         realtimeOfSkill.OldestInteractionWaitTime = Convert.ToInt32(WorkQueueProxy.GetOldestWaitTime(wallboardSkillInformation.SkillID));
                                         //realtimeOfSkill.OldestCallWaitTime = WorkQueueProxy.GetOldestWaitTime(wallboardSkillInformation.SkillID);
 
-                                        var agentStats = GetAgentListLoggedInForSkill(server, realtimeOfSkill.SkillId.ToString());
+                                        var agentStats = GetAgentListLoggedInForSkill(server, realtimeOfSkill.SkillExtensionId.ToString());
+                                        if (agentStats == null)                                       
+                                            log.Info("AgentStats is null");
+                                        
                                         if (realtimeOfSkill.AgentStats == null)
                                             realtimeOfSkill.AgentStats = new List<AgentData>();
-
+                                       
                                         realtimeOfSkill.AgentStats.AddRange(agentStats);
 
                                         if (realtimeOfSkill.AgentStats != null)
                                         {
+                                            log.Info($"TotalAgentsStaffed is {realtimeOfSkill.AgentStats.Count()}");
                                             // log.Debug("Active Interaction : " + wallboardSkillInformation.ActiveInteractions + 1);
                                             realtimeOfSkill.TotalAgentsStaffed = realtimeOfSkill.AgentStats.Count();
                                             realtimeOfSkill.TotalAgentsInACW = realtimeOfSkill.AgentStats.Count(x => x.State.Contains("ACW"));
-                                            realtimeOfSkill.TotalAgentsInAUX = realtimeOfSkill.AgentStats.Count(x=> Utilites.ConfigurationData.auxCodes.Contains(x.State));
+                                            realtimeOfSkill.TotalAgentsInAUX = realtimeOfSkill.AgentStats.Count(x => Utilites.ConfigurationData.auxCodes.Contains(x.State));
                                         }
                                     }
-                                    catch (Exception)
+                                    catch (Exception ex)
                                     {
-
+                                        log.Error($"Exception while getting/updating agent stats in FetchBCMSData: {ex}");
                                     }
 
                                     if (realtimeDataForAllSkills.Any(skill => skill.Key == realtimeOfSkill.SkillExtensionId))
@@ -615,17 +627,17 @@ namespace SIPDataCollector
                                     _agentSkillInfo.AddOrUpdate(entry.ItemArray[0].ToString(), new AgentSkillInfo
                                     {
                                         AgentId = entry.ItemArray[0].ToString(),
-                                        Skills = skillArray.ToList()
+                                        SkillExtension = skillArray.ToList()
                                     },
                                     (k, v) => new AgentSkillInfo
                                     {
                                         AgentId = entry.ItemArray[0].ToString(),
-                                        Skills = skillArray.ToList()
+                                        SkillExtension = skillArray.ToList()
                                     });
                                 }
                                 log.Debug("Total Agent-Skill Info dictionary count : " + _agentSkillInfo.Count());
                             }
-                            Thread.Sleep(Utilites.ConfigurationData.DBRefreshTime * 60000);
+                            Thread.Sleep(Utilites.ConfigurationData.DBRefreshTime);
                         }
                     }));
                     dbThread.Start();
@@ -643,6 +655,7 @@ namespace SIPDataCollector
                             {
                                 agentSkillInfo = GetTmacServerInstance(item).GetAgentSessionsList("", "", "", "", item);
                             }
+                            
                             if (agentSkillInfo != null)
                             {
                                 foreach (var data in agentSkillInfo)
@@ -650,17 +663,18 @@ namespace SIPDataCollector
                                     _agentSkillInfo.AddOrUpdate(data.AgentLoginID.ToString(), new AgentSkillInfo
                                     {
                                         AgentId = data.AgentLoginID.ToString(),
-                                        Skills = data.AgentVoiceSkillsAsString.Split(',').ToList()
+                                        SkillExtension = data.AgentVoiceSkillsAsString.Split(',').ToList()
                                     },
                                     (k, v) => new AgentSkillInfo
                                     {
                                         AgentId = data.AgentLoginID.ToString(),
-                                        Skills = data.AgentVoiceSkillsAsString.Split(',').ToList()
-                                    });
+                                        SkillExtension = data.AgentVoiceSkillsAsString.Split(',').ToList()
+                                    });                               
                                 }
                             }
+                            //DataCache.UpdateCacheObj(agentSkillInfo);
                             log.Debug("Total Agent-Skill Info dictionary count : " + _agentSkillInfo.Count());
-                            Thread.Sleep(Utilites.ConfigurationData.DBRefreshTime * 60000);
+                            Thread.Sleep(Utilites.ConfigurationData.DashboardRefreshTime);
                         }
                     }));
                     tmacThread.Start();
@@ -668,7 +682,7 @@ namespace SIPDataCollector
             }
             catch (Exception ex)
             {
-                _isStarted = false;
+                //_isStarted = false;
                 log.Error("Error in AgentSkillInfo() :", ex);
             }
         }
@@ -738,9 +752,9 @@ namespace SIPDataCollector
         /// </summary>
         /// <param name="skillId">skillid</param>
         /// <returns>List of agents who are currently loggedin for given skill</returns>
-        List<AgentData> GetAgentListLoggedInForSkill(string server, string skillId)
+        List<AgentData> GetAgentListLoggedInForSkill(string server, string skillExtension)
         {
-            log.Debug($"GetAgentListLoggedInForSkill(): Server {server}, SkillId{skillId}");
+            log.Debug($"GetAgentListLoggedInForSkill(): Server {server}, skillExtension {skillExtension}");
             try
             {
                 List<AgentData> agentListForSkill = new List<AgentData>();
@@ -750,7 +764,7 @@ namespace SIPDataCollector
                 var loggedInAgents = GetTmacServerInstance(server).GetLoggedInAgentList("");
 
                 // _agentSkillInfo contains all the agentdata from db, get all agents who has requested skillid.
-                var agentList = _agentSkillInfo.Where(x => x.Value.Skills.Contains(skillId)).Select(x => x.Key);
+                var agentList = _agentSkillInfo.Where(x => x.Value.SkillExtension.Contains(skillExtension)).Select(x => x.Key);
                 // log.Debug("Total number of agents found for skill : " + skillId + "is "+agentList.Count());
 
                 // Loop through and check amoung list of agents having given skill, how many of them are currently
@@ -761,6 +775,7 @@ namespace SIPDataCollector
                     var agentDetails = loggedInAgents.FirstOrDefault(y => y.AgentLoginID == entry);
                     if (agentDetails != null)
                     {
+                        log.Info($"Updating AgentDetails stats LoginID {entry}, State {agentDetails.CurrentAgentStatus}, StationID {agentDetails.StationID}");
                         agentData = new AgentData { LoginId = entry, State = agentDetails.CurrentAgentStatus, StationID = agentDetails.StationID };
                         agentListForSkill.Add(agentData);
                     }
@@ -807,32 +822,55 @@ namespace SIPDataCollector
         /// <summary>
         /// The below method gets the abandcalls, acdcalls and skillid from the function WorkQueueData and updates to cacheobj
         /// </summary>
-        public void GetSummaryData()
+        public void GetSummaryData(DateTime endDateTime, string date, string startTime, string endTime)
         {
             try
             {
-                log.Info("GetSummaryData()");
-                DataTable dTable = new DataTable();
-                string skills = string.Join(",", _skillExtnInfo.Keys.ToArray());
-                DateTime dt = new DateTime();
-                string date = DateTime.Now.ToString("yyyyMMdd");
-                string startTime = DateTime.Today.ToString("HHmmss");
-                string endTime = dt.Date.AddDays(1).AddTicks(-1).ToString("HHmmss");
-                log.Info($"GetSummaryData() from WorkQueueData date:{date}, startTime:{startTime},endTime:{endTime},skills:{skills}");
-                string connString = ConfigurationData.ConntnString;
+                log.Info($"GetSummaryData() ");
+                if (false)
+                {
+                    DataTable dTable = new DataTable();
+                    string skills = string.Join(",", _skillExtnInfo.Keys.ToArray());
 
-                SqlConnection conn = new SqlConnection(connString);
-                SqlCommand cmd = new SqlCommand("SELECT AbandCalls,PassedCalls,Skill FROM [dbo].[WorkQueueData](@Date,@StartTime,@EndTime,@Id,@acceptableSL)", conn);
-                cmd.Parameters.AddWithValue("@Date", date);
-                cmd.Parameters.AddWithValue("@StartTime", startTime);
-                cmd.Parameters.AddWithValue("@EndTime", endTime);
-                cmd.Parameters.AddWithValue("@Id", skills);
-                cmd.Parameters.AddWithValue("@acceptableSL", 1);
-                SqlDataAdapter da = new SqlDataAdapter(cmd);
-                da.Fill(dTable);
+                    log.Info($"GetSummaryData() from WorkQueueData date:{date}, startTime:{startTime},endTime:{endTime},skills:{skills}");
+                    string connString = ConfigurationData.ConntnString;
 
-                //dTable =Connector.DbLayer.SqlDataAccess.GetWorkQueueData(date,startTime,endTime, connString,skills);                
-                DataCache.UpdateSummaryData(dTable);
+                    using (SqlConnection conn = new SqlConnection(connString))
+                    {
+                        SqlCommand cmd = new SqlCommand("SELECT AbandCalls,PassedCalls,Skill FROM [dbo].[WorkQueueData](@Date,@StartTime,@EndTime,@Id,@acceptableSL)", conn);
+                        cmd.Parameters.AddWithValue("@Date", date);
+                        cmd.Parameters.AddWithValue("@StartTime", startTime);
+                        cmd.Parameters.AddWithValue("@EndTime", endTime);
+                        cmd.Parameters.AddWithValue("@Id", skills);
+                        cmd.Parameters.AddWithValue("@acceptableSL", 1); //acceptableSL is not used inside this function so passing it as 1 - 09 Dec
+                        SqlDataAdapter da = new SqlDataAdapter(cmd);
+                        da.Fill(dTable);
+                    }
+                    DataCache.UpdateSummaryData(dTable);
+                    ConfigurationData.LastExecutedTime = endDateTime;
+                }
+                else
+                {
+                    DataTable dTable = new DataTable();
+                    string skills = string.Join(",", _skillExtnInfo.Keys.ToArray());
+
+                    log.Info($"GetSummaryData() from GetRealtimeData SP date:{date}, startTime:{startTime},endTime:{endTime},skills:{skills}");
+                    string connString = ConfigurationData.ConntnString;
+
+                    using (SqlConnection conn = new SqlConnection(connString))
+                    {
+                        SqlCommand cmd = new SqlCommand("[GetRealtimeData]", conn);
+                        cmd.CommandType = CommandType.StoredProcedure;
+
+                        cmd.Parameters.Add("@startdate", SqlDbType.VarChar).Value = date + startTime;
+                        cmd.Parameters.Add("@enddate", SqlDbType.VarChar).Value = date + endTime;
+                        cmd.Parameters.Add("@type", SqlDbType.VarChar).Value = "MAIN";
+
+                        SqlDataAdapter da = new SqlDataAdapter(cmd);
+                        da.Fill(dTable);
+                    }
+                    DataCache.UpdateSummaryData(dTable);
+                }
             }
             catch (Exception e)
             {
@@ -848,7 +886,7 @@ namespace SIPDataCollector
                 _skillExtnInfo.TryGetValue(skillExtension.ToString(), out SkillExtensionInfo value);
                 if (value != null)
                 {
-                    log.Info($"Returning skillId for {skillExtension.ToString()}");
+                    log.Info($"Returning skillId {value.SkillId} for {skillExtension.ToString()}");
                     return value.SkillId;
                 }
                 return 0;

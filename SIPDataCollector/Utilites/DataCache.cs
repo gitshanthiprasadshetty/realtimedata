@@ -54,7 +54,7 @@ namespace SIPDataCollector.Utilites
             }
             catch (Exception ex)
             {
-                log.Error("Error in UpdateCacheData : " , ex);
+                log.Error("Error in UpdateCacheData : ", ex);
             }
         }
 
@@ -62,12 +62,12 @@ namespace SIPDataCollector.Utilites
         {
             log.Info("UpdateCacheData()");
             try
-            {                
+            {
                 if (itemList != null)
                 {
                     log.Info($"total items to update to cache memeory = {itemList.Count}");
                     foreach (var item in itemList)
-                    {                       
+                    {
                         if (CacheObj.ContainsKey(item.SkillId))
                         {
                             var value = CacheObj.FirstOrDefault(x => x.Key == item.SkillId).Value;
@@ -88,7 +88,7 @@ namespace SIPDataCollector.Utilites
                         }
                         else
                             CacheObj.TryAdd(item.SkillId, item);
-                    }                 
+                    }
                 }
             }
             catch (Exception ex)
@@ -106,9 +106,9 @@ namespace SIPDataCollector.Utilites
             try
             {
                 log.Debug("UpdateHistoricalData : for skill = " + data.skillId);
-                if(data != null)
+                if (data != null)
                 {
-                    if(CacheObj.TryGetValue(data.skillId, out RealtimeData values))
+                    if (CacheObj.TryGetValue(data.skillId, out RealtimeData values))
                     {
                         log.Debug("Updating with histoircaldata for skill = " + data.skillId);
                         // RealtimeData oldValues = values;                        
@@ -144,13 +144,14 @@ namespace SIPDataCollector.Utilites
                 {
                     _bcmsObj = new RealtimeData();
                     _listObj = new List<RealtimeData>();
-                    
+
                     foreach (KeyValuePair<int, RealtimeData> entry in CacheObj)
                     {
                         _bcmsObj = entry.Value;
                         _listObj.Add(_bcmsObj);
                     }
                     log.Debug("GetBcmsData BcmsDashboard Return Count for sip : " + _listObj.Count);
+                    return _listObj;
                 }
                 log.Debug("GetBcmsData BcmsDashboard No data to return");
                 return _listObj;
@@ -186,7 +187,7 @@ namespace SIPDataCollector.Utilites
             }
             catch (Exception ex)
             {
-                log.Error("Error in GetBcmsDataForSkill : " , ex);
+                log.Error("Error in GetBcmsDataForSkill : ", ex);
                 return null;
             }
         }
@@ -200,20 +201,76 @@ namespace SIPDataCollector.Utilites
             try
             {
                 log.Info("UpdateSummaryData()");
-                int skillId = 0;
+                int sl = ConfigurationData.acceptableSL;
+                int skillId = 0, callSlaCount = 0;
+                decimal slPercentage = (decimal)0m;
                 if (dataTable != null)
                 {
                     log.Info($"DataTable from DB count is {dataTable.Rows.Count}, hence trying to update cacheObj for Abandoned, Active and skillId");
                     for (int i = 0; i < dataTable.Rows.Count; i++)
                     {
-                        skillId = SIPManager.GetInstance().GetSkillExtensionInfo(dataTable.Rows[i][2]);
+                        skillId = SIPManager.GetInstance().GetSkillExtensionInfo(dataTable.Rows[i][0]);
                         log.Info($"UpdateSummaryData(): {skillId}");
-                        CacheObj.TryAdd(skillId, new RealtimeData
+                        CacheObj.AddOrUpdate(skillId, new RealtimeData
                         {
-                            AbandonedInteractionsSummary = Convert.ToInt32(dataTable.Rows[i][0]),
-                            ActiveInteractionsSummary = Convert.ToInt32(dataTable.Rows[i][1]),
-                            SkillId = skillId
+                            //AbandonedInteractionsSummary = Convert.ToInt32(dataTable.Rows[i][0]),
+                            InteractionsActiveTime = Convert.ToInt32(dataTable.Rows[i][1]),
+                            InteractionsHoldTime = Convert.ToInt32(dataTable.Rows[i][2]),
+                            InteractionsQueueTime = Convert.ToInt32(dataTable.Rows[i][3]),
+                            InteractionsAcwTime = Convert.ToInt32(dataTable.Rows[i][4]),
+                            AverageHandlingTime = Convert.ToInt32(dataTable.Rows[i][5]),
+                            ActiveInteractionsSummary = Convert.ToInt32(dataTable.Rows[i][6]),
+                            SkillId = skillId,
+                        },
+                        (k, v) => new RealtimeData
+                        {
+                            //AbandonedInteractionsSummary = Convert.ToInt32(dataTable.Rows[i][0]),
+                            InteractionsActiveTime = Convert.ToInt32(dataTable.Rows[i][1]),
+                            InteractionsHoldTime = Convert.ToInt32(dataTable.Rows[i][2]),
+                            InteractionsQueueTime = Convert.ToInt32(dataTable.Rows[i][3]),
+                            InteractionsAcwTime = Convert.ToInt32(dataTable.Rows[i][4]),
+                            AverageHandlingTime = Convert.ToInt32(dataTable.Rows[i][5]),
+                            ActiveInteractionsSummary = Convert.ToInt32(dataTable.Rows[i][6]),
+                            SkillId = skillId,
                         });
+
+                        if (Convert.ToInt32(dataTable.Rows[i][3]) < sl)
+                        {
+                            if (CacheObj.TryGetValue(skillId, out RealtimeData values))
+                            {
+                                if (values != null)
+                                {
+                                    callSlaCount = values.CallsAnsweredWithinSLA++;
+                                    log.Info($"CallSLACount for {skillId} is {callSlaCount}");
+                                    CacheObj.AddOrUpdate(skillId, new RealtimeData
+                                    {
+                                        CallsAnsweredWithinSLA = callSlaCount
+                                    },
+                                    (k, v) => new RealtimeData
+                                    {
+                                        CallsAnsweredWithinSLA = callSlaCount
+                                    });
+                                }
+                                log.Info($"CallAsnweredWithinSLA for {skillId} is {callSlaCount}");
+                            }
+                        }
+                        if (CacheObj.TryGetValue(skillId, out RealtimeData value))
+                        {
+                            if (value != null)
+                            {
+                                value.ActiveInteractionsSummary = value.ActiveInteractionsSummary == 0 ? 1 : value.ActiveInteractionsSummary;
+                                slPercentage = (value.CallsAnsweredWithinSLA * 100) / value.ActiveInteractionsSummary;
+                                CacheObj.AddOrUpdate(skillId, new RealtimeData
+                                {
+                                    SLPercentage = slPercentage
+                                },
+                                (k, v) => new RealtimeData
+                                {
+                                    SLPercentage = slPercentage
+                                });
+                                log.Info($"SLPercentage for {skillId} is {slPercentage}");
+                            }
+                        }
                     }
                 }
                 log.Info($"Total CacheObj count {CacheObj.Count()}");
@@ -237,7 +294,7 @@ namespace SIPDataCollector.Utilites
                 if (oldValue != null)
                 {
                     log.Info($"Incrementing ActiveInteractions in the cache obj: {oldValue.ActiveInteractionsSummary}");
-                    oldValue.ActiveInteractionsSummary ++ ;
+                    oldValue.ActiveInteractionsSummary++;
                     CacheObj.TryUpdate(skillId, oldValue, oldValue);
                     log.Info($"UpdateActiveInteraction: Done updating to CacheObj, count {CacheObj.Count()}");
                     return;
@@ -299,6 +356,53 @@ namespace SIPDataCollector.Utilites
             catch (Exception e)
             {
                 log.Error($"Exception in UpdateAbandonedCount(): {e}");
+            }
+        }
+
+        public static void UpdateCacheObj(List<DataModel.AgentSessionDataModel> agentSkillInfo)
+        {
+            try
+            {
+                log.Info($"UpdateCacheObj()");
+                int i = 0, queueTime = 0, skill, callSlaCount;
+                int sl = ConfigurationData.acceptableSL;
+                if (agentSkillInfo != null)
+                {
+                    foreach (var data in agentSkillInfo)
+                    {
+                        callSlaCount = 0;
+                        queueTime = data.InteractionList.Count() > 0 ? data.InteractionList[i].InteractionData.QueueTime : 0;
+                        //queueTime = data.InteractionList[i].InteractionData.QueueTime;
+                        skill = Convert.ToInt32(data.InteractionList[i].InteractionData.Skill);
+                        if (queueTime < sl)
+                        {
+                            log.Info("Queued time is less than SL");
+                            if (CacheObj.TryGetValue(skill, out RealtimeData values))
+                            {
+                                if (values != null)
+                                {
+                                    callSlaCount = values.CallsAnsweredWithinSLA++;
+                                    log.Info($"CallSLACount for {skill} is {callSlaCount}");
+                                }
+                            }
+                        }
+                        CacheObj.AddOrUpdate(skill, new RealtimeData
+                        {
+                            CallsAnsweredWithinSLA = callSlaCount,
+                            InteractionsQueueTime = queueTime
+                        },
+                    (k, v) => new RealtimeData
+                    {
+                        CallsAnsweredWithinSLA = callSlaCount,
+                        InteractionsQueueTime = queueTime
+                    });
+                    }
+                }
+                log.Info($"CacheObj updated count is {CacheObj.Count()}");
+            }
+            catch (Exception ex)
+            {
+                log.Error($"Exception in UpdateCache() {ex}");
             }
         }
         #region Bcms Summary

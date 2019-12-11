@@ -19,6 +19,6 @@ namespace SIPDataCollector.Models
         /// <summary>
         /// Total List of Skills assigned to Agent.
         /// </summary>
-        public List<string> Skills { get; set; }
+        public List<string> SkillExtension { get; set; }
     }
 }

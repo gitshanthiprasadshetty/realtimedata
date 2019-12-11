@@ -140,7 +140,7 @@ namespace SIPDataCollector.Utilities
         {
             try
             {
-                log.Info("GetAuxCodes()");
+                log.Info("GetAuxCodes() from AGT_AUX_Codes");
                 string[] auxCodes = new string[] { };
                 string sql = @"select Name from [dbo].[AGT_AUX_Codes] with (nolock)";
                 DataTable dataTable = SqlDataAccess.ExecuteDataTable(sql, ConfigurationData.ConntnString);

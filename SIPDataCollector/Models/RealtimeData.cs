@@ -23,6 +23,11 @@ public class RealtimeData
     public int AcceptedSL { get; set; }
     public string Channel { get; set; }
     public int AvgSpeedAnswer { get; set; }
+    public int InteractionsActiveTime { get; set; }
+    public int InteractionsHoldTime { get; set; }
+    public int InteractionsQueueTime { get; set; }
+    public int InteractionsAcwTime { get; set; }
+    public int CallsAnsweredWithinSLA { get; set; }
 }
 
 //public class RealtimeData

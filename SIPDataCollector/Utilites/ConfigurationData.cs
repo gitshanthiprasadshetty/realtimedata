@@ -9,6 +9,7 @@ using System.IO;
 using System.Linq;
 using System.Timers;
 using Newtonsoft.Json;
+using System.Globalization;
 
 namespace SIPDataCollector.Utilites
 {
@@ -60,6 +61,9 @@ namespace SIPDataCollector.Utilites
         /// Dashboard refresh time
         /// </summary>
         public static int DBRefreshTime { get; set; }
+        public static bool isVDN { get; set; }
+        public static List<string> ExtraAUXCodes { get; set; }
+        public static DateTime  LastExecutedTime { get; set; }
         /// <summary>
         /// Method to load all data from config.
         /// </summary>
@@ -79,13 +83,14 @@ namespace SIPDataCollector.Utilites
                 ReloadConfigTime = Convert.ToInt32(ConfigurationManager.AppSettings["ReloadConfigTime"]);
                 jsonPath = ConfigurationManager.AppSettings["JsonFilePath"];
                 GetAgentSkillInfoConfig = ConfigurationManager.AppSettings["GetAgentSkillInfo"];
-
+                isVDN = Convert.ToBoolean(ConfigurationManager.AppSettings["isVDNMonitor"]);
+                ExtraAUXCodes = ConfigurationManager.AppSettings["ExtraAUXCodes"]?.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries)?.ToList();
                 skillList = FormatSkills(skillsToMonitor);
                 string s = string.Join(",", skillList); //converting list of skillList to string
                 log.Info($"Monitoring {s}");
 
                 auxCodes = DataAccess.GetAuxCodes();
-                auxCodes.Add("Default");
+                auxCodes.AddRange(ExtraAUXCodes);
                 acceptableSlObj = DataAccess.GetAcceptableLevels();
 
                 // load json data to file.
@@ -97,6 +102,9 @@ namespace SIPDataCollector.Utilites
             }
         }
 
+        /// <summary>
+        /// Loading JSON file from jsonPath to load to cache memory
+        /// </summary>
         static void LoadDataFromFileToMemory()
         {
             log.Info("LoadDataFromFileToMemory()");
@@ -108,12 +116,10 @@ namespace SIPDataCollector.Utilites
                     {
                         string json = r.ReadToEnd();
                         List<RealtimeData> itemToLoadToCacheMemory = JsonConvert.DeserializeObject<List<RealtimeData>>(json);
+                        return;
                     }
                 }
-                else
-                {
-                    log.Info("Configured JsonPath does not exist. Please provide the proper path");
-                }
+                log.Info("Configured JsonPath does not exist. Please provide the proper path");
             }
             catch (Exception ex)
             {
@@ -127,9 +133,13 @@ namespace SIPDataCollector.Utilites
             log.Info("LoadDataFromDatabase()");
             try
             {
+                DateTime dt = new DateTime();
+                string date = DateTime.Now.ToString("yyyyMMdd");
+                string startTime = DateTime.Today.ToString("HHmmss");
+                string endTime = dt.Date.AddDays(1).AddTicks(-1).ToString("HHmmss");
                 // on app load get data from database by executing function.
-                SIPManager.GetInstance().GetSummaryData();
-
+                SIPManager.GetInstance().GetSummaryData(new DateTime(),date, startTime, endTime);
+                LastExecutedTime = DateTime.Now;
                 // after loading from database, push that data to cacheobj
             }
             catch (Exception ex)
@@ -138,6 +148,34 @@ namespace SIPDataCollector.Utilites
             }
         }
 
+        /// <summary>
+        /// This method is called for every dashboard configured time if vdnmonitor is set to false. This will get the data from workqueuedata function
+        /// </summary>
+        public static void LoadDataFromDatabaseForInterval()
+        {
+            log.Info("LoadDataFromDatabaseForInterval()");
+            try
+            {
+                string date = DateTime.Now.ToString("yyyyMMdd");
+                string endTime = DateTime.Now.ToString("HHmmss");
+                DateTime endDateTime = DateTime.Now;
+                
+                DateTime startTime = LastExecutedTime;
+
+                if(LastExecutedTime.Date < endDateTime.Date)
+                {
+                    log.Info("LastExecutedTime is less than endDateTime");
+                    startTime = LastExecutedTime.Date.AddDays(1).AddTicks(1).AddSeconds(1);
+                }
+                // on app load get data from database by executing function.
+                SIPManager.GetInstance().GetSummaryData(endDateTime,date, startTime.ToString("HHmmss"), endTime);
+                // after loading from database, push that data to cacheobj
+            }
+            catch (Exception ex)
+            {
+                log.Error("Error in LoadDataFromDatabase: " + ex);
+            }
+        }
         public static void Channel()
         {
             log.Debug("Channel");
@@ -168,6 +206,7 @@ namespace SIPDataCollector.Utilites
                         channelObj.Add(data.ChannelName, l2.Distinct().ToList());
                     }
                 }
+                log.Info($"Channel Obj count is {channelObj.Count()}");
             }
             catch (Exception ex)
             {
@@ -199,7 +238,6 @@ namespace SIPDataCollector.Utilites
             try
             {
                 log.Info($"FormatSkills() {skillList}");
-                //log.Info("Skills List: " + skillList);
                 if (skillList != null && skillList.Count() >= 0 && !string.IsNullOrEmpty(skillList))
                 {
                     string[] strArrays = skillList?.Split(new char[] { ';' });
@@ -228,7 +266,7 @@ namespace SIPDataCollector.Utilites
             }
             catch (Exception exception)
             {
-                ConfigurationData.log.Error("Error : ", exception);
+                log.Error("Error : ", exception);
             }
             return null;
         }
