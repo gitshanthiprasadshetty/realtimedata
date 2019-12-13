@@ -645,47 +645,58 @@ namespace SIPDataCollector
                 }
                 else
                 {
-                    log.Info("Getting agent skill info from TMAC GetAgentSessionsList method");
-                    List<string> server = ConfigurationData.TmacServers;
-                    List<DataModel.AgentSessionDataModel> agentSkillInfo = null;
-                    var tmacThread = new Thread(new ThreadStart(delegate
+                    try
                     {
-                        while (_isStarted)
+                        log.Info("Getting agent skill info from TMAC GetAgentSessionsList method");
+                        List<string> server = ConfigurationData.TmacServers;
+                        List<DataModel.AgentSessionDataModel> agentSkillInfo = new List<DataModel.AgentSessionDataModel>();
+                        var tmacThread = new Thread(new ThreadStart(delegate
                         {
-                            foreach (var item in server)
+                            while (_isStarted)
                             {
-                                try
+                                log.Info("Fetching Agent-Skill info from GetAgentSessionsList()");
+                                foreach (var item in server)
                                 {
-                                    agentSkillInfo = GetTmacServerInstance(item).GetAgentSessionsList("", "", "", "", item);
-                                }
-                                catch (Exception e)
-                                {
-                                    log.Warn($"TMAC Server is unreachable");
-                                }
-                            }
-
-                            if (agentSkillInfo != null)
-                            {
-                                foreach (var data in agentSkillInfo)
-                                {
-                                    _agentSkillInfo.AddOrUpdate(data.AgentLoginID.ToString(), new AgentSkillInfo
+                                    try
                                     {
-                                        AgentId = data.AgentLoginID.ToString(),
-                                        SkillExtension = data.AgentVoiceSkillsAsString.Split(',').ToList()
-                                    },
-                                    (k, v) => new AgentSkillInfo
+                                        agentSkillInfo = GetTmacServerInstance(item).GetAgentSessionsList("", "", "", "", item);
+                                    }
+                                    catch (Exception e)
                                     {
-                                        AgentId = data.AgentLoginID.ToString(),
-                                        SkillExtension = data.AgentVoiceSkillsAsString.Split(',').ToList()
-                                    });
+                                        log.Warn($"TMAC Server is unreachable or agentSkillInfo is null");
+                                    }
                                 }
+                                if (agentSkillInfo != null)
+                                {
+                                    if (agentSkillInfo?.Count > 0)
+                                    {
+                                        log.Info($"AgentSkillInfo from GetAgentSessionList has data of agent skill info");
+                                        foreach (var data in agentSkillInfo)
+                                        {
+                                            _agentSkillInfo.AddOrUpdate(data.AgentLoginID.ToString(), new AgentSkillInfo
+                                            {
+                                                AgentId = data.AgentLoginID.ToString(),
+                                                SkillExtension = data.AgentVoiceSkillsAsString.Split(',').ToList()
+                                            },
+                                            (k, v) => new AgentSkillInfo
+                                            {
+                                                AgentId = data.AgentLoginID.ToString(),
+                                                SkillExtension = data.AgentVoiceSkillsAsString.Split(',').ToList()
+                                            });
+                                        }
+                                    }
+                                }
+                                //DataCache.UpdateCacheObj(agentSkillInfo);
+                                log.Debug("Total Agent-Skill Info dictionary count : " + _agentSkillInfo?.Count());
+                                Thread.Sleep(Utilites.ConfigurationData.DashboardRefreshTime);
                             }
-                            //DataCache.UpdateCacheObj(agentSkillInfo);
-                            log.Debug("Total Agent-Skill Info dictionary count : " + _agentSkillInfo.Count());
-                            Thread.Sleep(Utilites.ConfigurationData.DashboardRefreshTime);
-                        }
-                    }));
-                    tmacThread.Start();
+                        }));
+                        tmacThread.Start();
+                    }
+                    catch (Exception ex)
+                    {
+                        log.Error($"Exception in AgentSkillInfo GetAgentSessionsList method {ex}");
+                    }
                 }
             }
             catch (Exception ex)

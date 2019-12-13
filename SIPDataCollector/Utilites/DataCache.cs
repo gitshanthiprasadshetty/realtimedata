@@ -175,7 +175,7 @@ namespace SIPDataCollector.Utilites
             {
                 if (CacheObj != null && CacheObj.Count > 0)
                 {
-                    log.Debug("DataCache[GetBcmsDataForSkill] Dictionary count : " + CacheObj.Count);
+                    log.Debug("DataCache[GetBcmsDataForSkill] Dictionary count : " + CacheObj?.Count);
                     _bcmsObj = new RealtimeData();
                     var result = CacheObj.FirstOrDefault(x => x.Key == skillId);
                     if (!result.Equals(default(KeyValuePair<string, RealtimeData>)))
@@ -262,7 +262,7 @@ namespace SIPDataCollector.Utilites
                         }
                     }
                 }
-                log.Info($"Total CacheObj count {CacheObj.Count()}");
+                log.Info($"Total CacheObj count {CacheObj?.Count()}");
             }
             catch (Exception ex)
             {
@@ -285,7 +285,7 @@ namespace SIPDataCollector.Utilites
                     log.Info($"Incrementing ActiveInteractions in the cache obj: {oldValue.ActiveInteractionsSummary}");
                     oldValue.ActiveInteractionsSummary++;
                     CacheObj.TryUpdate(skillId, oldValue, oldValue);
-                    log.Info($"UpdateActiveInteraction: Done updating to CacheObj, count {CacheObj.Count()}");
+                    log.Info($"UpdateActiveInteraction: Done updating to CacheObj, count {CacheObj?.Count()}");
                     return;
                 }
                 log.Info("No data found in CacheObj to update");
@@ -311,7 +311,7 @@ namespace SIPDataCollector.Utilites
                     log.Info($"Incrementing AvgSpeedAnswer in the cache obj {oldValue.AvgSpeedAnswer}");
                     oldValue.AvgSpeedAnswer++;
                     CacheObj.TryUpdate(skillId, oldValue, oldValue);
-                    log.Info($"UpdateASAData: Done updating to CacheObj, count {CacheObj.Count()}");
+                    log.Info($"UpdateASAData: Done updating to CacheObj, count {CacheObj?.Count()}");
                     return;
                 }
                 log.Info("No data found in CacheObj to update");
@@ -337,7 +337,7 @@ namespace SIPDataCollector.Utilites
                     log.Info($"Incrementing AbandonedInteractionsSummary in the cache obj {oldValue.AbandonedInteractionsSummary}");
                     oldValue.AbandonedInteractionsSummary++;
                     CacheObj.TryUpdate(skillId, oldValue, oldValue);
-                    log.Info($"UpdateAbandonedCount: Done updating to CacheObj, count {CacheObj.Count()}");
+                    log.Info($"UpdateAbandonedCount: Done updating to CacheObj, count {CacheObj?.Count()}");
                     return;
                 }
                 log.Info("No data found in CacheObj to update");
@@ -387,7 +387,7 @@ namespace SIPDataCollector.Utilites
                     });
                     }
                 }
-                log.Info($"CacheObj updated count is {CacheObj.Count()}");
+                log.Info($"CacheObj updated count is {CacheObj?.Count()}");
             }
             catch (Exception ex)
             {
@@ -429,7 +429,7 @@ namespace SIPDataCollector.Utilites
             {
                 log.Info("ClearCacheObj()");
                 CacheObj.Clear();
-                log.Info($"ClearCacheObj() count: {CacheObj.Count()}");
+                log.Info($"ClearCacheObj() count: {CacheObj?.Count()}");
                 return true;
             }
             catch (Exception ex)
