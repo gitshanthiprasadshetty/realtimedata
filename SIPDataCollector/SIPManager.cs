@@ -654,7 +654,14 @@ namespace SIPDataCollector
                         {
                             foreach (var item in server)
                             {
-                                agentSkillInfo = GetTmacServerInstance(item).GetAgentSessionsList("", "", "", "", item);
+                                try
+                                {
+                                    agentSkillInfo = GetTmacServerInstance(item).GetAgentSessionsList("", "", "", "", item);
+                                }
+                                catch (Exception e)
+                                {
+                                    log.Warn($"TMAC Server is unreachable");
+                                }
                             }
 
                             if (agentSkillInfo != null)
@@ -762,7 +769,9 @@ namespace SIPDataCollector
                 AgentData agentData;
 
                 // get all currently logged-in agents.
+
                 var loggedInAgents = GetTmacServerInstance(server).GetLoggedInAgentList("");
+
 
                 // _agentSkillInfo contains all the agentdata from db, get all agents who has requested skillid.
                 var agentList = _agentSkillInfo.Where(x => x.Value.SkillExtension.Contains(skillExtension)).Select(x => x.Key);
@@ -852,6 +861,7 @@ namespace SIPDataCollector
                 }
                 else
                 {
+                    int sla = ConfigurationData.acceptableSL;
                     DataTable dTable = new DataTable();
                     string skills = string.Join(",", _skillExtnInfo.Keys.ToArray());
 
@@ -860,17 +870,20 @@ namespace SIPDataCollector
 
                     using (SqlConnection conn = new SqlConnection(connString))
                     {
-                        SqlCommand cmd = new SqlCommand("[GetRealtimeData]", conn);
-                        cmd.CommandType = CommandType.StoredProcedure;
+                        using (SqlCommand cmd = new SqlCommand("[GetRealtimeData]", conn))
+                        {
+                            cmd.CommandType = CommandType.StoredProcedure;
 
-                        cmd.Parameters.Add("@startdate", SqlDbType.VarChar).Value = date + startTime;
-                        cmd.Parameters.Add("@enddate", SqlDbType.VarChar).Value = date + endTime;
-                        cmd.Parameters.Add("@type", SqlDbType.VarChar).Value = "MAIN";
+                            cmd.Parameters.Add("@startdate", SqlDbType.VarChar).Value = date + startTime;
+                            cmd.Parameters.Add("@enddate", SqlDbType.VarChar).Value = date + endTime;
+                            cmd.Parameters.Add("@acceptablesla", SqlDbType.VarChar).Value = sla;
 
-                        SqlDataAdapter da = new SqlDataAdapter(cmd);
-                        da.Fill(dTable);
+                            SqlDataAdapter da = new SqlDataAdapter(cmd);
+                            da.Fill(dTable);
+                        }
                     }
                     DataCache.UpdateSummaryData(dTable);
+                    ConfigurationData.LastExecutedTime = endDateTime;
                 }
             }
             catch (Exception e)

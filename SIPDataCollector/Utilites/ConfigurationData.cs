@@ -166,6 +166,11 @@ namespace SIPDataCollector.Utilites
                 {
                     log.Info("LastExecutedTime is less than endDateTime");
                     startTime = LastExecutedTime.Date.AddDays(1).AddTicks(1).AddSeconds(1);
+                    bool ret=DataCache.ClearCacheObj();
+                    if (ret)
+                    {
+                        log.Info("CacheObj is cleared for the next day's data");
+                    }
                 }
                 // on app load get data from database by executing function.
                 SIPManager.GetInstance().GetSummaryData(endDateTime,date, startTime.ToString("HHmmss"), endTime);
