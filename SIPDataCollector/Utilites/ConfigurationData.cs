@@ -82,6 +82,7 @@ namespace SIPDataCollector.Utilites
 
                 skillList = FormatSkills(skillsToMonitor);
 
+                log.Info($"Monitoring: {String.Join(", ", skillList)}");
                 auxCodes = DataAccess.GetAuxCodes();
                 auxCodes.Add("Default");
                 acceptableSlObj = DataAccess.GetAcceptableLevels();
@@ -161,7 +162,6 @@ namespace SIPDataCollector.Utilites
                     {
                         if (strArrays[0] != "")
                         {
-
                             List<HuntGroupType> result = SMSAPIProxy.GetSkills();
 
                             if (result != null)
@@ -254,6 +254,7 @@ namespace SIPDataCollector.Utilites
                 //skillList = FormatSkills(skillsToMonitor);
                 //FetchExtenSkillData();
                 LoadConfig();
+                SIPManager.GetInstance().MapSkillExtnData();
             }
             catch (Exception e)
             {

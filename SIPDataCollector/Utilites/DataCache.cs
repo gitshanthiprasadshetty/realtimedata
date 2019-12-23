@@ -18,7 +18,7 @@ namespace SIPDataCollector.Utilites
         /// <summary>
         /// Holds Bcms Dashboard data for SIP
         /// </summary>
-        static readonly ConcurrentDictionary<int, RealtimeData> CacheObj = new ConcurrentDictionary<int, RealtimeData>();
+        static ConcurrentDictionary<int, RealtimeData> CacheObj = new ConcurrentDictionary<int, RealtimeData>();
 
         /// <summary>
         /// 
@@ -53,7 +53,7 @@ namespace SIPDataCollector.Utilites
             }
             catch (Exception ex)
             {
-                log.Error("Error in UpdateCacheData : " , ex);
+                log.Error("Error in UpdateCacheData : ", ex);
             }
         }
 
@@ -61,12 +61,14 @@ namespace SIPDataCollector.Utilites
         {
             log.Info("UpdateCacheData()");
             try
-            {                
+            {
+                var entries = CacheObj.Select(d =>string.Format("\"{0}\": [{1}]", d.Key, string.Join(",", d.Value)));
+
                 if (itemList != null)
                 {
                     log.Info($"total items to update to cache memeory = {itemList.Count}");
                     foreach (var item in itemList)
-                    {                       
+                    {
                         if (CacheObj.ContainsKey(item.SkillId))
                         {
                             var value = CacheObj.FirstOrDefault(x => x.Key == item.SkillId).Value;
@@ -87,7 +89,9 @@ namespace SIPDataCollector.Utilites
                         }
                         else
                             CacheObj.TryAdd(item.SkillId, item);
-                    }                 
+                    }
+
+                    CacheObj = SIPManager.UpdateCache(CacheObj);
                 }
             }
             catch (Exception ex)
@@ -105,13 +109,42 @@ namespace SIPDataCollector.Utilites
             try
             {
                 log.Debug("UpdateHistoricalData : for skill = " + data.skillId);
-                if(data != null)
+                if (data != null)
                 {
-                    if(CacheObj.TryGetValue(data.skillId, out RealtimeData values))
+                    ConcurrentDictionary<int, RealtimeData> tempCacheObj = new ConcurrentDictionary<int, RealtimeData>();
+
+                    log.Debug("Updating with histoircaldata for skill = " + data.skillId);
+                    //CacheObj?.Clear();
+                    //CacheObj.AddOrUpdate(data.skillId, new RealtimeData
+                    //{
+                    //    AverageHandlingTime = data.AvgHandlingTime,
+                    //    SLPercentage = data.SLPercentage,
+                    //    AbandonedInteractionsSummary = data.AbandCalls,
+                    //    //log.Debug("ActiveInteractionsSummary before update = " + values.ActiveInteractionsSummary);
+                    //    ActiveInteractionsSummary = data.TotalACDInteractions,
+                    //    //log.Debug("ActiveInteractionsSummary after update = " + values.ActiveInteractionsSummary);
+                    //    AverageAbandonedTime = data.AvgAbandTime,
+                    //    AbandonPercentage = data.AbandonPercentage,
+                    //},
+                    //(k, v) => new RealtimeData
+                    //{
+                    //    AverageHandlingTime = data.AvgHandlingTime,
+                    //    SLPercentage = data.SLPercentage,
+                    //    AbandonedInteractionsSummary = data.AbandCalls,
+                    //    //log.Debug("ActiveInteractionsSummary before update = " + values.ActiveInteractionsSummary);
+                    //    ActiveInteractionsSummary = data.TotalACDInteractions,
+                    //    //log.Debug("ActiveInteractionsSummary after update = " + values.ActiveInteractionsSummary);
+                    //    AverageAbandonedTime = data.AvgAbandTime,
+                    //    AbandonPercentage = data.AbandonPercentage,
+                    //});
+
+                    //CacheObj = tempCacheObj;
+
+                    if (CacheObj.TryGetValue(data.skillId, out RealtimeData values))
                     {
                         log.Debug("Updating with histoircaldata for skill = " + data.skillId);
                         // RealtimeData oldValues = values;                        
-                        // values.AverageHandlingTime = data.AvgHandlingTime;
+                        //values.AverageHandlingTime = data.AvgHandlingTime;
                         values.AverageHandlingTime = data.AvgHandlingTime;
                         values.SLPercentage = data.SLPercentage;
                         values.AbandonedInteractionsSummary = data.AbandCalls;
@@ -143,12 +176,13 @@ namespace SIPDataCollector.Utilites
                 {
                     _bcmsObj = new RealtimeData();
                     _listObj = new List<RealtimeData>();
-                    
+
                     foreach (KeyValuePair<int, RealtimeData> entry in CacheObj)
                     {
                         _bcmsObj = entry.Value;
                         _listObj.Add(_bcmsObj);
                     }
+                    
                     log.Debug("GetBcmsData BcmsDashboard Return Count for sip : " + _listObj.Count);
                 }
                 log.Debug("GetBcmsData BcmsDashboard No data to return");
@@ -185,10 +219,17 @@ namespace SIPDataCollector.Utilites
             }
             catch (Exception ex)
             {
-                log.Error("Error in GetBcmsDataForSkill : " , ex);
+                log.Error("Error in GetBcmsDataForSkill : ", ex);
                 return null;
             }
         }
+
+        //public static void UpdateCacheDataAfterRefresh(Dictionary<string,SkillExtensionInfo> skillExtnInfo)
+        //{
+        //    var itemsToRemove = CacheObj.Where(kvp => kvp.Key.Equals(skillExtnInfo.ContainsValue();
+        //    foreach (var item in itemsToRemove)
+        //        dictionary.TryRemove(item.Key, out token);
+        //}
 
         #region Bcms Summary
 
