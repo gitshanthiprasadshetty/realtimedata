@@ -636,7 +636,7 @@ namespace SIPDataCollector
                                         SkillExtension = skillArray.ToList()
                                     });
                                 }
-                                log.Debug("Total Agent-Skill Info dictionary count : " + _agentSkillInfo.Count());
+                                log.Debug("Total Agent-Skill Info dictionary count : " + _agentSkillInfo?.Count());
                             }
                             Thread.Sleep(Utilites.ConfigurationData.DBRefreshTime);
                         }
@@ -785,7 +785,7 @@ namespace SIPDataCollector
 
 
                 // _agentSkillInfo contains all the agentdata from db, get all agents who has requested skillid.
-                var agentList = _agentSkillInfo.Where(x => x.Value.SkillExtension.Contains(skillExtension)).Select(x => x.Key);
+                var agentList = _agentSkillInfo?.Where(x => x.Value.SkillExtension.Contains(skillExtension)).Select(x => x.Key);
                 // log.Debug("Total number of agents found for skill : " + skillId + "is "+agentList.Count());
 
                 // Loop through and check amoung list of agents having given skill, how many of them are currently
