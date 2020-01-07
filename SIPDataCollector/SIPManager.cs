@@ -401,7 +401,7 @@ namespace SIPDataCollector
 
                 log.Info("Starting Timer for Config refresh time for SIP");
                 System.Timers.Timer timer = new System.Timers.Timer();
-                timer.Interval = Utilites.ConfigurationData.ReloadConfigTime * 60000;
+                timer.Interval = Utilites.ConfigurationData.ReloadConfigTime;
                 timer.Elapsed += Utilites.ConfigurationData.RefreshSection;
                 timer.Start();
             }
