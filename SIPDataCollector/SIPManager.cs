@@ -42,7 +42,7 @@ namespace SIPDataCollector
         /// <summary>
         /// Holds Skill-Extension Related information for given set of skills in config.
         /// </summary>
-        static Dictionary<string, SkillExtensionInfo> _skillExtnInfo = new Dictionary<string, SkillExtensionInfo>();
+        static ConcurrentDictionary<string, SkillExtensionInfo> _skillExtnInfo = new ConcurrentDictionary<string, SkillExtensionInfo>();
 
         /// <summary>
         ///  Holds all Agent-{Skill} Related information.
@@ -297,7 +297,7 @@ namespace SIPDataCollector
                 var result = DataAccess.GetSkillExtnInfo(skills);
                 if (result != null)
                 {
-                    Dictionary<string, SkillExtensionInfo> tempStorage = new Dictionary<string, SkillExtensionInfo>();
+                    ConcurrentDictionary<string, SkillExtensionInfo> tempStorage = new ConcurrentDictionary<string, SkillExtensionInfo>();
                     // we got fresh data from database , 
                     // remove unwanted skills from previous skilllist. 
 
@@ -308,8 +308,8 @@ namespace SIPDataCollector
                         // add to dictionary object to maintain a skill-Extn mapping.
                         //if (_skillExtnInfo.ContainsKey(entry.ItemArray[1].ToString()))
                         //    continue;
-
-                        tempStorage.Add(entry.ItemArray[1].ToString(), new SkillExtensionInfo
+                        
+                        tempStorage.TryAdd(entry.ItemArray[1].ToString(), new SkillExtensionInfo
                         {
                             SkillId = Convert.ToInt32(entry.ItemArray[0]),
                             ExtensionId = Convert.ToInt32(entry.ItemArray[1]),
@@ -318,7 +318,7 @@ namespace SIPDataCollector
                         });
                         log.Debug($"TempStorage SkillExtension: {entry.ItemArray[1].ToString()}");
                     }
-                    
+
                     if (!(_skillExtnInfo.Count == tempStorage.Count && _skillExtnInfo.Keys.SequenceEqual(tempStorage.Keys))) 
                     {
                         log.Debug("SKill extension info is updated");
