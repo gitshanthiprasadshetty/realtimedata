@@ -316,10 +316,16 @@ namespace SIPDataCollector
                             SkillName = Convert.ToString(entry.ItemArray[2]),
                             Channel = Utilites.ConfigurationData.GetChannel(Convert.ToString(entry.ItemArray[0]))
                         });
-                        log.Info($"TempStorage SkillExtension: {entry.ItemArray[1].ToString()}");
+                        log.Debug($"TempStorage SkillExtension: {entry.ItemArray[1].ToString()}");
                     }
-                    _skillExtnInfo = tempStorage;
-                    log.Info($"Total SkillExtnInfo: {String.Join(", ", _skillExtnInfo?.Keys.ToList())}");
+                    
+                    if (!(_skillExtnInfo.Count == tempStorage.Count && _skillExtnInfo.Keys.SequenceEqual(tempStorage.Keys))) 
+                    {
+                        log.Debug("SKill extension info is updated");
+                        _skillExtnInfo = tempStorage;
+                    }
+                                       
+                    log.Debug($"Total SkillExtnInfo: {String.Join(", ", _skillExtnInfo?.Keys.ToList())}");
                 }
                 //DataCache.UpdateCacheDataAfterRefresh(_skillExtnInfo);
             }
@@ -574,49 +580,56 @@ namespace SIPDataCollector
                 //List<SkillData> skillData = new List<SkillData>();
                 while (true)
                 {
-                    if (!queue.IsEmpty)
+                    try
                     {
-                        log.Debug("Queue is not empty");
-                        foreach (var item in queue)
+                        if (!queue.IsEmpty)
                         {
-                            log.Debug("Queue item is = " + item);
-                            if (queue.TryDequeue(out string skillExtn))
+                            log.Debug("Queue is not empty");
+                            foreach (var item in queue)
                             {
-                                log.Debug("skillExtn is = " + skillExtn);
-                                int skillId = _skillExtnInfo[skillExtn].SkillId;
-                                var dbData = DataAccess.GetHistoricalData(skillExtn, skillId);
-
-                                if (dbData != null)
+                                log.Debug("Queue item is = " + item);
+                                if (queue.TryDequeue(out string skillExtn))
                                 {
-                                    log.Debug("Received historical data");
-                                    try
-                                    {
-                                        decimal abandPercentage = Math.Round(Convert.ToDecimal(100 * Convert.ToDouble(dbData.AbandCalls) / ((dbData.AbandCalls) + (dbData.TotalACDInteractions == 0 ? 1 : dbData.TotalACDInteractions))), 2);
+                                    log.Debug("skillExtn is = " + skillExtn);
+                                    int skillId = _skillExtnInfo[skillExtn].SkillId;
+                                    var dbData = DataAccess.GetHistoricalData(skillExtn, skillId);
 
-                                        SkillData data = new SkillData
-                                        {
-                                            ACDTime = dbData.ACDTime,
-                                            ACWTime = dbData.ACWTime,
-                                            AbandCalls = dbData.AbandCalls,
-                                            SLPercentage = dbData.SLPercentage,
-                                            AvgHandlingTime = ((dbData.ACDTime + dbData.AHTTime) / (dbData.TotalCallsHandled == 0 ? 1 : dbData.TotalCallsHandled)),
-                                            skillId = Convert.ToInt32(_skillExtnInfo[skillExtn].SkillId),
-                                            TotalACDInteractions = dbData.TotalACDInteractions,
-                                            AbandonPercentage = abandPercentage,
-                                            AvgAbandTime = dbData.AvgAbandTime
-                                        };
-                                        //skillData.Add(data);
-                                        // if (!string.IsNullOrEmpty(data.skillId) && (data != null))
-                                        if (data != null)
-                                            DataCache.UpdateHistoricalData(data);
-                                    }
-                                    catch (Exception ex)
+                                    if (dbData != null)
                                     {
-                                        log.Error("Error while processing histoircal data : ", ex);
+                                        log.Debug("Received historical data");
+                                        try
+                                        {
+                                            decimal abandPercentage = Math.Round(Convert.ToDecimal(100 * Convert.ToDouble(dbData.AbandCalls) / ((dbData.AbandCalls) + (dbData.TotalACDInteractions == 0 ? 1 : dbData.TotalACDInteractions))), 2);
+
+                                            SkillData data = new SkillData
+                                            {
+                                                ACDTime = dbData.ACDTime,
+                                                ACWTime = dbData.ACWTime,
+                                                AbandCalls = dbData.AbandCalls,
+                                                SLPercentage = dbData.SLPercentage,
+                                                AvgHandlingTime = ((dbData.ACDTime + dbData.AHTTime) / (dbData.TotalCallsHandled == 0 ? 1 : dbData.TotalCallsHandled)),
+                                                skillId = Convert.ToInt32(_skillExtnInfo[skillExtn].SkillId),
+                                                TotalACDInteractions = dbData.TotalACDInteractions,
+                                                AbandonPercentage = abandPercentage,
+                                                AvgAbandTime = dbData.AvgAbandTime
+                                            };
+                                            //skillData.Add(data);
+                                            // if (!string.IsNullOrEmpty(data.skillId) && (data != null))
+                                            if (data != null)
+                                                DataCache.UpdateHistoricalData(data);
+                                        }
+                                        catch (Exception ex)
+                                        {
+                                            log.Error("Error while processing histoircal data : ", ex);
+                                        }
                                     }
                                 }
                             }
                         }
+                    }
+                    catch (Exception ex)
+                    {
+                        log.Debug("Skill extension info is updating: "+ ex);
                     }
                     Thread.Sleep(Utilites.ConfigurationData.DBRefreshTime);
                 }
@@ -624,6 +637,7 @@ namespace SIPDataCollector
             catch (Exception ex)
             {
                 log.Error("Error in GetHistoricalData", ex);
+                Thread.Sleep(Utilites.ConfigurationData.DBRefreshTime);
             }
         }
         /// <summary>
