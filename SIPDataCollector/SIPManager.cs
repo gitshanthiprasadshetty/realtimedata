@@ -610,33 +610,40 @@ namespace SIPDataCollector
                     {
                         while (_isStarted)
                         {
-                            // Get agent-{skill} info from db.
-                            result = DataAccess.GetAgentSkillInfo();
-                            if (result != null)
+                            try
                             {
-                                log.Info("Got data from db table");
-                                foreach (DataRow entry in result.Rows)
+                                // Get agent-{skill} info from db.
+                                result = DataAccess.GetAgentSkillInfo();
+                                if (result != null)
                                 {
-                                    // since we get data from db for every 5min and getAgentloggedinlist method cant be synced together for 5min interval
-                                    // consider all agentdata , filter can be done later in below GetAgentListLoggedInForSkill method.
-
-                                    var value = entry.ItemArray[1].ToString();
-                                    string[] skillArray = value.Split(',');
-                                    //log.Debug("Entry data [0]: " + entry.ItemArray[0].ToString());
-                                    //log.Debug("Entry data [1]: " + entry.ItemArray[1].ToString());
-
-                                    _agentSkillInfo.AddOrUpdate(entry.ItemArray[0].ToString(), new AgentSkillInfo
+                                    log.Info("Got data from db table");
+                                    foreach (DataRow entry in result.Rows)
                                     {
-                                        AgentId = entry.ItemArray[0].ToString(),
-                                        SkillExtension = skillArray.ToList()
-                                    },
-                                    (k, v) => new AgentSkillInfo
-                                    {
-                                        AgentId = entry.ItemArray[0].ToString(),
-                                        SkillExtension = skillArray.ToList()
-                                    });
+                                        // since we get data from db for every 5min and getAgentloggedinlist method cant be synced together for 5min interval
+                                        // consider all agentdata , filter can be done later in below GetAgentListLoggedInForSkill method.
+
+                                        var value = entry.ItemArray[1].ToString();
+                                        string[] skillArray = value.Split(',');
+                                        //log.Debug("Entry data [0]: " + entry.ItemArray[0].ToString());
+                                        //log.Debug("Entry data [1]: " + entry.ItemArray[1].ToString());
+
+                                        _agentSkillInfo.AddOrUpdate(entry.ItemArray[0].ToString(), new AgentSkillInfo
+                                        {
+                                            AgentId = entry.ItemArray[0].ToString(),
+                                            SkillExtension = skillArray.ToList()
+                                        },
+                                        (k, v) => new AgentSkillInfo
+                                        {
+                                            AgentId = entry.ItemArray[0].ToString(),
+                                            SkillExtension = skillArray.ToList()
+                                        });
+                                    }
+                                    log.Debug("Total Agent-Skill Info dictionary count : " + _agentSkillInfo?.Count());
                                 }
-                                log.Debug("Total Agent-Skill Info dictionary count : " + _agentSkillInfo?.Count());
+                            }
+                            catch (Exception e)
+                            {
+                                log.Error($"Exception while updating agentSkillInfo: { e}");
                             }
                             Thread.Sleep(Utilites.ConfigurationData.DBRefreshTime);
                         }
@@ -654,40 +661,47 @@ namespace SIPDataCollector
                         {
                             while (_isStarted)
                             {
-                                log.Info("Fetching Agent-Skill info from GetAgentSessionsList()");
-                                foreach (var item in server)
+                                try
                                 {
-                                    try
+                                    log.Info("Fetching Agent-Skill info from GetAgentSessionsList()");
+                                    foreach (var item in server)
                                     {
-                                        agentSkillInfo = GetTmacServerInstance(item).GetAgentSessionsList("", "", "", "", item);
-                                    }
-                                    catch (Exception e)
-                                    {
-                                        log.Warn($"TMAC Server is unreachable or agentSkillInfo is null");
-                                    }
-                                }
-                                if (agentSkillInfo != null)
-                                {
-                                    if (agentSkillInfo?.Count > 0)
-                                    {
-                                        log.Info($"AgentSkillInfo from GetAgentSessionList has data of agent skill info");
-                                        foreach (var data in agentSkillInfo)
+                                        try
                                         {
-                                            _agentSkillInfo.AddOrUpdate(data.AgentLoginID.ToString(), new AgentSkillInfo
-                                            {
-                                                AgentId = data.AgentLoginID.ToString(),
-                                                SkillExtension = data.AgentVoiceSkillsAsString.Split(',').ToList()
-                                            },
-                                            (k, v) => new AgentSkillInfo
-                                            {
-                                                AgentId = data.AgentLoginID.ToString(),
-                                                SkillExtension = data.AgentVoiceSkillsAsString.Split(',').ToList()
-                                            });
+                                            agentSkillInfo = GetTmacServerInstance(item).GetAgentSessionsList("", "", "", "", item);
+                                        }
+                                        catch (Exception e)
+                                        {
+                                            log.Warn($"TMAC Server is unreachable or agentSkillInfo is null");
                                         }
                                     }
+                                    if (agentSkillInfo != null)
+                                    {
+                                        if (agentSkillInfo?.Count > 0)
+                                        {
+                                            log.Info($"AgentSkillInfo from GetAgentSessionList has data of agent skill info");
+                                            foreach (var data in agentSkillInfo)
+                                            {
+                                                _agentSkillInfo.AddOrUpdate(data.AgentLoginID.ToString(), new AgentSkillInfo
+                                                {
+                                                    AgentId = data.AgentLoginID.ToString(),
+                                                    SkillExtension = data.AgentVoiceSkillsAsString.Split(',').ToList()
+                                                },
+                                                (k, v) => new AgentSkillInfo
+                                                {
+                                                    AgentId = data.AgentLoginID.ToString(),
+                                                    SkillExtension = data.AgentVoiceSkillsAsString.Split(',').ToList()
+                                                });
+                                            }
+                                        }
+                                    }
+                                    //DataCache.UpdateCacheObj(agentSkillInfo);
+                                    log.Debug("Total Agent-Skill Info dictionary count : " + _agentSkillInfo?.Count());
                                 }
-                                //DataCache.UpdateCacheObj(agentSkillInfo);
-                                log.Debug("Total Agent-Skill Info dictionary count : " + _agentSkillInfo?.Count());
+                                catch (Exception e)
+                                {
+                                    log.Error($"Error while updating agent skill info object: {e}");
+                                }
                                 Thread.Sleep(Utilites.ConfigurationData.DashboardRefreshTime);
                             }
                         }));
