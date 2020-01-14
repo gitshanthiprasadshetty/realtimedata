@@ -677,26 +677,27 @@ namespace SIPDataCollector
                                     }
                                     if (agentSkillInfo != null)
                                     {
-                                        if (agentSkillInfo?.Count > 0)
+                                        if (agentSkillInfo.Count > 0)
                                         {
                                             log.Info($"AgentSkillInfo from GetAgentSessionList has data of agent skill info");
                                             foreach (var data in agentSkillInfo)
                                             {
-                                                _agentSkillInfo.AddOrUpdate(data.AgentLoginID.ToString(), new AgentSkillInfo
+                                                _agentSkillInfo.AddOrUpdate(data.AgentLoginID, new AgentSkillInfo
                                                 {
-                                                    AgentId = data.AgentLoginID.ToString(),
+                                                    AgentId = data.AgentLoginID,
                                                     SkillExtension = data.AgentVoiceSkillsAsString.Split(',').ToList()
                                                 },
                                                 (k, v) => new AgentSkillInfo
                                                 {
-                                                    AgentId = data.AgentLoginID.ToString(),
+                                                    AgentId = data.AgentLoginID,
                                                     SkillExtension = data.AgentVoiceSkillsAsString.Split(',').ToList()
                                                 });
                                             }
+
+                                            //DataCache.UpdateCacheObj(agentSkillInfo);
+                                            log.Debug("Total Agent-Skill Info dictionary count : " + _agentSkillInfo?.Count());
                                         }
                                     }
-                                    //DataCache.UpdateCacheObj(agentSkillInfo);
-                                    log.Debug("Total Agent-Skill Info dictionary count : " + _agentSkillInfo?.Count());
                                 }
                                 catch (Exception e)
                                 {
