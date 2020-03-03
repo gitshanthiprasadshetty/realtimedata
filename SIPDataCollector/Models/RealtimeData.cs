@@ -58,6 +58,12 @@ public class RealtimeData
     public int InteractionsAcwTime { get; set; }
     [DataMember(Name = "callsAnsweredWithinSL")]
     public int CallsAnsweredWithinSLA { get; set; }
+    [DataMember(Name = "averageWaitingTime")]
+    public double AverageWaitingTime { get; set; }
+    [DataMember(Name = "averageHoldTime")]
+    public double AverageHoldTime { get; set; }
+    [DataMember(Name = "averageACWTime")]
+    public double AverageACWTime { get; set; }
 }
 
 //public class RealtimeData

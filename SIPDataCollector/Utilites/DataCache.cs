@@ -82,6 +82,9 @@ namespace SIPDataCollector.Utilites
                                 item.ActiveInteractionsSummary = value.ActiveInteractionsSummary;
                                 item.AverageAbandonedTime = value.AverageAbandonedTime;
                                 item.AbandonPercentage = value.AbandonPercentage;
+                                item.AverageACWTime = value.AverageACWTime;
+                                item.AverageHoldTime = value.AverageHoldTime;
+                                item.OldestInteractionWaitTime = value.OldestInteractionWaitTime;
 
                                 CacheObj.TryUpdate(value.SkillId, item, value);
                             }
@@ -202,7 +205,7 @@ namespace SIPDataCollector.Utilites
             {
                 log.Info("UpdateSummaryData()");
                 int sl = ConfigurationData.acceptableSL;
-                int skillId = 0, activeTime, HoldTime, AcwTime, callsWithinSLA, ACDSummary;
+                int skillId = 0, activeTime, HoldTime, AcwTime, callsWithinSLA, ACDSummary, waitTime;
                 List<string> skillsToMonitor = ConfigurationData.skillList;
                 //decimal slPercentage = (decimal)0m;
                 if (dataTable != null)
@@ -226,11 +229,17 @@ namespace SIPDataCollector.Utilites
                                     AcwTime = val.InteractionsAcwTime + Convert.ToInt32(dataTable.Rows[i][3]);
                                     ACDSummary = val.ActiveInteractionsSummary + Convert.ToInt32(dataTable.Rows[i][4]);
                                     callsWithinSLA = val.CallsAnsweredWithinSLA + Convert.ToInt32(dataTable.Rows[i][5]);
+                                    waitTime = val.TotalInteractionsQueueTime + Convert.ToInt32(dataTable.Rows[i][6]);
                                     val.InteractionsActiveTime = activeTime;
                                     val.InteractionsHoldTime = HoldTime;
                                     val.InteractionsAcwTime = AcwTime;
                                     val.ActiveInteractionsSummary = ACDSummary;
                                     val.CallsAnsweredWithinSLA = callsWithinSLA;
+                                    val.TotalInteractionsQueueTime = waitTime;
+                                    val.AverageHandlingTime = val.InteractionsActiveTime / (val.ActiveInteractionsSummary > 0 ? val.ActiveInteractionsSummary : 1);
+                                    val.AverageHoldTime = val.InteractionsHoldTime / (val.ActiveInteractionsSummary > 0 ? val.ActiveInteractionsSummary : 1);
+                                    val.AverageACWTime = val.InteractionsAcwTime / (val.ActiveInteractionsSummary > 0 ? val.ActiveInteractionsSummary : 1);
+                                    val.AverageWaitingTime = val.TotalInteractionsQueueTime / (val.ActiveInteractionsSummary > 0 ? val.ActiveInteractionsSummary : 1);
                                     CacheObj.TryUpdate(skillId, val, val);
                                 }
                             }
@@ -244,6 +253,11 @@ namespace SIPDataCollector.Utilites
                                     ActiveInteractionsSummary = Convert.ToInt32(dataTable.Rows[i][4]),
                                     CallsAnsweredWithinSLA = Convert.ToInt32(dataTable.Rows[i][5]),
                                     SkillId = skillId,
+                                    TotalInteractionsQueueTime = Convert.ToInt32(dataTable.Rows[i][6]),
+                                    AverageHandlingTime = Convert.ToInt32(dataTable.Rows[i][1]) / (Convert.ToInt32(dataTable.Rows[i][4]) > 0 ? Convert.ToInt32(dataTable.Rows[i][4]) : 1),
+                                    AverageHoldTime = Convert.ToInt32(dataTable.Rows[i][2]) / (Convert.ToInt32(dataTable.Rows[i][4]) > 0 ? Convert.ToInt32(dataTable.Rows[i][4]) : 1),
+                                    AverageACWTime = Convert.ToInt32(dataTable.Rows[i][3]) / (Convert.ToInt32(dataTable.Rows[i][4]) > 0 ? Convert.ToInt32(dataTable.Rows[i][4]) : 1),
+                                    AverageWaitingTime = Convert.ToInt32(dataTable.Rows[i][6]) / (Convert.ToInt32(dataTable.Rows[i][4]) > 0 ? Convert.ToInt32(dataTable.Rows[i][4]) : 1),
                                 },
                                 (k, v) => new RealtimeData
                                 {
@@ -253,7 +267,12 @@ namespace SIPDataCollector.Utilites
                                     ActiveInteractionsSummary = Convert.ToInt32(dataTable.Rows[i][4]),
                                     CallsAnsweredWithinSLA = Convert.ToInt32(dataTable.Rows[i][5]),
                                     SkillId = skillId,
-                                });
+                                    TotalInteractionsQueueTime = Convert.ToInt32(dataTable.Rows[i][6]),
+                                    AverageHandlingTime = Convert.ToInt32(dataTable.Rows[i][1]) / (Convert.ToInt32(dataTable.Rows[i][4]) > 0 ? Convert.ToInt32(dataTable.Rows[i][4]) : 1),
+                                    AverageHoldTime = Convert.ToInt32(dataTable.Rows[i][2]) / (Convert.ToInt32(dataTable.Rows[i][4]) > 0 ? Convert.ToInt32(dataTable.Rows[i][4]) : 1),
+                                    AverageACWTime = Convert.ToInt32(dataTable.Rows[i][3]) / (Convert.ToInt32(dataTable.Rows[i][4]) > 0 ? Convert.ToInt32(dataTable.Rows[i][4]) : 1),
+                                    AverageWaitingTime = Convert.ToInt32(dataTable.Rows[i][6]) / (Convert.ToInt32(dataTable.Rows[i][4]) > 0 ? Convert.ToInt32(dataTable.Rows[i][4]) : 1),
+                                }) ;
                             }
                         }
                         else
@@ -408,10 +427,14 @@ namespace SIPDataCollector.Utilites
                         data.InteractionsHoldTime = val.InteractionsHoldTime;
                         data.InteractionsQueueTime = val.InteractionsQueueTime;
                         data.InteractionsAcwTime = val.InteractionsAcwTime;
-                        data.AverageHandlingTime = val.AverageHandlingTime;
                         data.CallsAnsweredWithinSLA = val.CallsAnsweredWithinSLA;
                         data.SLPercentage = val.SLPercentage;
                         data.TotalInteractionsQueueTime = val.TotalInteractionsQueueTime;
+                        data.AverageACWTime = val.AverageACWTime;
+                        data.AverageHoldTime = val.AverageHoldTime;
+                        data.AverageWaitingTime = val.AverageWaitingTime;
+                        data.AverageHandlingTime = val.AverageHandlingTime;
+                        data.OldestInteractionWaitTime = val.OldestInteractionWaitTime;
                     }
                 }
                 return data;
