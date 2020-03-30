@@ -23,14 +23,16 @@ begin
 			SUM(t.HoldTime) as HoldTime, 
 			SUM(t.AcwTime) as ACWTime, 
 			COUNT(1) as TotalCallsInEachSkill,
-			SUM(t.CallsAnsWithnSLA) as CallsAnsWithnSLA 
+			SUM(t.CallsAnsWithnSLA) as CallsAnsWithnSLA,
+			SUM(QueueTime) as QueueTime
 			from (
 			select 
 			Case when tmac.QueueTime < @acceptablesla then 1 else 0 end as CallsAnsWithnSLA, 
 			tmac.ActiveTime as ActiveTime,
 			tmac.HoldTime as HoldTime,
 			tmac.AcwTime as AcwTime,
-			Skill 
+			Skill,
+			tmac.QueueTime as QueueTime
 			from TMAC_Interactions tmac
 			where tmac.Skill is not null and tmac.Skill !='' 
 			and ClosedDateTime >= @DataFromDate and ClosedDateTime <= @DataToDate ) t
