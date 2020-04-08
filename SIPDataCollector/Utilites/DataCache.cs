@@ -236,7 +236,7 @@ namespace SIPDataCollector.Utilites
                                     val.ActiveInteractionsSummary = ACDSummary;
                                     val.CallsAnsweredWithinSLA = callsWithinSLA;
                                     val.TotalInteractionsQueueTime = waitTime;
-                                    val.AverageHandlingTime = val.InteractionsActiveTime / (val.ActiveInteractionsSummary > 0 ? val.ActiveInteractionsSummary : 1);
+                                    val.AverageHandlingTime = (val.InteractionsActiveTime+val.InteractionsHoldTime) / (val.ActiveInteractionsSummary > 0 ? val.ActiveInteractionsSummary : 1);
                                     val.AverageHoldTime = val.InteractionsHoldTime / (val.ActiveInteractionsSummary > 0 ? val.ActiveInteractionsSummary : 1);
                                     val.AverageACWTime = val.InteractionsAcwTime / (val.ActiveInteractionsSummary > 0 ? val.ActiveInteractionsSummary : 1);
                                     val.AverageWaitingTime = val.TotalInteractionsQueueTime / (val.ActiveInteractionsSummary > 0 ? val.ActiveInteractionsSummary : 1);
@@ -254,7 +254,7 @@ namespace SIPDataCollector.Utilites
                                     CallsAnsweredWithinSLA = Convert.ToInt32(dataTable.Rows[i][5]),
                                     SkillId = skillId,
                                     TotalInteractionsQueueTime = Convert.ToInt32(dataTable.Rows[i][6]),
-                                    AverageHandlingTime = Convert.ToInt32(dataTable.Rows[i][1]) / (Convert.ToInt32(dataTable.Rows[i][4]) > 0 ? Convert.ToInt32(dataTable.Rows[i][4]) : 1),
+                                    AverageHandlingTime = (Convert.ToInt32(dataTable.Rows[i][1])+ Convert.ToInt32(dataTable.Rows[i][2])) / (Convert.ToInt32(dataTable.Rows[i][4]) > 0 ? Convert.ToInt32(dataTable.Rows[i][4]) : 1),
                                     AverageHoldTime = Convert.ToInt32(dataTable.Rows[i][2]) / (Convert.ToInt32(dataTable.Rows[i][4]) > 0 ? Convert.ToInt32(dataTable.Rows[i][4]) : 1),
                                     AverageACWTime = Convert.ToInt32(dataTable.Rows[i][3]) / (Convert.ToInt32(dataTable.Rows[i][4]) > 0 ? Convert.ToInt32(dataTable.Rows[i][4]) : 1),
                                     AverageWaitingTime = Convert.ToInt32(dataTable.Rows[i][6]) / (Convert.ToInt32(dataTable.Rows[i][4]) > 0 ? Convert.ToInt32(dataTable.Rows[i][4]) : 1),
@@ -268,7 +268,7 @@ namespace SIPDataCollector.Utilites
                                     CallsAnsweredWithinSLA = Convert.ToInt32(dataTable.Rows[i][5]),
                                     SkillId = skillId,
                                     TotalInteractionsQueueTime = Convert.ToInt32(dataTable.Rows[i][6]),
-                                    AverageHandlingTime = Convert.ToInt32(dataTable.Rows[i][1]) / (Convert.ToInt32(dataTable.Rows[i][4]) > 0 ? Convert.ToInt32(dataTable.Rows[i][4]) : 1),
+                                    AverageHandlingTime = (Convert.ToInt32(dataTable.Rows[i][1]) + Convert.ToInt32(dataTable.Rows[i][2])) / (Convert.ToInt32(dataTable.Rows[i][4]) > 0 ? Convert.ToInt32(dataTable.Rows[i][4]) : 1),
                                     AverageHoldTime = Convert.ToInt32(dataTable.Rows[i][2]) / (Convert.ToInt32(dataTable.Rows[i][4]) > 0 ? Convert.ToInt32(dataTable.Rows[i][4]) : 1),
                                     AverageACWTime = Convert.ToInt32(dataTable.Rows[i][3]) / (Convert.ToInt32(dataTable.Rows[i][4]) > 0 ? Convert.ToInt32(dataTable.Rows[i][4]) : 1),
                                     AverageWaitingTime = Convert.ToInt32(dataTable.Rows[i][6]) / (Convert.ToInt32(dataTable.Rows[i][4]) > 0 ? Convert.ToInt32(dataTable.Rows[i][4]) : 1),
