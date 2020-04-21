@@ -1,0 +1,18 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp3.0</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\SIPDataCollector\SIPDataCollector.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="Logger">
+      <HintPath>..\..\TRealtime\SIPDataCollector\Lib\Logger.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
+
+</Project>
