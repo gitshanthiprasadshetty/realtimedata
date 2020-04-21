@@ -14,9 +14,8 @@ using System.Data.SqlClient;
 using Microsoft.AspNetCore.Mvc;
 
 namespace SIPDataCollector
-{
-    [Route("api/[controller]")]
-    public class SIPManager : Controller, ISipDataCollector
+{   
+    public class SIPManager : ISipDataCollector
     {
         #region Global Declaration
 
@@ -178,14 +177,23 @@ namespace SIPDataCollector
         /// Gets List of bcms data related to all given skills in config
         /// </summary>
         /// <returns>returns all bcms data related for given skills in config.</returns>
-        [HttpGet]
-        [Route("api/TRealtimeData/GetRealtimeDataForAllSkills")]
         public List<RealtimeData> GetBcmsData()
         {
-            //    log.Info("GetBcmsData()");
+                log.Info("GetBcmsData()");
             try
             {
-                return DataCache.GetBcmsData();
+                List<RealtimeData> obj = new List<RealtimeData>();
+                RealtimeData obj1 = new RealtimeData();
+                obj1.AbandonedInteractionsSummary = 1;
+                obj1.AbandonPercentage = 80;
+                obj1.AcceptedSL = 20;
+                obj1.ActiveInteractions = 5;
+                obj1.ActiveInteractionsSummary = 50;
+                obj1.AverageACWTime = 1.0;
+                obj1.AvgSpeedAnswer = 1;
+                obj.Add(obj1);
+                return obj;
+               // return DataCache.GetBcmsData();
             }
             catch (Exception ex)
             {
@@ -199,13 +207,20 @@ namespace SIPDataCollector
         /// </summary>
         /// <param name="skillId">skillId</param>
         /// <returns>returns bcms data for passed skillid</returns>
-        [HttpGet]
-        [Route("api/TRealtimeData/GetRealtimeDataForSkill/{skillId}")]
         public RealtimeData GetBcmsDataForSkill(string skillId)
         {
             //    log.Info($"GetBcmsDataForSkill(), skillid = {skillId}");
             try
             {
+                RealtimeData obj1 = new RealtimeData();
+                obj1.AbandonedInteractionsSummary = 1;
+                obj1.AbandonPercentage = 80;
+                obj1.AcceptedSL = 20;
+                obj1.ActiveInteractions = 5;
+                obj1.ActiveInteractionsSummary = 50;
+                obj1.AverageACWTime = 1.0;
+                obj1.AvgSpeedAnswer = 1;
+                return obj1;
                 return DataCache.GetBcmsDataForSkill(Convert.ToInt32(skillId));
             }
             catch (Exception ex)
@@ -268,8 +283,7 @@ namespace SIPDataCollector
                 log.Error("Error in PullDataFromAlternateServer() :" + ex);
             }
         }
-        [HttpGet]
-        [Route("api/TRealtimeData/GetSkillAndExtensions")]
+
         public List<SkillExtensionInfo> GetSkillAndExtensions()
         {
             log.Info("GetSkillAndExtensions()");
@@ -291,8 +305,6 @@ namespace SIPDataCollector
         /// <param name="queue"></param>
         /// <param name="queuetime"></param>
         /// <param name="abandontime"></param>
-        [HttpGet]
-        [Route("/VdnInformation/{callid}/{queue}/{queuetime}/{abandontime}")]
         public void VdnInformation(string callid, string queue, string queuetime, string abandontime)
         {
             log.Info($"VdnInformation() : CallId = {callid}, skillExtension = {queue} , QueueTime = {queuetime} , AbandonTime={abandontime}");
@@ -335,8 +347,6 @@ namespace SIPDataCollector
         /// <param name="queue"></param>
         /// <param name="queuetime"></param>
         /// <param name="abandontime"></param>
-        [HttpGet]
-        [Route("api/TRealtimeData/VdnInformationForAbandon/{callid}/{queue}/{queuetime}/{abandontime}")]
         public void VdnInformationForAbandon(string callid, string queue, string queuetime, string abandontime)
         {
             log.Info($"VdnInformationForAbandon() : CallId = {callid}, skillExtension = {queue} , QueueTime = {queuetime} , AbandonTime={abandontime}");

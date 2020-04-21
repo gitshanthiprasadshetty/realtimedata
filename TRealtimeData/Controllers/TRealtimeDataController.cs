@@ -58,10 +58,6 @@ namespace TRealtimeData.Controllers
             })
             .ToArray();
         }
-        [HttpGet("{id}")]
-        public List<RealtimeData> GetBcmsData()
-        {
-            return SIPDataCollector.SIPManager.GetInstance().GetBcmsData();
-        }
+
     }
 }

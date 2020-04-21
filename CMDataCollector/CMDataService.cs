@@ -15,6 +15,22 @@ namespace CMDataCollector
         private static Logger.Logger Log = new Logger.Logger(typeof(CMDataService));
 
         /// <summary>
+        /// singleton instance of class
+        /// </summary>
+        private static CMDataService _instance;
+
+        /// <summary>
+        /// Get current instance of class/ create new instance.
+        /// </summary>
+        /// <returns>Returns existing instance or new instance of this class</returns>
+        public static CMDataService GetInstance()
+        {
+            if (_instance == null)
+                _instance = new CMDataService();
+
+            return _instance;
+        }
+        /// <summary>
         /// Gets Bcms data for all skills
         /// </summary>
         /// <returns>returns Bcms data for all skills</returns>

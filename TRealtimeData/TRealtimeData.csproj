@@ -5,6 +5,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\CMDataCollector\CMDataCollector.csproj" />
     <ProjectReference Include="..\SIPDataCollector\SIPDataCollector.csproj" />
   </ItemGroup>
 

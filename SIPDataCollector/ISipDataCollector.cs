@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using Microsoft.AspNetCore.Mvc;
 using SIPDataCollector.Models;
 
 namespace SIPDataCollector
 {
     public interface ISipDataCollector
     {
+       
         List<RealtimeData> GetBcmsData();
 
         RealtimeData GetBcmsDataForSkill(string skillId);
