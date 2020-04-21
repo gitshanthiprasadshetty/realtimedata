@@ -1,9 +1,0 @@
-﻿<?xml version='1.0' encoding='utf-8'?>
-<SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="TRealTimeDataSync.Properties" GeneratedClassName="Settings">
-  <Profiles />
-  <Settings>
-    <Setting Name="TRealTimeDataSync_HB_TRealtimeData_CMDataService" Type="(Web Service URL)" Scope="Application">
-      <Value Profile="(Default)">http://10.133.146.11:55555/TRealtimeData/</Value>
-    </Setting>
-  </Settings>
-</SettingsFile>
