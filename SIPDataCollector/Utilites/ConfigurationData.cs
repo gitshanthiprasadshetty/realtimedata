@@ -82,6 +82,9 @@ namespace SIPDataCollector.Utilites
 
                 skillList = FormatSkills(skillsToMonitor);
 
+                //modified by Anish In SIP we don't have to check for SMSAPI skills
+                skillList = skillsToMonitor.Split(',').ToList();
+
                 log.Info($"Monitoring: {String.Join(", ", skillList)}");
                 auxCodes = DataAccess.GetAuxCodes();
                 auxCodes.Add("Default");

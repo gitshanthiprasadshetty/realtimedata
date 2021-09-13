@@ -122,17 +122,20 @@
       <SubType>Designer</SubType>
     </None>
     <None Include="packages.config" />
-    <None Include="Service References\THistoricalData\CMDataCollector.THistoricalData.SkillData.datasource">
+    <None Include="Service References\THistoricalData\CMDataCollector.THistoricalData.AgentInfo.datasource">
       <DependentUpon>Reference.svcmap</DependentUpon>
     </None>
-    <None Include="Service References\THistoricalData\service.wsdl" />
-    <None Include="Service References\THistoricalData\service.xsd">
+    <None Include="Service References\THistoricalData\CMDataCollector.THistoricalData.SkillInfo.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\THistoricalData\HistoricalData.wsdl" />
+    <None Include="Service References\THistoricalData\item.xsd">
       <SubType>Designer</SubType>
     </None>
-    <None Include="Service References\THistoricalData\service1.xsd">
+    <None Include="Service References\THistoricalData\item1.xsd">
       <SubType>Designer</SubType>
     </None>
-    <None Include="Service References\THistoricalData\THistoricalData.Lib.Model.xsd">
+    <None Include="Service References\THistoricalData\item2.xsd">
       <SubType>Designer</SubType>
     </None>
   </ItemGroup>
@@ -141,6 +144,9 @@
   </ItemGroup>
   <ItemGroup>
     <WCFMetadataStorage Include="Service References\THistoricalData\" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Service References\THistoricalData\item.disco" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Service References\THistoricalData\configuration91.svcinfo" />

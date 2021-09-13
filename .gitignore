@@ -21,3 +21,8 @@ SIPDataCollector/bin/*
 Connector/obj/*
 Connector/bin/*
 CMDataCollector/bin/*
+TRealtimeClient/.vs/TRealtimeClient/v16/.suo
+TRealtimeClient/.vs/TRealtimeClient/v16/Server/sqlite3/db.lock
+TRealtimeClient/.vs/TRealtimeClient/v16/Server/sqlite3/storage.ide
+TRealtimeData/UpgradeLog2.htm
+TRealtimeData/UpgradeLog.htm

@@ -357,6 +357,7 @@ namespace SIPDataCollector
                     {
                         log.Info($"Get wallboardskills data from TMAC server {server}");
                         var wallboardSkillsData = GetTmacServerInstance(server).GetTmacWallboardSkills("");
+                        var skillData = _skillExtnInfo.Where(x => !wallboardSkillsData.Any(y => y.SkillID == x.Value.ExtensionId.ToString()));
                         if (wallboardSkillsData != null && wallboardSkillsData.Count > 0)
                         {
                             log.Info($"save wallboardskills data from server {server}");
@@ -404,8 +405,10 @@ namespace SIPDataCollector
                                             realtimeOfSkill.TotalAgentsInAUX = realtimeOfSkill.AgentStats.Count(x => Utilites.ConfigurationData.auxCodes.Contains(x.State));
                                         }
                                     }
-                                    catch (Exception)
+                                    catch (Exception ex)
                                     {
+                                        //added on 07-05-2020 by Anish   
+                                        log.Error("Error in FetchBcms(): ", ex);
                                     }
 
                                     if (realtimeDataForAllSkills.Any(skill => skill.Key == realtimeOfSkill.SkillExtensionId))
@@ -420,7 +423,63 @@ namespace SIPDataCollector
                         }
                         else
                             log.Info($"No response from TMAC server instance : {server}");
+                        if (skillData.Count() > 0)
+                        {
+                            foreach(var skill in skillData)
+                            {
+                                RealtimeData realtimeOfSkill;
+                                if (realtimeDataForAllSkills.Any(x => x.Key == skill.Value.ExtensionId))
+                                {
+                                    realtimeOfSkill = realtimeDataForAllSkills?.FirstOrDefault(x => x.Key == skill.Value.ExtensionId).Value;
+                                }
+                                else
+                                    realtimeOfSkill = new RealtimeData();
 
+                                realtimeOfSkill.SkillId = _skillExtnInfo[skill.Value.ExtensionId.ToString()].SkillId;
+                                realtimeOfSkill.Channel = Utilites.ConfigurationData.GetChannel(Convert.ToString(realtimeOfSkill.SkillId));
+                                realtimeOfSkill.SkillName = skill.Value.SkillName;
+                                realtimeOfSkill.SkillExtensionId = _skillExtnInfo[skill.Value.ExtensionId.ToString()].ExtensionId;
+                                realtimeOfSkill.ActiveInteractions += 0;
+                                realtimeOfSkill.TotalAgentsAvailable += 0;
+                                realtimeOfSkill.AverageAbandonedTime = 0;
+
+                                try
+                                {
+                                    realtimeOfSkill.AcceptedSL = Convert.ToInt32(Utilites.ConfigurationData.acceptableSlObj?.FirstOrDefault(x => x.Key == realtimeOfSkill.SkillId.ToString()).Value);
+                                    realtimeOfSkill.InteractionsInQueue = (realtimeOfSkill.Channel.ToLower() == "email") ? Convert.ToInt32(WorkQueueProxy.GetQueueCount(skill.Value.ExtensionId.ToString())) : 0;
+                                    //realtimeOfSkill.CallsWaiting = (realtimeOfSkill.Channel.ToLower() == "email") ? Convert.ToInt32(WorkQueueProxy.GetQueueCount(wallboardSkillInformation.SkillID)) : wallboardSkillInformation.CallsInQueue;
+                                    realtimeOfSkill.OldestInteractionWaitTime = Convert.ToInt32(WorkQueueProxy.GetOldestWaitTime(skill.Value.ExtensionId.ToString()));
+                                    //realtimeOfSkill.OldestCallWaitTime = WorkQueueProxy.GetOldestWaitTime(wallboardSkillInformation.SkillID);
+
+                                    var agentStats = GetAgentListLoggedInForSkill(server, realtimeOfSkill.SkillId.ToString());
+                                    if (realtimeOfSkill.AgentStats == null)
+                                        realtimeOfSkill.AgentStats = new List<AgentData>();
+
+                                    realtimeOfSkill.AgentStats.AddRange(agentStats);
+
+                                    if (realtimeOfSkill.AgentStats != null)
+                                    {
+                                        // log.Debug("Active Interaction : " + wallboardSkillInformation.ActiveInteractions + 1);
+                                        realtimeOfSkill.TotalAgentsStaffed = realtimeOfSkill.AgentStats.Count();
+                                        realtimeOfSkill.TotalAgentsInACW = realtimeOfSkill.AgentStats.Count(x => x.State.Contains("ACW"));
+                                        realtimeOfSkill.TotalAgentsInAUX = realtimeOfSkill.AgentStats.Count(x => Utilites.ConfigurationData.auxCodes.Contains(x.State));
+                                    }
+                                }
+                                catch (Exception ex)
+                                {
+                                    //made changes by Anish on 15-05-2020
+                                    log.Error("Error in FetchBCMS() for skills which are not present in tmac: ", ex);
+                                }
+
+                                if (realtimeDataForAllSkills.Any(x => x.Key == realtimeOfSkill.SkillExtensionId))
+                                    realtimeDataForAllSkills.Remove(realtimeOfSkill.SkillExtensionId);
+
+                                realtimeDataForAllSkills.Add(realtimeOfSkill.SkillExtensionId, realtimeOfSkill);
+
+                                if (!queue.Contains(skill.Value.ExtensionId.ToString()))
+                                    queue.Enqueue(skill.Value.ExtensionId.ToString());
+                            }
+                        }
 
                         //bcmsdata.Add(data);
                         // update data to cache memory.
@@ -528,10 +587,10 @@ namespace SIPDataCollector
                 DataTable result = null;
 
                 // get agent-skillid data from db[TMAC_Agent_Skills]
-                //var dbThread = new Thread(new ThreadStart(delegate
-                //{
-                //    while (_isStarted)
-                //    {
+                var dbThread = new Thread(new ThreadStart(delegate
+                {
+                    while (_isStarted)
+                    {
                         // Get agent-{skill} info from db.
                         result = DataAccess.GetAgentSkillInfo();
                         if (result != null)
@@ -559,10 +618,10 @@ namespace SIPDataCollector
                             }
                             log.Debug("Total Agent-Skill Info dictionary count : " + _agentSkillInfo.Count());
                         }
-                        //Thread.Sleep(Utilites.ConfigurationData.DashboardRefreshTime);
-                    //}
-                //}));
-                //dbThread.Start();
+                        Thread.Sleep(Utilites.ConfigurationData.DashboardRefreshTime);
+                    }
+                }));
+                dbThread.Start();
             }
             catch (Exception ex)
             {

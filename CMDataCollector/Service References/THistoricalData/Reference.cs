@@ -15,18 +15,139 @@ namespace CMDataCollector.THistoricalData {
     
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Runtime.Serialization", "4.0.0.0")]
-    [System.Runtime.Serialization.DataContractAttribute(Name="SkillData", Namespace="http://schemas.datacontract.org/2004/07/THistoricalData.Lib.Model")]
+    [System.Runtime.Serialization.DataContractAttribute(Name="Info", Namespace="http://schemas.datacontract.org/2004/07/THistoricalData.Model")]
     [System.SerializableAttribute()]
-    public partial class SkillData : object, System.Runtime.Serialization.IExtensibleDataObject, System.ComponentModel.INotifyPropertyChanged {
+    [System.Runtime.Serialization.KnownTypeAttribute(typeof(CMDataCollector.THistoricalData.SkillInfo))]
+    [System.Runtime.Serialization.KnownTypeAttribute(typeof(CMDataCollector.THistoricalData.AgentInfo))]
+    public partial class Info : object, System.Runtime.Serialization.IExtensibleDataObject, System.ComponentModel.INotifyPropertyChanged {
         
         [System.NonSerializedAttribute()]
         private System.Runtime.Serialization.ExtensionDataObject extensionDataField;
         
         [System.Runtime.Serialization.OptionalFieldAttribute()]
-        private int AbandCallsField;
+        private int AcceptableServiceLevelField;
         
         [System.Runtime.Serialization.OptionalFieldAttribute()]
-        private string AcceptableServiceLevelField;
+        private string ExtnField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private string HybridSourceTypeField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private string IdField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private string LastUpdatedByField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private string NameField;
+        
+        [global::System.ComponentModel.BrowsableAttribute(false)]
+        public System.Runtime.Serialization.ExtensionDataObject ExtensionData {
+            get {
+                return this.extensionDataField;
+            }
+            set {
+                this.extensionDataField = value;
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public int AcceptableServiceLevel {
+            get {
+                return this.AcceptableServiceLevelField;
+            }
+            set {
+                if ((this.AcceptableServiceLevelField.Equals(value) != true)) {
+                    this.AcceptableServiceLevelField = value;
+                    this.RaisePropertyChanged("AcceptableServiceLevel");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public string Extn {
+            get {
+                return this.ExtnField;
+            }
+            set {
+                if ((object.ReferenceEquals(this.ExtnField, value) != true)) {
+                    this.ExtnField = value;
+                    this.RaisePropertyChanged("Extn");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public string HybridSourceType {
+            get {
+                return this.HybridSourceTypeField;
+            }
+            set {
+                if ((object.ReferenceEquals(this.HybridSourceTypeField, value) != true)) {
+                    this.HybridSourceTypeField = value;
+                    this.RaisePropertyChanged("HybridSourceType");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public string Id {
+            get {
+                return this.IdField;
+            }
+            set {
+                if ((object.ReferenceEquals(this.IdField, value) != true)) {
+                    this.IdField = value;
+                    this.RaisePropertyChanged("Id");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public string LastUpdatedBy {
+            get {
+                return this.LastUpdatedByField;
+            }
+            set {
+                if ((object.ReferenceEquals(this.LastUpdatedByField, value) != true)) {
+                    this.LastUpdatedByField = value;
+                    this.RaisePropertyChanged("LastUpdatedBy");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public string Name {
+            get {
+                return this.NameField;
+            }
+            set {
+                if ((object.ReferenceEquals(this.NameField, value) != true)) {
+                    this.NameField = value;
+                    this.RaisePropertyChanged("Name");
+                }
+            }
+        }
+        
+        public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
+        
+        protected void RaisePropertyChanged(string propertyName) {
+            System.ComponentModel.PropertyChangedEventHandler propertyChanged = this.PropertyChanged;
+            if ((propertyChanged != null)) {
+                propertyChanged(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
+            }
+        }
+    }
+    
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Runtime.Serialization", "4.0.0.0")]
+    [System.Runtime.Serialization.DataContractAttribute(Name="SkillInfo", Namespace="http://schemas.datacontract.org/2004/07/THistoricalData.Model")]
+    [System.SerializableAttribute()]
+    public partial class SkillInfo : CMDataCollector.THistoricalData.Info {
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private int AbandCallsField;
         
         [System.Runtime.Serialization.OptionalFieldAttribute()]
         private int AcdCallsField;
@@ -38,10 +159,19 @@ namespace CMDataCollector.THistoricalData {
         private string AvgSpeedAnswerField;
         
         [System.Runtime.Serialization.OptionalFieldAttribute()]
-        private decimal AvgStaffField;
+        private string AvgStaffedTimeField;
         
         [System.Runtime.Serialization.OptionalFieldAttribute()]
         private string AvgTalkTimeField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private int CallsAbandonedAfterSLAThresholdField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private int CallsHandledWithinSLAThresholdField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private string DateField;
         
         [System.Runtime.Serialization.OptionalFieldAttribute()]
         private string DateIntField;
@@ -59,13 +189,19 @@ namespace CMDataCollector.THistoricalData {
         private string IntvlField;
         
         [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private int PassedCallsField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
         private System.DateTime ReportDateTimeField;
         
         [System.Runtime.Serialization.OptionalFieldAttribute()]
         private string ReportTypeField;
         
         [System.Runtime.Serialization.OptionalFieldAttribute()]
-        private string ServiceLevelField;
+        private string SLPercentageField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private string SkillExtensionField;
         
         [System.Runtime.Serialization.OptionalFieldAttribute()]
         private string SkillIdField;
@@ -74,26 +210,37 @@ namespace CMDataCollector.THistoricalData {
         private string SkillNameField;
         
         [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private int SpeedOfAnswerField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
         private string StartDateTimeField;
         
         [System.Runtime.Serialization.OptionalFieldAttribute()]
         private string SwitchNameField;
         
         [System.Runtime.Serialization.OptionalFieldAttribute()]
-        private string TotalAfterCallTimeField;
+        private int TotalAbandTimeField;
         
         [System.Runtime.Serialization.OptionalFieldAttribute()]
-        private string TotalAuxField;
+        private int TotalAfterCallTimeField;
         
-        [global::System.ComponentModel.BrowsableAttribute(false)]
-        public System.Runtime.Serialization.ExtensionDataObject ExtensionData {
-            get {
-                return this.extensionDataField;
-            }
-            set {
-                this.extensionDataField = value;
-            }
-        }
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private int TotalAuxTimeField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private string TotalInteractionField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private int TotalStaffedAgentsField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private int TotalStaffedTimeField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private int TotalTalkTimeField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private int TransferCallField;
         
         [System.Runtime.Serialization.DataMemberAttribute()]
         public int AbandCalls {
@@ -104,19 +251,6 @@ namespace CMDataCollector.THistoricalData {
                 if ((this.AbandCallsField.Equals(value) != true)) {
                     this.AbandCallsField = value;
                     this.RaisePropertyChanged("AbandCalls");
-                }
-            }
-        }
-        
-        [System.Runtime.Serialization.DataMemberAttribute()]
-        public string AcceptableServiceLevel {
-            get {
-                return this.AcceptableServiceLevelField;
-            }
-            set {
-                if ((object.ReferenceEquals(this.AcceptableServiceLevelField, value) != true)) {
-                    this.AcceptableServiceLevelField = value;
-                    this.RaisePropertyChanged("AcceptableServiceLevel");
                 }
             }
         }
@@ -161,14 +295,14 @@ namespace CMDataCollector.THistoricalData {
         }
         
         [System.Runtime.Serialization.DataMemberAttribute()]
-        public decimal AvgStaff {
+        public string AvgStaffedTime {
             get {
-                return this.AvgStaffField;
+                return this.AvgStaffedTimeField;
             }
             set {
-                if ((this.AvgStaffField.Equals(value) != true)) {
-                    this.AvgStaffField = value;
-                    this.RaisePropertyChanged("AvgStaff");
+                if ((object.ReferenceEquals(this.AvgStaffedTimeField, value) != true)) {
+                    this.AvgStaffedTimeField = value;
+                    this.RaisePropertyChanged("AvgStaffedTime");
                 }
             }
         }
@@ -182,6 +316,45 @@ namespace CMDataCollector.THistoricalData {
                 if ((object.ReferenceEquals(this.AvgTalkTimeField, value) != true)) {
                     this.AvgTalkTimeField = value;
                     this.RaisePropertyChanged("AvgTalkTime");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public int CallsAbandonedAfterSLAThreshold {
+            get {
+                return this.CallsAbandonedAfterSLAThresholdField;
+            }
+            set {
+                if ((this.CallsAbandonedAfterSLAThresholdField.Equals(value) != true)) {
+                    this.CallsAbandonedAfterSLAThresholdField = value;
+                    this.RaisePropertyChanged("CallsAbandonedAfterSLAThreshold");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public int CallsHandledWithinSLAThreshold {
+            get {
+                return this.CallsHandledWithinSLAThresholdField;
+            }
+            set {
+                if ((this.CallsHandledWithinSLAThresholdField.Equals(value) != true)) {
+                    this.CallsHandledWithinSLAThresholdField = value;
+                    this.RaisePropertyChanged("CallsHandledWithinSLAThreshold");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public string Date {
+            get {
+                return this.DateField;
+            }
+            set {
+                if ((object.ReferenceEquals(this.DateField, value) != true)) {
+                    this.DateField = value;
+                    this.RaisePropertyChanged("Date");
                 }
             }
         }
@@ -252,6 +425,19 @@ namespace CMDataCollector.THistoricalData {
         }
         
         [System.Runtime.Serialization.DataMemberAttribute()]
+        public int PassedCalls {
+            get {
+                return this.PassedCallsField;
+            }
+            set {
+                if ((this.PassedCallsField.Equals(value) != true)) {
+                    this.PassedCallsField = value;
+                    this.RaisePropertyChanged("PassedCalls");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
         public System.DateTime ReportDateTime {
             get {
                 return this.ReportDateTimeField;
@@ -278,14 +464,27 @@ namespace CMDataCollector.THistoricalData {
         }
         
         [System.Runtime.Serialization.DataMemberAttribute()]
-        public string ServiceLevel {
+        public string SLPercentage {
             get {
-                return this.ServiceLevelField;
+                return this.SLPercentageField;
             }
             set {
-                if ((object.ReferenceEquals(this.ServiceLevelField, value) != true)) {
-                    this.ServiceLevelField = value;
-                    this.RaisePropertyChanged("ServiceLevel");
+                if ((object.ReferenceEquals(this.SLPercentageField, value) != true)) {
+                    this.SLPercentageField = value;
+                    this.RaisePropertyChanged("SLPercentage");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public string SkillExtension {
+            get {
+                return this.SkillExtensionField;
+            }
+            set {
+                if ((object.ReferenceEquals(this.SkillExtensionField, value) != true)) {
+                    this.SkillExtensionField = value;
+                    this.RaisePropertyChanged("SkillExtension");
                 }
             }
         }
@@ -317,6 +516,19 @@ namespace CMDataCollector.THistoricalData {
         }
         
         [System.Runtime.Serialization.DataMemberAttribute()]
+        public int SpeedOfAnswer {
+            get {
+                return this.SpeedOfAnswerField;
+            }
+            set {
+                if ((this.SpeedOfAnswerField.Equals(value) != true)) {
+                    this.SpeedOfAnswerField = value;
+                    this.RaisePropertyChanged("SpeedOfAnswer");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
         public string StartDateTime {
             get {
                 return this.StartDateTimeField;
@@ -343,12 +555,25 @@ namespace CMDataCollector.THistoricalData {
         }
         
         [System.Runtime.Serialization.DataMemberAttribute()]
-        public string TotalAfterCallTime {
+        public int TotalAbandTime {
+            get {
+                return this.TotalAbandTimeField;
+            }
+            set {
+                if ((this.TotalAbandTimeField.Equals(value) != true)) {
+                    this.TotalAbandTimeField = value;
+                    this.RaisePropertyChanged("TotalAbandTime");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public int TotalAfterCallTime {
             get {
                 return this.TotalAfterCallTimeField;
             }
             set {
-                if ((object.ReferenceEquals(this.TotalAfterCallTimeField, value) != true)) {
+                if ((this.TotalAfterCallTimeField.Equals(value) != true)) {
                     this.TotalAfterCallTimeField = value;
                     this.RaisePropertyChanged("TotalAfterCallTime");
                 }
@@ -356,24 +581,535 @@ namespace CMDataCollector.THistoricalData {
         }
         
         [System.Runtime.Serialization.DataMemberAttribute()]
-        public string TotalAux {
+        public int TotalAuxTime {
             get {
-                return this.TotalAuxField;
+                return this.TotalAuxTimeField;
             }
             set {
-                if ((object.ReferenceEquals(this.TotalAuxField, value) != true)) {
-                    this.TotalAuxField = value;
-                    this.RaisePropertyChanged("TotalAux");
+                if ((this.TotalAuxTimeField.Equals(value) != true)) {
+                    this.TotalAuxTimeField = value;
+                    this.RaisePropertyChanged("TotalAuxTime");
                 }
             }
         }
         
-        public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public string TotalInteraction {
+            get {
+                return this.TotalInteractionField;
+            }
+            set {
+                if ((object.ReferenceEquals(this.TotalInteractionField, value) != true)) {
+                    this.TotalInteractionField = value;
+                    this.RaisePropertyChanged("TotalInteraction");
+                }
+            }
+        }
         
-        protected void RaisePropertyChanged(string propertyName) {
-            System.ComponentModel.PropertyChangedEventHandler propertyChanged = this.PropertyChanged;
-            if ((propertyChanged != null)) {
-                propertyChanged(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public int TotalStaffedAgents {
+            get {
+                return this.TotalStaffedAgentsField;
+            }
+            set {
+                if ((this.TotalStaffedAgentsField.Equals(value) != true)) {
+                    this.TotalStaffedAgentsField = value;
+                    this.RaisePropertyChanged("TotalStaffedAgents");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public int TotalStaffedTime {
+            get {
+                return this.TotalStaffedTimeField;
+            }
+            set {
+                if ((this.TotalStaffedTimeField.Equals(value) != true)) {
+                    this.TotalStaffedTimeField = value;
+                    this.RaisePropertyChanged("TotalStaffedTime");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public int TotalTalkTime {
+            get {
+                return this.TotalTalkTimeField;
+            }
+            set {
+                if ((this.TotalTalkTimeField.Equals(value) != true)) {
+                    this.TotalTalkTimeField = value;
+                    this.RaisePropertyChanged("TotalTalkTime");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public int TransferCall {
+            get {
+                return this.TransferCallField;
+            }
+            set {
+                if ((this.TransferCallField.Equals(value) != true)) {
+                    this.TransferCallField = value;
+                    this.RaisePropertyChanged("TransferCall");
+                }
+            }
+        }
+    }
+    
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Runtime.Serialization", "4.0.0.0")]
+    [System.Runtime.Serialization.DataContractAttribute(Name="AgentInfo", Namespace="http://schemas.datacontract.org/2004/07/THistoricalData.Model")]
+    [System.SerializableAttribute()]
+    public partial class AgentInfo : CMDataCollector.THistoricalData.Info {
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private int AcdCallsField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private string AgentIDField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private string AgentNameField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private string AvgAudioIPTimeField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private string AvgChatTimeField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private string AvgExtensionTimeField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private string AvgInteractionTimeField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private string AvgTalkTimeField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private string DateField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private string DateIntField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private int ExtensionCallsField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private string IntervalField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private string IntvlField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private System.DateTime ReportDateTimeField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private string SupervisorNameField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private int TotalAfterCallTimeField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private int TotalAudioIPField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private int TotalAudioIPTimeField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private int TotalAuxTimeField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private int TotalAvailTimeField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private int TotalChatField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private int TotalChatTimeField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private int TotalExtensionTimeField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private int TotalHoldTimeField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private string TotalInteractionField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private int TotalInteractionTimeField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private int TotalStaffedTimeField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private int TransferCallField;
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public int AcdCalls {
+            get {
+                return this.AcdCallsField;
+            }
+            set {
+                if ((this.AcdCallsField.Equals(value) != true)) {
+                    this.AcdCallsField = value;
+                    this.RaisePropertyChanged("AcdCalls");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public string AgentID {
+            get {
+                return this.AgentIDField;
+            }
+            set {
+                if ((object.ReferenceEquals(this.AgentIDField, value) != true)) {
+                    this.AgentIDField = value;
+                    this.RaisePropertyChanged("AgentID");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public string AgentName {
+            get {
+                return this.AgentNameField;
+            }
+            set {
+                if ((object.ReferenceEquals(this.AgentNameField, value) != true)) {
+                    this.AgentNameField = value;
+                    this.RaisePropertyChanged("AgentName");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public string AvgAudioIPTime {
+            get {
+                return this.AvgAudioIPTimeField;
+            }
+            set {
+                if ((object.ReferenceEquals(this.AvgAudioIPTimeField, value) != true)) {
+                    this.AvgAudioIPTimeField = value;
+                    this.RaisePropertyChanged("AvgAudioIPTime");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public string AvgChatTime {
+            get {
+                return this.AvgChatTimeField;
+            }
+            set {
+                if ((object.ReferenceEquals(this.AvgChatTimeField, value) != true)) {
+                    this.AvgChatTimeField = value;
+                    this.RaisePropertyChanged("AvgChatTime");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public string AvgExtensionTime {
+            get {
+                return this.AvgExtensionTimeField;
+            }
+            set {
+                if ((object.ReferenceEquals(this.AvgExtensionTimeField, value) != true)) {
+                    this.AvgExtensionTimeField = value;
+                    this.RaisePropertyChanged("AvgExtensionTime");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public string AvgInteractionTime {
+            get {
+                return this.AvgInteractionTimeField;
+            }
+            set {
+                if ((object.ReferenceEquals(this.AvgInteractionTimeField, value) != true)) {
+                    this.AvgInteractionTimeField = value;
+                    this.RaisePropertyChanged("AvgInteractionTime");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public string AvgTalkTime {
+            get {
+                return this.AvgTalkTimeField;
+            }
+            set {
+                if ((object.ReferenceEquals(this.AvgTalkTimeField, value) != true)) {
+                    this.AvgTalkTimeField = value;
+                    this.RaisePropertyChanged("AvgTalkTime");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public string Date {
+            get {
+                return this.DateField;
+            }
+            set {
+                if ((object.ReferenceEquals(this.DateField, value) != true)) {
+                    this.DateField = value;
+                    this.RaisePropertyChanged("Date");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public string DateInt {
+            get {
+                return this.DateIntField;
+            }
+            set {
+                if ((object.ReferenceEquals(this.DateIntField, value) != true)) {
+                    this.DateIntField = value;
+                    this.RaisePropertyChanged("DateInt");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public int ExtensionCalls {
+            get {
+                return this.ExtensionCallsField;
+            }
+            set {
+                if ((this.ExtensionCallsField.Equals(value) != true)) {
+                    this.ExtensionCallsField = value;
+                    this.RaisePropertyChanged("ExtensionCalls");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public string Interval {
+            get {
+                return this.IntervalField;
+            }
+            set {
+                if ((object.ReferenceEquals(this.IntervalField, value) != true)) {
+                    this.IntervalField = value;
+                    this.RaisePropertyChanged("Interval");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public string Intvl {
+            get {
+                return this.IntvlField;
+            }
+            set {
+                if ((object.ReferenceEquals(this.IntvlField, value) != true)) {
+                    this.IntvlField = value;
+                    this.RaisePropertyChanged("Intvl");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public System.DateTime ReportDateTime {
+            get {
+                return this.ReportDateTimeField;
+            }
+            set {
+                if ((this.ReportDateTimeField.Equals(value) != true)) {
+                    this.ReportDateTimeField = value;
+                    this.RaisePropertyChanged("ReportDateTime");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public string SupervisorName {
+            get {
+                return this.SupervisorNameField;
+            }
+            set {
+                if ((object.ReferenceEquals(this.SupervisorNameField, value) != true)) {
+                    this.SupervisorNameField = value;
+                    this.RaisePropertyChanged("SupervisorName");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public int TotalAfterCallTime {
+            get {
+                return this.TotalAfterCallTimeField;
+            }
+            set {
+                if ((this.TotalAfterCallTimeField.Equals(value) != true)) {
+                    this.TotalAfterCallTimeField = value;
+                    this.RaisePropertyChanged("TotalAfterCallTime");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public int TotalAudioIP {
+            get {
+                return this.TotalAudioIPField;
+            }
+            set {
+                if ((this.TotalAudioIPField.Equals(value) != true)) {
+                    this.TotalAudioIPField = value;
+                    this.RaisePropertyChanged("TotalAudioIP");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public int TotalAudioIPTime {
+            get {
+                return this.TotalAudioIPTimeField;
+            }
+            set {
+                if ((this.TotalAudioIPTimeField.Equals(value) != true)) {
+                    this.TotalAudioIPTimeField = value;
+                    this.RaisePropertyChanged("TotalAudioIPTime");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public int TotalAuxTime {
+            get {
+                return this.TotalAuxTimeField;
+            }
+            set {
+                if ((this.TotalAuxTimeField.Equals(value) != true)) {
+                    this.TotalAuxTimeField = value;
+                    this.RaisePropertyChanged("TotalAuxTime");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public int TotalAvailTime {
+            get {
+                return this.TotalAvailTimeField;
+            }
+            set {
+                if ((this.TotalAvailTimeField.Equals(value) != true)) {
+                    this.TotalAvailTimeField = value;
+                    this.RaisePropertyChanged("TotalAvailTime");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public int TotalChat {
+            get {
+                return this.TotalChatField;
+            }
+            set {
+                if ((this.TotalChatField.Equals(value) != true)) {
+                    this.TotalChatField = value;
+                    this.RaisePropertyChanged("TotalChat");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public int TotalChatTime {
+            get {
+                return this.TotalChatTimeField;
+            }
+            set {
+                if ((this.TotalChatTimeField.Equals(value) != true)) {
+                    this.TotalChatTimeField = value;
+                    this.RaisePropertyChanged("TotalChatTime");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public int TotalExtensionTime {
+            get {
+                return this.TotalExtensionTimeField;
+            }
+            set {
+                if ((this.TotalExtensionTimeField.Equals(value) != true)) {
+                    this.TotalExtensionTimeField = value;
+                    this.RaisePropertyChanged("TotalExtensionTime");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public int TotalHoldTime {
+            get {
+                return this.TotalHoldTimeField;
+            }
+            set {
+                if ((this.TotalHoldTimeField.Equals(value) != true)) {
+                    this.TotalHoldTimeField = value;
+                    this.RaisePropertyChanged("TotalHoldTime");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public string TotalInteraction {
+            get {
+                return this.TotalInteractionField;
+            }
+            set {
+                if ((object.ReferenceEquals(this.TotalInteractionField, value) != true)) {
+                    this.TotalInteractionField = value;
+                    this.RaisePropertyChanged("TotalInteraction");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public int TotalInteractionTime {
+            get {
+                return this.TotalInteractionTimeField;
+            }
+            set {
+                if ((this.TotalInteractionTimeField.Equals(value) != true)) {
+                    this.TotalInteractionTimeField = value;
+                    this.RaisePropertyChanged("TotalInteractionTime");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public int TotalStaffedTime {
+            get {
+                return this.TotalStaffedTimeField;
+            }
+            set {
+                if ((this.TotalStaffedTimeField.Equals(value) != true)) {
+                    this.TotalStaffedTimeField = value;
+                    this.RaisePropertyChanged("TotalStaffedTime");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public int TransferCall {
+            get {
+                return this.TransferCallField;
+            }
+            set {
+                if ((this.TransferCallField.Equals(value) != true)) {
+                    this.TransferCallField = value;
+                    this.RaisePropertyChanged("TransferCall");
+                }
             }
         }
     }
@@ -382,11 +1118,29 @@ namespace CMDataCollector.THistoricalData {
     [System.ServiceModel.ServiceContractAttribute(ConfigurationName="THistoricalData.IHistoricalData")]
     public interface IHistoricalData {
         
-        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IHistoricalData/GetSkillHistoricalData", ReplyAction="http://tempuri.org/IHistoricalData/GetSkillHistoricalDataResponse")]
-        CMDataCollector.THistoricalData.SkillData GetSkillHistoricalData(string skillId);
+        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IHistoricalData/GetAgentHistoricalData", ReplyAction="http://tempuri.org/IHistoricalData/GetAgentHistoricalDataResponse")]
+        CMDataCollector.THistoricalData.AgentInfo GetAgentHistoricalData(string agentId);
+        
+        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IHistoricalData/GetAgentHistoricalData", ReplyAction="http://tempuri.org/IHistoricalData/GetAgentHistoricalDataResponse")]
+        System.Threading.Tasks.Task<CMDataCollector.THistoricalData.AgentInfo> GetAgentHistoricalDataAsync(string agentId);
         
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IHistoricalData/GetSkillHistoricalData", ReplyAction="http://tempuri.org/IHistoricalData/GetSkillHistoricalDataResponse")]
-        System.Threading.Tasks.Task<CMDataCollector.THistoricalData.SkillData> GetSkillHistoricalDataAsync(string skillId);
+        CMDataCollector.THistoricalData.SkillInfo GetSkillHistoricalData(string skillId);
+        
+        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IHistoricalData/GetSkillHistoricalData", ReplyAction="http://tempuri.org/IHistoricalData/GetSkillHistoricalDataResponse")]
+        System.Threading.Tasks.Task<CMDataCollector.THistoricalData.SkillInfo> GetSkillHistoricalDataAsync(string skillId);
+        
+        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IHistoricalData/IsServiceRunning", ReplyAction="http://tempuri.org/IHistoricalData/IsServiceRunningResponse")]
+        bool IsServiceRunning();
+        
+        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IHistoricalData/IsServiceRunning", ReplyAction="http://tempuri.org/IHistoricalData/IsServiceRunningResponse")]
+        System.Threading.Tasks.Task<bool> IsServiceRunningAsync();
+        
+        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IHistoricalData/ServerId", ReplyAction="http://tempuri.org/IHistoricalData/ServerIdResponse")]
+        int ServerId();
+        
+        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IHistoricalData/ServerId", ReplyAction="http://tempuri.org/IHistoricalData/ServerIdResponse")]
+        System.Threading.Tasks.Task<int> ServerIdAsync();
     }
     
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
@@ -416,12 +1170,36 @@ namespace CMDataCollector.THistoricalData {
                 base(binding, remoteAddress) {
         }
         
-        public CMDataCollector.THistoricalData.SkillData GetSkillHistoricalData(string skillId) {
+        public CMDataCollector.THistoricalData.AgentInfo GetAgentHistoricalData(string agentId) {
+            return base.Channel.GetAgentHistoricalData(agentId);
+        }
+        
+        public System.Threading.Tasks.Task<CMDataCollector.THistoricalData.AgentInfo> GetAgentHistoricalDataAsync(string agentId) {
+            return base.Channel.GetAgentHistoricalDataAsync(agentId);
+        }
+        
+        public CMDataCollector.THistoricalData.SkillInfo GetSkillHistoricalData(string skillId) {
             return base.Channel.GetSkillHistoricalData(skillId);
         }
         
-        public System.Threading.Tasks.Task<CMDataCollector.THistoricalData.SkillData> GetSkillHistoricalDataAsync(string skillId) {
+        public System.Threading.Tasks.Task<CMDataCollector.THistoricalData.SkillInfo> GetSkillHistoricalDataAsync(string skillId) {
             return base.Channel.GetSkillHistoricalDataAsync(skillId);
+        }
+        
+        public bool IsServiceRunning() {
+            return base.Channel.IsServiceRunning();
+        }
+        
+        public System.Threading.Tasks.Task<bool> IsServiceRunningAsync() {
+            return base.Channel.IsServiceRunningAsync();
+        }
+        
+        public int ServerId() {
+            return base.Channel.ServerId();
+        }
+        
+        public System.Threading.Tasks.Task<int> ServerIdAsync() {
+            return base.Channel.ServerIdAsync();
         }
     }
 }

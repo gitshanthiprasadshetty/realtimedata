@@ -370,20 +370,22 @@ namespace CMDataCollector.Utilities
                     _reportObj = new BcmsHistoricalReport();
                     _reportObj.abandoned_Calls = Convert.ToString(result.AbandCalls);
                     //Log.Debug("abandonedcalls bokka : " + Convert.ToString(result.AbandCalls));
-                    _reportObj.acceptable_Service_Level = Convert.ToString(result.ServiceLevel);
+                    _reportObj.acceptable_Service_Level = Convert.ToString(result.SLPercentage);
                     _reportObj.acd_Calls = Convert.ToString(result.AcdCalls);
                     //Log.Debug("AcdCalls bokka : " + Convert.ToString(result.AcdCalls));
                     _reportObj.avg_Abandoned_Time = Convert.ToString(result.AvgAbandTime);
                     _reportObj.avg_Speed_Answered = result.AvgSpeedAnswer;
-                    _reportObj.avg_Staff = Convert.ToString(result.AvgStaff);
+                    _reportObj.avg_Staff = Convert.ToString(result.AvgStaffedTime);
                     _reportObj.avg_Talk_Time = result.AvgTalkTime;
                     _reportObj.date = result.DateInt;
                     _reportObj.flow_In = Convert.ToString(result.FlowIn);
                     _reportObj.flow_Out = Convert.ToString(result.FlowOut);
                     _reportObj.interval = result.Interval;
-                    _reportObj.pct_In_Svc_Level = result.ServiceLevel;
-                    _reportObj.total_After_Call = result.TotalAfterCallTime;
-                    _reportObj.total_Aux_Other = result.TotalAux;
+                    _reportObj.pct_In_Svc_Level = result.SLPercentage;
+                    TimeSpan acw = TimeSpan.FromSeconds(result.TotalAfterCallTime);
+                    _reportObj.total_After_Call = acw.ToString(@"hh\:mm\:ss");
+                    TimeSpan aux = TimeSpan.FromSeconds(result.TotalAfterCallTime);
+                    _reportObj.total_Aux_Other = aux.ToString(@"hh\:mm\:ss");
                     _reportObj.report_Type = result.ReportType;
                     _reportObj.skill = result.SkillId;
                     _reportObj.skill_Name = result.SkillName;
@@ -880,9 +882,11 @@ namespace CMDataCollector.Utilities
                 {
                     Log.Debug("CacheMemory[GetBcmsData] :: IsUpdateStarted : " + CMConnectionManager.GetInstance().IsUpdateStarted +
                                " | IsBcmsEnabled :" + CMConnectionManager.GetInstance().isBcmsEnabled + " | IstrafficEnabled :" + CMConnectionManager.GetInstance().isTrafficEnabled);
+                    
                     if (!CMConnectionManager.GetInstance().IsUpdateStarted)
                     {
                         CMConnectionManager.GetInstance().IsUpdateStarted = true;
+
                         var u = new Thread(new ThreadStart(delegate
                         {
                             Log.Debug("CacheMemory[GetBcmsData] :: UpdateDashboard");

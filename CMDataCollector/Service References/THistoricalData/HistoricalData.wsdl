@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="utf-8"?>
+<wsdl:definitions xmlns:wsap="http://schemas.xmlsoap.org/ws/2004/08/addressing/policy" xmlns:wsa10="http://www.w3.org/2005/08/addressing" xmlns:tns="http://tempuri.org/" xmlns:msc="http://schemas.microsoft.com/ws/2005/12/wsdl/contract" xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/" xmlns:wsx="http://schemas.xmlsoap.org/ws/2004/09/mex" xmlns:wsp="http://schemas.xmlsoap.org/ws/2004/09/policy" xmlns:wsam="http://www.w3.org/2007/05/addressing/metadata" xmlns:wsa="http://schemas.xmlsoap.org/ws/2004/08/addressing" xmlns:wsaw="http://www.w3.org/2006/05/addressing/wsdl" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:soap12="http://schemas.xmlsoap.org/wsdl/soap12/" xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd" xmlns:xsd="http://www.w3.org/2001/XMLSchema" name="HistoricalData" targetNamespace="http://tempuri.org/" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
+  <wsdl:types>
+    <xsd:schema targetNamespace="http://tempuri.org/Imports">
+      <xsd:import schemaLocation="http://localhost:12345/THistoricalData/?xsd=xsd0" namespace="http://tempuri.org/" />
+      <xsd:import schemaLocation="http://localhost:12345/THistoricalData/?xsd=xsd1" namespace="http://schemas.microsoft.com/2003/10/Serialization/" />
+      <xsd:import schemaLocation="http://localhost:12345/THistoricalData/?xsd=xsd2" namespace="http://schemas.datacontract.org/2004/07/THistoricalData.Model" />
+    </xsd:schema>
+  </wsdl:types>
+  <wsdl:message name="IHistoricalData_GetAgentHistoricalData_InputMessage">
+    <wsdl:part name="parameters" element="tns:GetAgentHistoricalData" />
+  </wsdl:message>
+  <wsdl:message name="IHistoricalData_GetAgentHistoricalData_OutputMessage">
+    <wsdl:part name="parameters" element="tns:GetAgentHistoricalDataResponse" />
+  </wsdl:message>
+  <wsdl:message name="IHistoricalData_GetSkillHistoricalData_InputMessage">
+    <wsdl:part name="parameters" element="tns:GetSkillHistoricalData" />
+  </wsdl:message>
+  <wsdl:message name="IHistoricalData_GetSkillHistoricalData_OutputMessage">
+    <wsdl:part name="parameters" element="tns:GetSkillHistoricalDataResponse" />
+  </wsdl:message>
+  <wsdl:message name="IHistoricalData_IsServiceRunning_InputMessage">
+    <wsdl:part name="parameters" element="tns:IsServiceRunning" />
+  </wsdl:message>
+  <wsdl:message name="IHistoricalData_IsServiceRunning_OutputMessage">
+    <wsdl:part name="parameters" element="tns:IsServiceRunningResponse" />
+  </wsdl:message>
+  <wsdl:message name="IHistoricalData_ServerId_InputMessage">
+    <wsdl:part name="parameters" element="tns:ServerId" />
+  </wsdl:message>
+  <wsdl:message name="IHistoricalData_ServerId_OutputMessage">
+    <wsdl:part name="parameters" element="tns:ServerIdResponse" />
+  </wsdl:message>
+  <wsdl:portType name="IHistoricalData">
+    <wsdl:operation name="GetAgentHistoricalData">
+      <wsdl:input wsaw:Action="http://tempuri.org/IHistoricalData/GetAgentHistoricalData" message="tns:IHistoricalData_GetAgentHistoricalData_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/IHistoricalData/GetAgentHistoricalDataResponse" message="tns:IHistoricalData_GetAgentHistoricalData_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="GetSkillHistoricalData">
+      <wsdl:input wsaw:Action="http://tempuri.org/IHistoricalData/GetSkillHistoricalData" message="tns:IHistoricalData_GetSkillHistoricalData_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/IHistoricalData/GetSkillHistoricalDataResponse" message="tns:IHistoricalData_GetSkillHistoricalData_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="IsServiceRunning">
+      <wsdl:input wsaw:Action="http://tempuri.org/IHistoricalData/IsServiceRunning" message="tns:IHistoricalData_IsServiceRunning_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/IHistoricalData/IsServiceRunningResponse" message="tns:IHistoricalData_IsServiceRunning_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="ServerId">
+      <wsdl:input wsaw:Action="http://tempuri.org/IHistoricalData/ServerId" message="tns:IHistoricalData_ServerId_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/IHistoricalData/ServerIdResponse" message="tns:IHistoricalData_ServerId_OutputMessage" />
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:binding name="BasicHttpBinding_IHistoricalData" type="tns:IHistoricalData">
+    <soap:binding transport="http://schemas.xmlsoap.org/soap/http" />
+    <wsdl:operation name="GetAgentHistoricalData">
+      <soap:operation soapAction="http://tempuri.org/IHistoricalData/GetAgentHistoricalData" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetSkillHistoricalData">
+      <soap:operation soapAction="http://tempuri.org/IHistoricalData/GetSkillHistoricalData" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="IsServiceRunning">
+      <soap:operation soapAction="http://tempuri.org/IHistoricalData/IsServiceRunning" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="ServerId">
+      <soap:operation soapAction="http://tempuri.org/IHistoricalData/ServerId" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:service name="HistoricalData">
+    <wsdl:port name="BasicHttpBinding_IHistoricalData" binding="tns:BasicHttpBinding_IHistoricalData">
+      <soap:address location="http://localhost:12345/THistoricalData/" />
+    </wsdl:port>
+  </wsdl:service>
+</wsdl:definitions>

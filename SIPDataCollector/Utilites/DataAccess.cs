@@ -236,7 +236,7 @@ namespace SIPDataCollector.Utilities
                     foreach (DataRow item in dataTable.Rows)
                     {
                         string skillId = Convert.ToString(item["SkillID"]);
-                        int accSlLevl = string.IsNullOrEmpty(item["AcceptableServiceLevel"].ToString()) ? ConfigurationData.acceptableSL : Convert.ToInt32(item["AcceptableServiceLevel"]);
+                        int accSlLevl = string.IsNullOrEmpty(item["AcceptableServiceLevel"].ToString()) ? ConfigurationData.acceptableSL : Convert.ToInt32(item["AcceptableServiceLevel"]) == 0 ? ConfigurationData.acceptableSL : Convert.ToInt32(item["AcceptableServiceLevel"]);
                         result.Add(skillId, accSlLevl);
                     }
                     return result;

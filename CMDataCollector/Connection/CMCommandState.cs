@@ -249,7 +249,7 @@ namespace CMDataCollector.Connection
                             _connValue.BcmsDashboard.SkillName = b.SkillName;
                             _connValue.BcmsDashboard.InteractionsInQueue = Convert.ToInt32(b.CallsWaiting); // (channel.ToLower() == "email") ? Convert.ToInt32(Connector.Proxy.WorkQueueProxy.GetQueueCount(extenstion)) : Convert.ToInt32(b.CallsWaiting);
                             _connValue.BcmsDashboard.AcceptedSL = Convert.ToInt32(b.AccptedSL);
-                            _connValue.BcmsDashboard.OldestInteractionWaitTime = (int)seconds; //(channel.ToLower() == "email") ? Convert.ToInt32(Connector.Proxy.WorkQueueProxy.GetOldestWaitTime(extenstion)) : Convert.ToInt32(b.OldestCall);
+                            _connValue.BcmsDashboard.OldestInteractionWaitTime = (int)seconds > 0 ? (int)seconds : 0; //(channel.ToLower() == "email") ? Convert.ToInt32(Connector.Proxy.WorkQueueProxy.GetOldestWaitTime(extenstion)) : Convert.ToInt32(b.OldestCall);
                            // _connValue.BcmsDashboard.SLPercentage = Convert.ToDecimal(b.SL);
                             _connValue.BcmsDashboard.TotalAgentsStaffed = Convert.ToInt32(b.Staff);
                             _connValue.BcmsDashboard.TotalAgentsAvailable = Convert.ToInt32(b.Avail);

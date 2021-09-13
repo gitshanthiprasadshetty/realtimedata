@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xs:schema xmlns:tns="http://schemas.datacontract.org/2004/07/THistoricalData.Model" elementFormDefault="qualified" targetNamespace="http://schemas.datacontract.org/2004/07/THistoricalData.Model" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:complexType name="AgentInfo">
+    <xs:complexContent mixed="false">
+      <xs:extension base="tns:Info">
+        <xs:sequence>
+          <xs:element minOccurs="0" name="AcdCalls" type="xs:int" />
+          <xs:element minOccurs="0" name="AgentID" nillable="true" type="xs:string" />
+          <xs:element minOccurs="0" name="AgentName" nillable="true" type="xs:string" />
+          <xs:element minOccurs="0" name="AvgAudioIPTime" nillable="true" type="xs:string" />
+          <xs:element minOccurs="0" name="AvgChatTime" nillable="true" type="xs:string" />
+          <xs:element minOccurs="0" name="AvgExtensionTime" nillable="true" type="xs:string" />
+          <xs:element minOccurs="0" name="AvgInteractionTime" nillable="true" type="xs:string" />
+          <xs:element minOccurs="0" name="AvgTalkTime" nillable="true" type="xs:string" />
+          <xs:element minOccurs="0" name="Date" nillable="true" type="xs:string" />
+          <xs:element minOccurs="0" name="DateInt" nillable="true" type="xs:string" />
+          <xs:element minOccurs="0" name="ExtensionCalls" type="xs:int" />
+          <xs:element minOccurs="0" name="Interval" nillable="true" type="xs:string" />
+          <xs:element minOccurs="0" name="Intvl" nillable="true" type="xs:string" />
+          <xs:element minOccurs="0" name="ReportDateTime" type="xs:dateTime" />
+          <xs:element minOccurs="0" name="SupervisorName" nillable="true" type="xs:string" />
+          <xs:element minOccurs="0" name="TotalAfterCallTime" type="xs:int" />
+          <xs:element minOccurs="0" name="TotalAudioIP" type="xs:int" />
+          <xs:element minOccurs="0" name="TotalAudioIPTime" type="xs:int" />
+          <xs:element minOccurs="0" name="TotalAuxTime" type="xs:int" />
+          <xs:element minOccurs="0" name="TotalAvailTime" type="xs:int" />
+          <xs:element minOccurs="0" name="TotalChat" type="xs:int" />
+          <xs:element minOccurs="0" name="TotalChatTime" type="xs:int" />
+          <xs:element minOccurs="0" name="TotalExtensionTime" type="xs:int" />
+          <xs:element minOccurs="0" name="TotalHoldTime" type="xs:int" />
+          <xs:element minOccurs="0" name="TotalInteraction" nillable="true" type="xs:string" />
+          <xs:element minOccurs="0" name="TotalInteractionTime" type="xs:int" />
+          <xs:element minOccurs="0" name="TotalStaffedTime" type="xs:int" />
+          <xs:element minOccurs="0" name="TransferCall" type="xs:int" />
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:element name="AgentInfo" nillable="true" type="tns:AgentInfo" />
+  <xs:complexType name="Info">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="AcceptableServiceLevel" type="xs:int" />
+      <xs:element minOccurs="0" name="Extn" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="HybridSourceType" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="Id" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="LastUpdatedBy" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="Name" nillable="true" type="xs:string" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="Info" nillable="true" type="tns:Info" />
+  <xs:complexType name="SkillInfo">
+    <xs:complexContent mixed="false">
+      <xs:extension base="tns:Info">
+        <xs:sequence>
+          <xs:element minOccurs="0" name="AbandCalls" type="xs:int" />
+          <xs:element minOccurs="0" name="AcdCalls" type="xs:int" />
+          <xs:element minOccurs="0" name="AvgAbandTime" nillable="true" type="xs:string" />
+          <xs:element minOccurs="0" name="AvgSpeedAnswer" nillable="true" type="xs:string" />
+          <xs:element minOccurs="0" name="AvgStaffedTime" nillable="true" type="xs:string" />
+          <xs:element minOccurs="0" name="AvgTalkTime" nillable="true" type="xs:string" />
+          <xs:element minOccurs="0" name="CallsAbandonedAfterSLAThreshold" type="xs:int" />
+          <xs:element minOccurs="0" name="CallsHandledWithinSLAThreshold" type="xs:int" />
+          <xs:element minOccurs="0" name="Date" nillable="true" type="xs:string" />
+          <xs:element minOccurs="0" name="DateInt" nillable="true" type="xs:string" />
+          <xs:element minOccurs="0" name="FlowIn" type="xs:int" />
+          <xs:element minOccurs="0" name="FlowOut" type="xs:int" />
+          <xs:element minOccurs="0" name="Interval" nillable="true" type="xs:string" />
+          <xs:element minOccurs="0" name="Intvl" nillable="true" type="xs:string" />
+          <xs:element minOccurs="0" name="PassedCalls" type="xs:int" />
+          <xs:element minOccurs="0" name="ReportDateTime" type="xs:dateTime" />
+          <xs:element minOccurs="0" name="ReportType" nillable="true" type="xs:string" />
+          <xs:element minOccurs="0" name="SLPercentage" nillable="true" type="xs:string" />
+          <xs:element minOccurs="0" name="SkillExtension" nillable="true" type="xs:string" />
+          <xs:element minOccurs="0" name="SkillId" nillable="true" type="xs:string" />
+          <xs:element minOccurs="0" name="SkillName" nillable="true" type="xs:string" />
+          <xs:element minOccurs="0" name="SpeedOfAnswer" type="xs:int" />
+          <xs:element minOccurs="0" name="StartDateTime" nillable="true" type="xs:string" />
+          <xs:element minOccurs="0" name="SwitchName" nillable="true" type="xs:string" />
+          <xs:element minOccurs="0" name="TotalAbandTime" type="xs:int" />
+          <xs:element minOccurs="0" name="TotalAfterCallTime" type="xs:int" />
+          <xs:element minOccurs="0" name="TotalAuxTime" type="xs:int" />
+          <xs:element minOccurs="0" name="TotalInteraction" nillable="true" type="xs:string" />
+          <xs:element minOccurs="0" name="TotalStaffedAgents" type="xs:int" />
+          <xs:element minOccurs="0" name="TotalStaffedTime" type="xs:int" />
+          <xs:element minOccurs="0" name="TotalTalkTime" type="xs:int" />
+          <xs:element minOccurs="0" name="TransferCall" type="xs:int" />
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:element name="SkillInfo" nillable="true" type="tns:SkillInfo" />
+</xs:schema>

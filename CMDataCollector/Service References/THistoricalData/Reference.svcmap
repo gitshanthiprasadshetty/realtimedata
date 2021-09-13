@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ReferenceGroup xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" ID="7678e6b4-1ae8-4d9c-883d-c6df74357ed3" xmlns="urn:schemas-microsoft-com:xml-wcfservicemap">
+<ReferenceGroup xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" ID="a99312a0-8da4-4280-ac7b-965c0adaeb60" xmlns="urn:schemas-microsoft-com:xml-wcfservicemap">
   <ClientOptions>
     <GenerateAsynchronousMethods>false</GenerateAsynchronousMethods>
     <GenerateTaskBasedAsynchronousMethod>true</GenerateTaskBasedAsynchronousMethod>
@@ -19,13 +19,14 @@
     <ServiceContractMappings />
   </ClientOptions>
   <MetadataSources>
-    <MetadataSource Address="http://10.133.146.4:55000/THistoricalData/mex" Protocol="mex" SourceId="1" />
+    <MetadataSource Address="http://localhost:12345/THistoricalData/" Protocol="http" SourceId="1" />
   </MetadataSources>
   <Metadata>
-    <MetadataFile FileName="service.wsdl" MetadataType="Wsdl" ID="41ff29e3-b242-4696-adc8-fda80a0230b2" SourceId="1" SourceUrl="http://10.133.146.4:55000/THistoricalData/mex" />
-    <MetadataFile FileName="service.xsd" MetadataType="Schema" ID="e03e8a16-74bb-471a-8e14-8c63cbdd8bd7" SourceId="1" SourceUrl="http://10.133.146.4:55000/THistoricalData/mex" />
-    <MetadataFile FileName="service1.xsd" MetadataType="Schema" ID="e14d38ce-00f2-4701-9d0e-c257d304301e" SourceId="1" SourceUrl="http://10.133.146.4:55000/THistoricalData/mex" />
-    <MetadataFile FileName="THistoricalData.Lib.Model.xsd" MetadataType="Schema" ID="b09a5fd4-1fc4-4511-8f3b-a1b445306562" SourceId="1" SourceUrl="http://10.133.146.4:55000/THistoricalData/mex" />
+    <MetadataFile FileName="item.xsd" MetadataType="Schema" ID="5178dd9e-054b-4bb1-8d6a-a1dea6599141" SourceId="1" SourceUrl="http://localhost:12345/THistoricalData/?xsd=xsd2" />
+    <MetadataFile FileName="item1.xsd" MetadataType="Schema" ID="a810ea8b-97cb-4e54-bb36-8c0753f4c00c" SourceId="1" SourceUrl="http://localhost:12345/THistoricalData/?xsd=xsd0" />
+    <MetadataFile FileName="HistoricalData.wsdl" MetadataType="Wsdl" ID="9bf6627c-66b7-4131-86c4-1b7de8c67c07" SourceId="1" SourceUrl="http://localhost:12345/THistoricalData/?wsdl" />
+    <MetadataFile FileName="item2.xsd" MetadataType="Schema" ID="d869c9ff-bb44-4197-8730-7edce23c2748" SourceId="1" SourceUrl="http://localhost:12345/THistoricalData/?xsd=xsd1" />
+    <MetadataFile FileName="item.disco" MetadataType="Disco" ID="641203fa-01ce-4ac9-a2a2-2a984cb0c06d" SourceId="1" SourceUrl="http://localhost:12345/THistoricalData/?disco" />
   </Metadata>
   <Extensions>
     <ExtensionFile FileName="configuration91.svcinfo" Name="configuration91.svcinfo" />
