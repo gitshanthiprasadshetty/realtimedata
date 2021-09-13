@@ -251,16 +251,16 @@ namespace SIPDataCollector.Utilities
 
         #region for bcms summary data
 
-        public void SummaryData(BcmsDataForSIP summarydata)
-        {
-            try
-            {
+        //public void SummaryData(BcmsDataForSIP summarydata)
+        //{
+        //    try
+        //    {
 
-            }
-            catch (Exception ex)
-            {
-            }
-        }
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //    }
+        //}
 
         #endregion
 

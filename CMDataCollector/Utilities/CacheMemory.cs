@@ -519,7 +519,7 @@ namespace CMDataCollector.Utilities
                             values.SLPercentage = Convert.ToDecimal(reportValue.pct_In_Svc_Level);
                             Log.Debug($"SLPercentage = {values.SLPercentage}");
                         }
-                        catch (Exception ex)
+                        catch (Exception)
                         {
                             Log.Warn("error while converting sl percentage value to decimal.");
                         }

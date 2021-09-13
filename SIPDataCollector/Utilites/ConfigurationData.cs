@@ -69,13 +69,13 @@ namespace SIPDataCollector.Utilites
                 Channel();
                 sectionSkills = SectionSkills();
                 ////ConntnString = ConfigurationSettings.AppSettings["CMDbConn"].ToString();
-                ConntnString = ConnectionStrings.DecryptConnectionString(ConfigurationSettings.AppSettings["CMDbConn"]);
+                ConntnString = ConnectionStrings.DecryptConnectionString(ConfigurationManager.AppSettings["CMDbConn"]);
                 //skillsToMonitor = ConfigurationSettings.AppSettings["skillsToMonitorForSIP"];
                 skillsToMonitor = sectionSkills;
-                DashboardRefreshTime = Convert.ToInt32(ConfigurationSettings.AppSettings["DashboardRefreshTime"]);
-                acceptableSL = Convert.ToInt32(ConfigurationSettings.AppSettings["acceptableSL"]);
-                DBRefreshTime = Convert.ToInt32(ConfigurationSettings.AppSettings["DBRefreshTime"]);
-                TmacServers = ConfigurationSettings.AppSettings["TmacServers"].Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries).ToList();
+                DashboardRefreshTime = Convert.ToInt32(ConfigurationManager.AppSettings["DashboardRefreshTime"]);
+                acceptableSL = Convert.ToInt32(ConfigurationManager.AppSettings["acceptableSL"]);
+                DBRefreshTime = Convert.ToInt32(ConfigurationManager.AppSettings["DBRefreshTime"]);
+                TmacServers = ConfigurationManager.AppSettings["TmacServers"].Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries).ToList();
                 ReloadConfigTime = Convert.ToInt32(ConfigurationManager.AppSettings["ReloadConfigTime"]);
                 //if (!string.IsNullOrEmpty(skillsToMonitor) || skillsToMonitor.ToLower() != "na")
                 //    skillList = skillsToMonitor.Split(',');
@@ -317,11 +317,11 @@ namespace SIPDataCollector.Utilites
                 {
                     string ConnectionString = String.Format(ConntnString, decryptedPassword);
                 }
-                catch (Exception ex)
+                catch (Exception)
                 {
                 }
             }
-            catch (Exception ex)
+            catch (Exception)
             {
             }
         }

@@ -33,9 +33,6 @@
     <Reference Include="ConfigurationProvider">
       <HintPath>lib\ConfigurationProvider.dll</HintPath>
     </Reference>
-    <Reference Include="Connector">
-      <HintPath>..\Connector\bin\Debug\Connector.dll</HintPath>
-    </Reference>
     <Reference Include="DataModel">
       <HintPath>lib\DataModel.dll</HintPath>
     </Reference>
@@ -51,7 +48,6 @@
     <Reference Include="Logger">
       <HintPath>lib\Logger.dll</HintPath>
     </Reference>
-    <Reference Include="Newtonsoft.Json, Version=6.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL" />
     <Reference Include="System" />
     <Reference Include="System.Configuration" />
     <Reference Include="System.Core" />
@@ -95,6 +91,12 @@
     <None Include="App.config">
       <SubType>Designer</SubType>
     </None>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Connector\Connector.csproj">
+      <Project>{ca10cad4-ebd5-40aa-b608-380a7b29e08a}</Project>
+      <Name>Connector</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
