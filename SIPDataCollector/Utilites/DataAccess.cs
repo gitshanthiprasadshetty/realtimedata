@@ -123,6 +123,48 @@ namespace SIPDataCollector.Utilities
             return new SkillData();
         }
 
+        public static SkillData GetAsyncHistoricalData(string skillExtn, int skillId)
+        {
+            log.Info($"GetAsyncHistoricalData() : skillExtn = {skillExtn} , skillid = {skillId}");
+            try
+            {
+                SkillData skillInfo;
+                int accSlLevl;
+                try
+                {
+                    accSlLevl = ConfigurationData.acceptableSlObj.FirstOrDefault(x => x.Key == skillId.ToString()).Value;
+                }
+                catch (Exception ex)
+                {
+                    log.Error("Error while reading acceptable sl level : ", ex);
+                    accSlLevl = ConfigurationData.acceptableSL;
+                }
+                string sql = @"EXEC [Get_AsyncSkillDashboard] '" + DateTime.Now.Date.ToString("yyyyMMdd") + "'" + ',' + "'" + skillExtn + "'";
+                log.Debug("SQL Query : " + sql);
+                DataTable dsusers = SqlDataAccess.ExecuteDataTable(sql, ConfigurationData.ConntnString);
+                if (dsusers != null)
+                {
+                    foreach (DataRow item in dsusers.Rows)
+                    {
+                        skillInfo = new SkillData
+                        {
+                            TotalMetFirstResponse = Convert.ToInt32(item["TotalMetFirstResponse"]),
+                            TotalNoFirstResponse = Convert.ToInt32(item["TotalNoFirstResponse"]),
+                            TotalNotMetFirstResponse = Convert.ToInt32(item["TotalNotMetFirstResponse"]),
+                            AverageFirstResponse = Convert.ToInt32(item["AverageFirstResponse"])
+                        };
+                        return skillInfo;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                log.Error("Exception in GetAsyncHistoricalData():", ex);
+            }
+            return new SkillData();
+        }
+
+
         /// <summary>
         /// Gets total summary of acd calls for given extensionid
         /// </summary>

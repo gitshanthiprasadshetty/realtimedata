@@ -56,6 +56,7 @@ namespace SIPDataCollector.Utilites
         /// Dashboard refresh time
         /// </summary>
         public static int DBRefreshTime { get; set; }
+        public static List<string> asyncChatUrl { get; set; }
         /// <summary>
         /// Method to load all data from config.
         /// </summary>
@@ -77,6 +78,8 @@ namespace SIPDataCollector.Utilites
                 DBRefreshTime = Convert.ToInt32(ConfigurationManager.AppSettings["DBRefreshTime"]);
                 TmacServers = ConfigurationManager.AppSettings["TmacServers"].Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries).ToList();
                 ReloadConfigTime = Convert.ToInt32(ConfigurationManager.AppSettings["ReloadConfigTime"]);
+                asyncChatUrl = ConfigurationManager.AppSettings["AsyncApiURL"].Split(new char[] { ',' },
+                        StringSplitOptions.RemoveEmptyEntries).Select(s => s.Trim()).ToList();
                 //if (!string.IsNullOrEmpty(skillsToMonitor) || skillsToMonitor.ToLower() != "na")
                 //    skillList = skillsToMonitor.Split(',');
 

@@ -9,6 +9,9 @@ using System.Threading;
 using SIPDataCollector.Utilites;
 using Connector.Proxy;
 using AMACWeb_Proxy;
+using RestSharp;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 namespace SIPDataCollector
 {
@@ -153,6 +156,9 @@ namespace SIPDataCollector
 
                 Thread historicalData = new Thread(new ThreadStart(delegate { GetHistoricalData(); }));
                 historicalData.Start();
+
+                Thread asyncHistoricalData = new Thread(new ThreadStart(delegate { GetAsyncHistoricalData(); }));
+                asyncHistoricalData.Start();
 
                 log.Info("Starting Timer for Config refresh time for SIP");
                 System.Timers.Timer timer = new System.Timers.Timer();
@@ -353,6 +359,7 @@ namespace SIPDataCollector
                 Dictionary<int, RealtimeData> realtimeDataForAllSkills = new Dictionary<int, RealtimeData>();
                 try
                 {
+                    List<AsyncChat> result = AsyncChatList();
                     foreach (var server in Utilites.ConfigurationData.TmacServers)
                     {
                         log.Info($"Get wallboardskills data from TMAC server {server}");
@@ -403,6 +410,18 @@ namespace SIPDataCollector
                                             realtimeOfSkill.TotalAgentsStaffed = realtimeOfSkill.AgentStats.Count();
                                             realtimeOfSkill.TotalAgentsInACW = realtimeOfSkill.AgentStats.Count(x => x.State.Contains("ACW"));
                                             realtimeOfSkill.TotalAgentsInAUX = realtimeOfSkill.AgentStats.Count(x => Utilites.ConfigurationData.auxCodes.Contains(x.State));
+                                        }
+                                        if (Utilites.ConfigurationData.GetChannel(Convert.ToString(realtimeOfSkill.SkillId)).ToLower().Equals("async")) 
+                                        {
+                                            if (result != null)
+                                            {
+                                                result = result.Where(x => x.state != 0 && x.state != 5 && x.queueId == Convert.ToString(realtimeOfSkill.SkillId)).ToList();
+                                                realtimeOfSkill.Backlog = result?.Count > 0 ? result.Count : 0;
+                                            }
+                                            else
+                                            {
+                                                realtimeOfSkill.Backlog = 0;
+                                            }
                                         }
                                     }
                                     catch (Exception ex)
@@ -796,6 +815,130 @@ namespace SIPDataCollector
             return CacheObj1;
         }
 
+        public void GetAsyncHistoricalData()
+        {
+            log.Debug("GetAsyncHistoricalData()");
+            try
+            {
+                while (true)
+                {
+                    try
+                    {
+                        if (!queue.IsEmpty)
+                        {
+                            log.Debug("Queue is not empty");
+                            foreach (var item in queue)
+                            {
+                                log.Debug("Queue item is = " + item);
+                                if (queue.TryDequeue(out string skillExtn))
+                                {
+                                    log.Debug("skillExtn is = " + skillExtn);
+                                    int skillId = _skillExtnInfo[skillExtn].SkillId;
+                                    var dbData = DataAccess.GetAsyncHistoricalData(skillExtn, skillId);
+
+                                    if (dbData != null)
+                                    {
+                                        log.Debug("Received historical data");
+                                        try
+                                        {
+                                            SkillData data = new SkillData
+                                            {
+                                                TotalMetFirstResponse = dbData.TotalMetFirstResponse,
+                                                TotalNotMetFirstResponse = dbData.TotalNotMetFirstResponse,
+                                                TotalNoFirstResponse = dbData.TotalNoFirstResponse,
+                                                AverageFirstResponse = dbData.AverageFirstResponse,
+                                                Backlog = dbData.Backlog
+                                            };
+
+                                            if (data != null)
+                                                DataCache.UpdateHistoricalData(data);
+                                        }
+                                        catch (Exception ex)
+                                        {
+                                            log.Error("Error while processing histoircal data : ", ex);
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        log.Debug("Skill extension info is updating: " + ex);
+                    }
+                    Thread.Sleep(Utilites.ConfigurationData.DBRefreshTime);
+                }
+            }
+            catch (Exception ex)
+            {
+                log.Error("Error in GetHistoricalData", ex);
+                Thread.Sleep(Utilites.ConfigurationData.DBRefreshTime);
+            }
+        }
+
+        public static List<AsyncChat> AsyncChatList()
+        {
+            Response trestresponse = new Response();
+            try
+            {
+                log.Debug("Inside SIPManager.AsyncChatList()");
+
+                var tRestServerLinks = Utilites.ConfigurationData.asyncChatUrl;
+                RawData rawData = new RawData();
+                rawData.createdDateTime = DateTime.Now.Date.ToString("yyyy-MM-dd");
+                rawData.fromDB = false;
+                string requestBody = JsonConvert.SerializeObject(rawData);
+                foreach (var serverUrlPath in tRestServerLinks)
+                {
+                    string serverUrl = serverUrlPath;
+                    try
+                    {
+                        if (!serverUrl.EndsWith("/"))
+                        {
+                            serverUrl = string.Concat(new string[] { serverUrl, "/" });
+                        }
+
+                        string trestServerurl = string.Concat(new string[] { serverUrl, "v1​/Chats​/active" });
+
+                        log.Debug(string.Concat(" Connecting to : ", trestServerurl));
+                        RestClient client = new RestClient(@trestServerurl);
+                        //CertificateBinding.BindRestAPICertificate(client, certificatePath);
+                        RestRequest request = new RestRequest(Method.POST);
+                        // request.AddHeader("postman-token", "7f56a635-1347-2385-3b87-2af172957a19");
+                        //request.AddHeader("cache-control", "no-cache");
+                        request.AddHeader("Content-Type", "application/json");
+                        request.AddParameter("application/json", requestBody, ParameterType.RequestBody);
+                        IRestResponse response = client.Execute(request);
+
+                        if (response.ErrorException != null)
+                        {
+                            log.Error(string.Concat("SIPManager.AsyncChatList Response : ", response.ErrorException.Message));
+                            trestresponse.resultCode = "-7";
+                            trestresponse.errorMessage = response.ErrorException.Message;
+                        }
+
+                        string jsonObject = JToken.Parse(response.Content).ToString();
+                        trestresponse = JsonConvert.DeserializeObject<Response>(jsonObject);
+
+                        break;
+                    }
+                    catch (Exception exception)
+                    {
+                        log.Error(string.Concat("AsyncChatList: ", exception));
+                        trestresponse.resultCode = "-8";
+                        trestresponse.errorMessage = exception.Message;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                log.Error(string.Concat("SIPManager.AsyncChatList : ", ex));
+
+                trestresponse.resultCode = "-8";
+                trestresponse.errorMessage = "System Error";
+            }
+            return trestresponse.data;
+        }
         #endregion
     }
 }
