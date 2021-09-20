@@ -10,7 +10,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Tetherfi Technologies Pvt Ltd")]
 [assembly: AssemblyProduct("SIPDataCollector")]
-[assembly: AssemblyCopyright("Copyright ©  2019")]
+[assembly: AssemblyCopyright("Copyright ©  2021")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
@@ -32,6 +32,6 @@ using System.Runtime.InteropServices;
 // You can specify all the values or you can default the Build and Revision Numbers 
 // by using the '*' as shown below:
 // [assembly: AssemblyVersion("1.0.*")]
-[assembly: AssemblyVersion("1.2.5.15")]
-[assembly: AssemblyFileVersion("1.2.5.15")]
-[assembly: AssemblyInformationalVersion("1.1.11.19")]
+[assembly: AssemblyVersion("1.2.9.20")]
+[assembly: AssemblyFileVersion("1.2.9.20")]
+[assembly: AssemblyInformationalVersion("1.2.9.20")]
