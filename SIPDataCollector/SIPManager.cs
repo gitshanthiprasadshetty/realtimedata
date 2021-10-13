@@ -157,8 +157,8 @@ namespace SIPDataCollector
                 Thread historicalData = new Thread(new ThreadStart(delegate { GetHistoricalData(); }));
                 historicalData.Start();
 
-                Thread asyncHistoricalData = new Thread(new ThreadStart(delegate { GetAsyncHistoricalData(); }));
-                asyncHistoricalData.Start();
+                //Thread asyncHistoricalData = new Thread(new ThreadStart(delegate { GetAsyncHistoricalData(); }));
+                //asyncHistoricalData.Start();
 
                 log.Info("Starting Timer for Config refresh time for SIP");
                 System.Timers.Timer timer = new System.Timers.Timer();
@@ -413,10 +413,35 @@ namespace SIPDataCollector
                                         }
                                         if (Utilites.ConfigurationData.GetChannel(Convert.ToString(realtimeOfSkill.SkillId)).ToLower().Equals("async")) 
                                         {
+                                            int responseTime = 0;
                                             if (result != null)
                                             {
-                                                result = result.Where(x => x.state != 0 && x.state != 5 && x.queueId == Convert.ToString(realtimeOfSkill.SkillId)).ToList();
-                                                realtimeOfSkill.Backlog = result?.Count > 0 ? result.Count : 0;
+                                                realtimeOfSkill.Backlog = result.Where(x => (x.state == 0 || x.state == 5) && x.queueId == Convert.ToString(realtimeOfSkill.SkillId)).ToList().Count();
+                                                realtimeOfSkill.InteractionsInQueue = result.Where(x => x.state == 4 && x.queueId == Convert.ToString(realtimeOfSkill.SkillId)).ToList().Count();
+                                                realtimeOfSkill.ActiveInteractionsSummary = result.Where(x => (x.state == 3 || x.state == 5 || x.state == 6) && x.queueId == Convert.ToString(realtimeOfSkill.SkillId)).ToList().Count();
+                                                realtimeOfSkill.ActiveInteractions = result.Where(x => x.state == 2 && x.queueId == Convert.ToString(realtimeOfSkill.SkillId)).ToList().Count();
+                                                result.ForEach(x =>
+                                                {
+                                                    if (x.queueId == Convert.ToString(realtimeOfSkill.SkillId))
+                                                    {
+                                                        x.slaDetails.ForEach(item =>
+                                                            {
+                                                                if (item.slaId.Equals("SLA_1"))
+                                                                {
+                                                                    responseTime += item.slaElapsed;
+                                                                    if (item.slaMet == 1)
+                                                                        realtimeOfSkill.TotalMetFirstResponse += 1;
+                                                                    else if (item.slaElapsed > 0)
+                                                                        realtimeOfSkill.TotalNotMetFirstResponse += 1;
+                                                                    else if (x.resolutionTimeElapsed == 0) 
+                                                                        realtimeOfSkill.TotalNoFirstResponse += 1;
+                                                                }
+                                                            }
+                                                        );
+                                                    }
+                                                });
+                                                int totalResponse = realtimeOfSkill.TotalMetFirstResponse + realtimeOfSkill.TotalNotMetFirstResponse;
+                                                realtimeOfSkill.AverageFirstResponse =TimeSpan.FromSeconds(responseTime/(totalResponse == 0 ? 1 : totalResponse)).ToString(@"hh\:mm\:ss");
                                             }
                                             else
                                             {
@@ -884,7 +909,7 @@ namespace SIPDataCollector
                 log.Debug("Inside SIPManager.AsyncChatList()");
 
                 var tRestServerLinks = Utilites.ConfigurationData.asyncChatUrl;
-                RawData rawData = new RawData();
+                RawData rawData = new RawData(); 
                 rawData.createdDateTime = DateTime.Now.Date.ToString("yyyy-MM-dd");
                 rawData.fromDB = false;
                 string requestBody = JsonConvert.SerializeObject(rawData);
@@ -893,19 +918,24 @@ namespace SIPDataCollector
                     string serverUrl = serverUrlPath;
                     try
                     {
-                        if (!serverUrl.EndsWith("/"))
+                        if (!serverUrl.EndsWith(@"/"))
                         {
                             serverUrl = string.Concat(new string[] { serverUrl, "/" });
                         }
 
-                        string trestServerurl = string.Concat(new string[] { serverUrl, "v1​/Chats​/active" });
+                        string trestServerurl = string.Concat(new string[] { serverUrl, "v1/Chats/active" });
 
                         log.Debug(string.Concat(" Connecting to : ", trestServerurl));
-                        RestClient client = new RestClient(@trestServerurl);
-                        //CertificateBinding.BindRestAPICertificate(client, certificatePath);
+                        RestClient client = new RestClient(trestServerurl);
+                        try
+                        {
+                            Utilites.ConfigurationData.BindRestAPICertificate(client, Utilites.ConfigurationData.certificatePath);
+                        }
+                        catch(Exception ex)
+                        {
+                            log.Error("Exception in AsyncChatList(): Missing ceritificate File");
+                        }
                         RestRequest request = new RestRequest(Method.POST);
-                        // request.AddHeader("postman-token", "7f56a635-1347-2385-3b87-2af172957a19");
-                        //request.AddHeader("cache-control", "no-cache");
                         request.AddHeader("Content-Type", "application/json");
                         request.AddParameter("application/json", requestBody, ParameterType.RequestBody);
                         IRestResponse response = client.Execute(request);

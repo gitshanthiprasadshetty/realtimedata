@@ -35,6 +35,7 @@ namespace SIPDataCollector.Models
         public DateTime? expiredDateTime { get; set; }
         public int transferCount { get; set; }
         public string otherData { get; set; }
+        public double resolutionTimeElapsed { get; set; }
         public List<SlaDetails> slaDetails { get; set; }
     }
     public class Response

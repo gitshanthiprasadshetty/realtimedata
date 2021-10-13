@@ -1,11 +1,15 @@
 ﻿using ConfigurationProvider;
 using Connector.Proxy;
 using Connector.SMSAPI;
+using RestSharp;
 using SIPDataCollector.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Configuration;
+using System.IO;
 using System.Linq;
+using System.Net;
+using System.Security.Cryptography.X509Certificates;
 using System.Timers;
 
 namespace SIPDataCollector.Utilites
@@ -57,6 +61,7 @@ namespace SIPDataCollector.Utilites
         /// </summary>
         public static int DBRefreshTime { get; set; }
         public static List<string> asyncChatUrl { get; set; }
+        public static string certificatePath { get; set; }
         /// <summary>
         /// Method to load all data from config.
         /// </summary>
@@ -80,6 +85,7 @@ namespace SIPDataCollector.Utilites
                 ReloadConfigTime = Convert.ToInt32(ConfigurationManager.AppSettings["ReloadConfigTime"]);
                 asyncChatUrl = ConfigurationManager.AppSettings["AsyncApiURL"].Split(new char[] { ',' },
                         StringSplitOptions.RemoveEmptyEntries).Select(s => s.Trim()).ToList();
+                certificatePath = ConfigurationManager.AppSettings["AsyncApiCertificateFolder"].ToString();
                 //if (!string.IsNullOrEmpty(skillsToMonitor) || skillsToMonitor.ToLower() != "na")
                 //    skillList = skillsToMonitor.Split(',');
 
@@ -327,6 +333,58 @@ namespace SIPDataCollector.Utilites
             catch (Exception)
             {
             }
+        }
+
+
+
+        /// <summary>
+        /// REST API Certificate Binding
+        /// </summary>
+        /// <param name="clientProxy"><see cref="RestHttpClientProtocol"/></param>
+        public static RestClient BindRestAPICertificate(RestClient clientProxy, string certificatePath)
+        {
+            try
+            {
+                if (string.IsNullOrWhiteSpace(certificatePath))
+                {
+                    log.Debug("Certificate Path Not configured");
+                    return clientProxy;
+                }
+
+                log.Debug("[BindRestAPICertificate] STARTS");
+                ServicePointManager.Expect100Continue = true;
+
+                //search cerficates in folder
+                string[] certificateFiles =
+                    Directory.GetFiles(certificatePath, "*.cer");
+                if (certificateFiles.Length > 0)
+                {
+                    foreach (string certFile in certificateFiles)
+                    {
+                        log.Debug("[BindRestAPICertificate] Certificate [binding] : " + certFile.ToString());
+                        System.Security.Cryptography.X509Certificates.X509Certificate2 cert =
+                            new System.Security.Cryptography.X509Certificates.X509Certificate2(certFile);
+
+                        //cert.Import(certFile);
+
+                        log.Debug("[BindRestAPICertificate] Certificate Subject  : " + cert.Subject +
+                            " | Issuer : " + cert.Issuer +
+                            " | Format  :" + cert.GetFormat() +
+                            " | Efffective Date : " + cert.GetEffectiveDateString() +
+                            " | Expiry Date : " + cert.GetExpirationDateString()
+                            );
+                        clientProxy.ClientCertificates = new X509Certificate2Collection();
+                        clientProxy.ClientCertificates.Add(cert);
+                    }
+                }
+                log.Debug("[BindRestAPICertificate] ENDS");
+            }
+            catch (Exception exception)
+            {
+                log.Error("[BindRestAPICertificate] : " + exception);
+
+            }
+            return clientProxy;
         }
         #endregion
     }
