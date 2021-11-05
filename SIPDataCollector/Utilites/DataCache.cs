@@ -83,7 +83,6 @@ namespace SIPDataCollector.Utilites
                                 item.ActiveInteractionsSummary = value.ActiveInteractionsSummary;
                                 item.AverageAbandonedTime = value.AverageAbandonedTime;
                                 item.AbandonPercentage = value.AbandonPercentage;
-                                item.Backlog = value.Backlog;
                                 CacheObj.TryUpdate(value.SkillId, item, value);
                             }
                         }
@@ -114,6 +113,7 @@ namespace SIPDataCollector.Utilites
                     ConcurrentDictionary<int, RealtimeData> tempCacheObj = new ConcurrentDictionary<int, RealtimeData>();
 
                     log.Debug("Updating with histoircaldata for skill = " + data.skillId);
+                    #region oldCode
                     //CacheObj?.Clear();
                     //CacheObj.AddOrUpdate(data.skillId, new RealtimeData
                     //{
@@ -139,6 +139,7 @@ namespace SIPDataCollector.Utilites
                     //});
 
                     //CacheObj = tempCacheObj;
+                    #endregion
 
                     if (CacheObj.TryGetValue(data.skillId, out RealtimeData values))
                     {
@@ -153,10 +154,10 @@ namespace SIPDataCollector.Utilites
                         //log.Debug("ActiveInteractionsSummary after update = " + values.ActiveInteractionsSummary);
                         values.AverageAbandonedTime = data.AvgAbandTime;
                         values.AbandonPercentage = data.AbandonPercentage;
-                        values.TotalNoFirstResponse = data.TotalNoFirstResponse;
-                        values.TotalMetFirstResponse = data.TotalMetFirstResponse;
-                        values.TotalNotMetFirstResponse = data.TotalNotMetFirstResponse;
-                        values.AverageFirstResponse = data.AverageFirstResponse;
+                        //values.TotalNoFirstResponse = data.TotalNoFirstResponse;
+                        //values.TotalMetFirstResponse = data.TotalMetFirstResponse;
+                        //values.TotalNotMetFirstResponse = data.TotalNotMetFirstResponse;
+                        //values.AverageFirstResponse = data.AverageFirstResponse;
                         CacheObj.TryUpdate(data.skillId, values, values);
                     }
                 }

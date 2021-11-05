@@ -416,9 +416,10 @@ namespace SIPDataCollector
                                             int responseTime = 0;
                                             if (result != null)
                                             {
-                                                realtimeOfSkill.Backlog = result.Where(x => (x.state == 0 || x.state == 5) && x.queueId == Convert.ToString(realtimeOfSkill.SkillId)).ToList().Count();
-                                                realtimeOfSkill.InteractionsInQueue = result.Where(x => x.state == 4 && x.queueId == Convert.ToString(realtimeOfSkill.SkillId)).ToList().Count();
-                                                realtimeOfSkill.ActiveInteractionsSummary = result.Where(x => (x.state == 3 || x.state == 5 || x.state == 6) && x.queueId == Convert.ToString(realtimeOfSkill.SkillId)).ToList().Count();
+                                                result.RemoveAll(x => x.statusUpdatedDateTime == null && !x.createdDateTime.Contains(DateTime.Now.ToString("yyyy-MM-dd")));
+                                                realtimeOfSkill.Backlog = result.Where(x => x.queueId == Convert.ToString(realtimeOfSkill.SkillId) && Utilites.ConfigurationData.asyncChatBacklogStatus.Any(y=>y.ToString().ToLower().Equals(x.statusName.ToLower()))).ToList().Count();
+                                                realtimeOfSkill.InteractionsInQueue = result.Where(x => (x.state == 1 || x.state == 4) && x.queueId == Convert.ToString(realtimeOfSkill.SkillId)).ToList().Count();
+                                                realtimeOfSkill.ActiveInteractionsSummary = result.Where(x => (x.state == 1 || x.state == 4 || Utilites.ConfigurationData.asyncChatInteractionStatus.Any(y => y.ToString().ToLower().Equals(x.statusName.ToLower()))) && x.queueId == Convert.ToString(realtimeOfSkill.SkillId)).ToList().Count();
                                                 realtimeOfSkill.ActiveInteractions = result.Where(x => x.state == 2 && x.queueId == Convert.ToString(realtimeOfSkill.SkillId)).ToList().Count();
                                                 result.ForEach(x =>
                                                 {
@@ -431,9 +432,9 @@ namespace SIPDataCollector
                                                                     responseTime += item.slaElapsed;
                                                                     if (item.slaMet == 1)
                                                                         realtimeOfSkill.TotalMetFirstResponse += 1;
-                                                                    else if (item.slaElapsed > 0)
+                                                                    else if (x.lastAgentMessageDatetime != null) 
                                                                         realtimeOfSkill.TotalNotMetFirstResponse += 1;
-                                                                    else if (x.resolutionTimeElapsed == 0) 
+                                                                    else if (x.lastAgentMessageDatetime == null) 
                                                                         realtimeOfSkill.TotalNoFirstResponse += 1;
                                                                 }
                                                             }
@@ -446,6 +447,9 @@ namespace SIPDataCollector
                                             else
                                             {
                                                 realtimeOfSkill.Backlog = 0;
+                                                realtimeOfSkill.ActiveInteractionsSummary = 0;
+                                                realtimeOfSkill.InteractionsInQueue = 0;
+                                                realtimeOfSkill.ActiveInteractions = 0;
                                             }
                                         }
                                     }
@@ -694,36 +698,39 @@ namespace SIPDataCollector
                                 if (queue.TryDequeue(out string skillExtn))
                                 {
                                     log.Debug("skillExtn is = " + skillExtn);
-                                    int skillId = _skillExtnInfo[skillExtn].SkillId;
-                                    var dbData = DataAccess.GetHistoricalData(skillExtn, skillId);
-
-                                    if (dbData != null)
+                                    if (_skillExtnInfo[skillExtn].Channel.ToLower() != "async")
                                     {
-                                        log.Debug("Received historical data");
-                                        try
-                                        {
-                                            decimal abandPercentage = Math.Round(Convert.ToDecimal(100 * Convert.ToDouble(dbData.AbandCalls) / ((dbData.AbandCalls) + (dbData.TotalACDInteractions == 0 ? 1 : dbData.TotalACDInteractions))), 2);
+                                        int skillId = _skillExtnInfo[skillExtn].SkillId;
+                                        var dbData = DataAccess.GetHistoricalData(skillExtn, skillId);
 
-                                            SkillData data = new SkillData
-                                            {
-                                                ACDTime = dbData.ACDTime,
-                                                ACWTime = dbData.ACWTime,
-                                                AbandCalls = dbData.AbandCalls,
-                                                SLPercentage = dbData.SLPercentage,
-                                                AvgHandlingTime = ((dbData.ACDTime + dbData.AHTTime) / (dbData.TotalCallsHandled == 0 ? 1 : dbData.TotalCallsHandled)),
-                                                skillId = Convert.ToInt32(_skillExtnInfo[skillExtn].SkillId),
-                                                TotalACDInteractions = dbData.TotalACDInteractions,
-                                                AbandonPercentage = abandPercentage,
-                                                AvgAbandTime = dbData.AvgAbandTime
-                                            };
-                                            //skillData.Add(data);
-                                            // if (!string.IsNullOrEmpty(data.skillId) && (data != null))
-                                            if (data != null)
-                                                DataCache.UpdateHistoricalData(data);
-                                        }
-                                        catch (Exception ex)
+                                        if (dbData != null)
                                         {
-                                            log.Error("Error while processing histoircal data : ", ex);
+                                            log.Debug("Received historical data");
+                                            try
+                                            {
+                                                decimal abandPercentage = Math.Round(Convert.ToDecimal(100 * Convert.ToDouble(dbData.AbandCalls) / ((dbData.AbandCalls) + (dbData.TotalACDInteractions == 0 ? 1 : dbData.TotalACDInteractions))), 2);
+
+                                                SkillData data = new SkillData
+                                                {
+                                                    ACDTime = dbData.ACDTime,
+                                                    ACWTime = dbData.ACWTime,
+                                                    AbandCalls = dbData.AbandCalls,
+                                                    SLPercentage = dbData.SLPercentage,
+                                                    AvgHandlingTime = ((dbData.ACDTime + dbData.AHTTime) / (dbData.TotalCallsHandled == 0 ? 1 : dbData.TotalCallsHandled)),
+                                                    skillId = Convert.ToInt32(_skillExtnInfo[skillExtn].SkillId),
+                                                    TotalACDInteractions = dbData.TotalACDInteractions,
+                                                    AbandonPercentage = abandPercentage,
+                                                    AvgAbandTime = dbData.AvgAbandTime
+                                                };
+                                                //skillData.Add(data);
+                                                // if (!string.IsNullOrEmpty(data.skillId) && (data != null))
+                                                if (data != null)
+                                                    DataCache.UpdateHistoricalData(data);
+                                            }
+                                            catch (Exception ex)
+                                            {
+                                                log.Error("Error while processing histoircal data : ", ex);
+                                            }
                                         }
                                     }
                                 }
@@ -910,7 +917,7 @@ namespace SIPDataCollector
 
                 var tRestServerLinks = Utilites.ConfigurationData.asyncChatUrl;
                 RawData rawData = new RawData(); 
-                rawData.createdDateTime = DateTime.Now.Date.ToString("yyyy-MM-dd");
+                rawData.statusUpdatedDateTime = DateTime.Now.Date.ToString("yyyy-MM-dd");
                 rawData.fromDB = false;
                 string requestBody = JsonConvert.SerializeObject(rawData);
                 foreach (var serverUrlPath in tRestServerLinks)

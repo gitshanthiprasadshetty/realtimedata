@@ -22,6 +22,6 @@ namespace SIPDataCollector.Models
         public int TotalNoFirstResponse { get; set; }
         public int TotalMetFirstResponse { get; set; }
         public int TotalNotMetFirstResponse { get; set; }
-        public int AverageFirstResponse { get; set; }
+        public string AverageFirstResponse { get; set; }
     }
 }

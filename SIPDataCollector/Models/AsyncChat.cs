@@ -57,7 +57,7 @@ namespace SIPDataCollector.Models
     }
     public class RawData
     {
-        public string createdDateTime { get; set; }
+        public string statusUpdatedDateTime { get; set; }
         public bool fromDB { get; set; }
     }
 }

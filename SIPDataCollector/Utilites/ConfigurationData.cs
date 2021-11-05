@@ -62,6 +62,8 @@ namespace SIPDataCollector.Utilites
         public static int DBRefreshTime { get; set; }
         public static List<string> asyncChatUrl { get; set; }
         public static string certificatePath { get; set; }
+        public static List<string> asyncChatInteractionStatus { get; set; }
+        public static List<string> asyncChatBacklogStatus { get; set; }
         /// <summary>
         /// Method to load all data from config.
         /// </summary>
@@ -86,6 +88,8 @@ namespace SIPDataCollector.Utilites
                 asyncChatUrl = ConfigurationManager.AppSettings["AsyncApiURL"].Split(new char[] { ',' },
                         StringSplitOptions.RemoveEmptyEntries).Select(s => s.Trim()).ToList();
                 certificatePath = ConfigurationManager.AppSettings["AsyncApiCertificateFolder"].ToString();
+                asyncChatInteractionStatus = ConfigurationManager.AppSettings["AsyncChatInteractionStatus"].Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries).ToList();
+                asyncChatBacklogStatus = ConfigurationManager.AppSettings["AsyncChatBacklogStatus"].Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries).ToList();
                 //if (!string.IsNullOrEmpty(skillsToMonitor) || skillsToMonitor.ToLower() != "na")
                 //    skillList = skillsToMonitor.Split(',');
 
