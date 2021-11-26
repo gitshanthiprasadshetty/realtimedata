@@ -153,7 +153,6 @@ namespace SIPDataCollector
                 sipThread.Start();
 
                 log.Info("start fetching historical data from historical service.");
-
                 Thread historicalData = new Thread(new ThreadStart(delegate { GetHistoricalData(); }));
                 historicalData.Start();
 
@@ -360,6 +359,7 @@ namespace SIPDataCollector
                 try
                 {
                     List<AsyncChat> result = AsyncChatList();
+                    List<string> skillList = new List<string>();
                     foreach (var server in Utilites.ConfigurationData.TmacServers)
                     {
                         log.Info($"Get wallboardskills data from TMAC server {server}");
@@ -372,6 +372,7 @@ namespace SIPDataCollector
                             {
                                 if (_skillExtnInfo.ContainsKey(wallboardSkillInformation.SkillID))
                                 {
+                                    skillList.Add(wallboardSkillInformation.SkillID);
                                     RealtimeData realtimeOfSkill;
                                     // skillid field that we get from tmac actually is skillextensionid
                                     int skillExtnId = Convert.ToInt32(wallboardSkillInformation.SkillID);
@@ -464,10 +465,13 @@ namespace SIPDataCollector
 
                                     realtimeDataForAllSkills.Add(realtimeOfSkill.SkillExtensionId, realtimeOfSkill);
 
-                                    if (!queue.Contains(wallboardSkillInformation.SkillID))
-                                        queue.Enqueue(wallboardSkillInformation.SkillID);
                                 }
                             }
+                            skillList.ForEach(x =>
+                            {
+                                if (!queue.Contains(x))
+                                    queue.Enqueue(x);
+                            });
                         }
                         else
                             log.Info($"No response from TMAC server instance : {server}");
@@ -524,9 +528,12 @@ namespace SIPDataCollector
 
                                 realtimeDataForAllSkills.Add(realtimeOfSkill.SkillExtensionId, realtimeOfSkill);
 
-                                if (!queue.Contains(skill.Value.ExtensionId.ToString()))
-                                    queue.Enqueue(skill.Value.ExtensionId.ToString());
                             }
+                            skillData.ToList().ForEach(x =>
+                            {
+                                if (!queue.Contains(x.Value.ExtensionId.ToString()))
+                                    queue.Enqueue(x.Value.ExtensionId.ToString());
+                            });
                         }
 
                         //bcmsdata.Add(data);
@@ -539,84 +546,6 @@ namespace SIPDataCollector
                 {
                     log.Error("Error in FetchBcmsData: ", exception);
                 }
-
-                #region oldcode
-                /*
-                if (wallboardSkills != null)
-                {
-                    log.Debug("Total count from GetTmacWallboardSkills : " + res.Count());
-                    foreach (var wallboard in wallboardSkills.)
-                    {                        
-                        // if current EXTENSIONID is present in _skillExtnInfo dictionary object, then take a count else ignore. 
-                        // here SkillID obtained from _tmacProxy is actually EXTENSIONID.
-                        if (_skillExtnInfo.ContainsKey(wallboard.SkillID))
-                        {
-                            log.Debug("Extension-Id : " + wallboard.SkillID + " is found in _skillExtnInfo dictionary object");
-                            data = new RealtimeData();
-                            // here model name skill is actually extnid,so get actual skillid from _skillExtnInfo object
-                            data.SkillId = _skillExtnInfo[wallboard.SkillID].SkillId;                         
-                            data.Channel = Utilites.ConfigurationData.GetChannel(Convert.ToString(data.SkillId));
-                            data.SkillName = wallboard.SkillName;
-                            try
-                            {
-                                // data.InteractionsInQueue = (data.Channel.ToLower() == "email") ? Convert.ToInt32(WorkQueueProxy.GetQueueCount(entry.SkillID)) : entry.CallsInQueue;
-                                data.CallsWaiting = (data.Channel.ToLower() == "email") ? Convert.ToInt32(WorkQueueProxy.GetQueueCount(wallboard.SkillID)) : wallboard.CallsInQueue;
-                                // data.OldestInteractionWaitTime = Convert.ToInt32(WorkQueueProxy.GetOldestWaitTime(entry.SkillID));
-                                data.OldestCallWaitTime = WorkQueueProxy.GetOldestWaitTime(wallboard.SkillID);
-
-                            }
-                            catch (Exception ex)
-                            {
-                                log.Error("Error while reading workqueue data : " + ex);
-                            }
-
-
-                            data.SkillExtensionId = _skillExtnInfo[wallboard.SkillID].ExtensionId;
-                       
-                            // get the agentdata[Total agents logged-in for a skill] for given skillId
-                            try
-                            {
-                                //   data.AgentStats = _instance.GetAgentListLoggedInForSkill(data.SkillId.ToString());
-                                data.AgentData = _instance.GetAgentListLoggedInForSkill(data.SkillId.ToString());
-                                if (data.AgentData != null)
-                                {                                 
-                                    log.Debug("Active Interaction : " + wallboard.ActiveInteractions + 1);
-                                    data.TotalAgentsStaffed = data.AgentData.Count();
-                                    data.TotalAgentsInACW = data.AgentData.Count(x => x.State.Contains("ACW"));
-                                    data.TotalAgentsInAUX = data.AgentData.Count(x => Utilites.ConfigurationData.auxCodes.Contains(x.State));
-                                }
-                            }
-                            catch (Exception)
-                            {
-                                log.Error("Error while calling tmac method : GetAgentListLoggedInForSkill() for skill = " + data.SkillId);
-                            }
-     
-                            data.ActiveCalls = wallboard.ActiveInteractions;
-                            data.TotalAvailableAgents = wallboard.AgentAvailable;
-                            data.AverageAbandonedTime = "00:00:00";
-
-
-                            try
-                            {
-                                data.AcceptedSL = Convert.ToInt32(Utilites.ConfigurationData.acceptableSlObj?.FirstOrDefault(x => x.Key == data.SkillId.ToString()).Value);
-                            }
-                            catch (Exception)
-                            {
-                            }
-
-                            //bcmsdata.Add(data);
-                            // update data to cache memory.
-                            DataCache.UpdateCacheData(data);
-
-                            if (!queue.Contains(wallboard.SkillID))
-                                queue.Enqueue(wallboard.SkillID);
-                        }
-                    }
-                }
-                else
-                    log.Info($"No response from TMAC");
-                    */
-                #endregion
             }
             catch (Exception ex)
             {
@@ -682,57 +611,61 @@ namespace SIPDataCollector
         public void GetHistoricalData()
         {
             log.Debug("GetHistoricalData()");
+            List<string> skillList = new List<string>();
+            List<SkillData> skillListResult = new List<SkillData>();
             try
             {
-                //List<SkillData> skillData = new List<SkillData>();
                 while (true)
                 {
                     try
                     {
-                        if (!queue.IsEmpty)
+                        skillList = _skillExtnInfo.Values.Where(x => x.Channel.ToLower() != "async").Select(x => x.ExtensionId.ToString()).ToList();
+                        if (skillList.Count > 0) 
                         {
-                            log.Debug("Queue is not empty");
-                            foreach (var item in queue)
+                            //log.Debug("Queue is not empty");
+                            //foreach (var item in queue)
+                            //{
+                            //    log.Debug("Queue item is = " + item);
+                            //    if (queue.TryDequeue(out string skillExtn))
+                            //    {
+                            //        log.Debug("skillExtn is = " + skillExtn);
+                            //        if (_skillExtnInfo[skillExtn].Channel.ToLower() != "async")
+                            //        {
+                            //            skillList.Add(skillExtn);
+                            //        }
+                            //    }
+                            //}
+                            skillListResult = DataAccess.GetHistoricalData(string.Join(",", skillList));
+                            if (skillListResult.Count > 0) 
                             {
-                                log.Debug("Queue item is = " + item);
-                                if (queue.TryDequeue(out string skillExtn))
+                                log.Debug("Received historical data");
+                                try
                                 {
-                                    log.Debug("skillExtn is = " + skillExtn);
-                                    if (_skillExtnInfo[skillExtn].Channel.ToLower() != "async")
+                                    foreach (var dbData in skillListResult)
                                     {
-                                        int skillId = _skillExtnInfo[skillExtn].SkillId;
-                                        var dbData = DataAccess.GetHistoricalData(skillExtn, skillId);
+                                        decimal abandPercentage = Math.Round(Convert.ToDecimal(100 * Convert.ToDouble(dbData.AbandCalls) / ((dbData.AbandCalls) + (dbData.TotalACDInteractions == 0 ? 1 : dbData.TotalACDInteractions))), 2);
 
-                                        if (dbData != null)
+                                        SkillData data = new SkillData
                                         {
-                                            log.Debug("Received historical data");
-                                            try
-                                            {
-                                                decimal abandPercentage = Math.Round(Convert.ToDecimal(100 * Convert.ToDouble(dbData.AbandCalls) / ((dbData.AbandCalls) + (dbData.TotalACDInteractions == 0 ? 1 : dbData.TotalACDInteractions))), 2);
-
-                                                SkillData data = new SkillData
-                                                {
-                                                    ACDTime = dbData.ACDTime,
-                                                    ACWTime = dbData.ACWTime,
-                                                    AbandCalls = dbData.AbandCalls,
-                                                    SLPercentage = dbData.SLPercentage,
-                                                    AvgHandlingTime = ((dbData.ACDTime + dbData.AHTTime) / (dbData.TotalCallsHandled == 0 ? 1 : dbData.TotalCallsHandled)),
-                                                    skillId = Convert.ToInt32(_skillExtnInfo[skillExtn].SkillId),
-                                                    TotalACDInteractions = dbData.TotalACDInteractions,
-                                                    AbandonPercentage = abandPercentage,
-                                                    AvgAbandTime = dbData.AvgAbandTime
-                                                };
-                                                //skillData.Add(data);
-                                                // if (!string.IsNullOrEmpty(data.skillId) && (data != null))
-                                                if (data != null)
-                                                    DataCache.UpdateHistoricalData(data);
-                                            }
-                                            catch (Exception ex)
-                                            {
-                                                log.Error("Error while processing histoircal data : ", ex);
-                                            }
-                                        }
+                                            ACDTime = dbData.ACDTime,
+                                            ACWTime = dbData.ACWTime,
+                                            AbandCalls = dbData.AbandCalls,
+                                            SLPercentage = dbData.SLPercentage,
+                                            AvgHandlingTime = ((dbData.ACDTime + dbData.AHTTime) / (dbData.TotalCallsHandled == 0 ? 1 : dbData.TotalCallsHandled)),
+                                            skillId = dbData.skillId,
+                                            TotalACDInteractions = dbData.TotalACDInteractions,
+                                            AbandonPercentage = abandPercentage,
+                                            AvgAbandTime = dbData.AvgAbandTime
+                                        };
+                                        //skillData.Add(data);
+                                        // if (!string.IsNullOrEmpty(data.skillId) && (data != null))
+                                        if (data != null)
+                                            DataCache.UpdateHistoricalData(data);
                                     }
+                                }
+                                catch (Exception ex)
+                                {
+                                    log.Error("Error while processing histoircal data : ", ex);
                                 }
                             }
                         }

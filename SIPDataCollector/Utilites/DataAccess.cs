@@ -73,35 +73,24 @@ namespace SIPDataCollector.Utilities
             return 0;
         }
 
-        public static SkillData GetHistoricalData(string skillExtn, int skillId)
+        public static List<SkillData> GetHistoricalData(string skillExtn)
         {
-            log.Info($"GetHistoricalData() : skillExtn = {skillExtn} , skillid = {skillId}");
+            log.Info($"GetHistoricalData() : skillExtn = {skillExtn}");
+            List<SkillData> skillInfo = new List<SkillData>();
             try
             {
-                //string sql = @"select Count(1) as COUNT from dbo.TMAC_WorkQueueHistory 
-                //               where channel='voice' and Reason='ABN' and skill='" + Extn + "' and CreateDate= '" + DateTime.Now.Date.ToString("yyyyMMdd") + "'";
-                SkillData skillInfo;
                 string startTime = "000000";
                 string endTime = DateTime.Now.TimeOfDay.ToString("hhmmss");
                 string type = "skill";
-                int accSlLevl;
-                try
-                {
-                    accSlLevl = ConfigurationData.acceptableSlObj.FirstOrDefault(x => x.Key == skillId.ToString()).Value;
-                }
-                catch (Exception ex)
-                {
-                    log.Error("Error while reading acceptable sl level : ", ex);
-                    accSlLevl = ConfigurationData.acceptableSL;
-                }
+                int accSlLevl = 20;
                 string sql = @"EXEC [GET_HistoricalData] '" + DateTime.Now.Date.ToString("yyyyMMdd") + "'" + ',' + "'" + startTime + "'" + ',' + "'" + endTime + "'" + ',' + "'" + skillExtn + "'" + ',' + "'" + type + "'" + ',' + "'" + accSlLevl + "'";
                 log.Debug("SQL Query : " + sql);
                 DataTable dsusers = SqlDataAccess.ExecuteDataTable(sql, ConfigurationData.ConntnString);
                 if (dsusers != null)
                 {
-                    foreach(DataRow item in dsusers.Rows)
+                    foreach (DataRow item in dsusers.Rows)
                     {
-                        skillInfo = new SkillData
+                        skillInfo.Add(new SkillData()
                         {
                             ACWTime = Convert.ToInt32(item["TotalAfterCallTime"]),
                             SLPercentage = Convert.ToDecimal(item["SLPercentage"]),
@@ -111,16 +100,15 @@ namespace SIPDataCollector.Utilities
                             AvgAbandTime = Convert.ToInt32(item["AvgAbandTime"]),
                             AHTTime = Convert.ToInt32(item["HoldTime"]),
                             TotalCallsHandled = Convert.ToInt32(item["TotalInteraction"])
-                        };
-                        return skillInfo;
+                        });
                     }
                 }
             }
             catch (Exception ex)
             {
-                log.Error("Exception in GetHistoricalData():" , ex);
+                log.Error("Exception in GetHistoricalData():", ex);
             }
-            return new SkillData();
+            return skillInfo;
         }
 
         public static SkillData GetAsyncHistoricalData(string skillExtn, int skillId)
@@ -151,7 +139,7 @@ namespace SIPDataCollector.Utilities
                             TotalMetFirstResponse = Convert.ToInt32(item["TotalMetFirstResponse"]),
                             TotalNoFirstResponse = Convert.ToInt32(item["TotalNoFirstResponse"]),
                             TotalNotMetFirstResponse = Convert.ToInt32(item["TotalNotMetFirstResponse"]),
-                            AverageFirstResponse = Convert.ToInt32(item["AverageFirstResponse"])
+                            AverageFirstResponse = item["AverageFirstResponse"].ToString()
                         };
                         return skillInfo;
                     }
@@ -163,7 +151,6 @@ namespace SIPDataCollector.Utilities
             }
             return new SkillData();
         }
-
 
         /// <summary>
         /// Gets total summary of acd calls for given extensionid
